@@ -45,12 +45,14 @@ type IValidator interface {
 	storage.Table[*Validator]
 
 	ByAddress(ctx context.Context, address string) (Validator, error)
+	ByConsAddress(ctx context.Context, address string) (Validator, error)
 	TotalVotingPower(ctx context.Context) (types.Numeric, error)
 	ListByPower(ctx context.Context, fltrs ValidatorFilters) ([]Validator, error)
 	CountByStatus(ctx context.Context) (CountByStatus, error)
 	Messages(ctx context.Context, id uint64, fltrs ValidatorMessagesFilters) ([]MsgValidator, error)
 	Metrics(ctx context.Context, id uint64) (ValidatorMetrics, error)
 	TopNMetrics(ctx context.Context, n int) (ValidatorMetrics, error)
+	BondedValidators(ctx context.Context) ([]Validator, error)
 }
 
 type Validator struct {

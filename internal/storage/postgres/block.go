@@ -9,7 +9,6 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/dipdup-io/go-lib/database"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
 	"github.com/uptrace/bun"
@@ -21,7 +20,7 @@ type Blocks struct {
 }
 
 // NewBlocks -
-func NewBlocks(db *database.Bun) *Blocks {
+func NewBlocks(db bun.IDB) storage.IBlock {
 	return &Blocks{
 		Table: postgres.NewTable[*storage.Block](db),
 	}

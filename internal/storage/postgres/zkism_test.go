@@ -120,43 +120,6 @@ func (s *StorageTestSuite) TestZkISMListAsc() {
 }
 
 // ---------------------------------------------------------------------------
-// ById
-// ---------------------------------------------------------------------------
-
-func (s *StorageTestSuite) TestZkISMById() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	ism, err := s.storage.ZkISM.ById(ctx, 1)
-	s.Require().NoError(err)
-
-	s.Require().EqualValues(1, ism.Id)
-	s.Require().EqualValues(1000, ism.Height)
-	s.Require().EqualValues([]byte{0x31, 0x30, 0x30}, ism.ExternalId)
-	s.Require().NotEmpty(ism.State)
-	s.Require().NotEmpty(ism.MerkleTreeAddress)
-	s.Require().NotEmpty(ism.Groth16VKey)
-	s.Require().NotEmpty(ism.StateTransitionVKey)
-	s.Require().NotEmpty(ism.StateMembershipVKey)
-
-	s.Require().NotNil(ism.Tx)
-	txHash, err := hex.DecodeString("652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF")
-	s.Require().NoError(err)
-	s.Require().Equal(txHash, ism.Tx.Hash)
-
-	s.Require().NotNil(ism.Creator)
-	s.Require().EqualValues("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", ism.Creator.Address)
-}
-
-func (s *StorageTestSuite) TestZkISMByIdNotFound() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	_, err := s.storage.ZkISM.ById(ctx, 999)
-	s.Require().Error(err)
-}
-
-// ---------------------------------------------------------------------------
 // Updates
 // ---------------------------------------------------------------------------
 

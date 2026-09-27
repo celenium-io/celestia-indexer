@@ -16,8 +16,8 @@ import (
 )
 
 // storedNamespaces are the rows rollbackNamespaces reads before applying a diff.
-func storedNamespaces() map[uint64]storage.Namespace {
-	return map[uint64]storage.Namespace{
+func storedNamespaces() map[uint64]*storage.Namespace {
+	return map[uint64]*storage.Namespace{
 		1: {
 			Id: 1, Version: 0, NamespaceID: []byte{0xaa},
 			PfbCount: 5, Size: 500,
@@ -114,13 +114,18 @@ func Test_rollbackNamespaces(t *testing.T) {
 
 			stored := storedNamespaces()
 			tx := mock.NewMockTransaction(ctrl)
-			tx.EXPECT().
-				Namespace(gomock.Any(), gomock.Any()).
-				DoAndReturn(func(_ context.Context, id uint64) (storage.Namespace, error) {
+			repos := mock.NewTxRepos(ctrl)
+
+			repos.Namespace.
+				EXPECT().
+				GetByID(gomock.Any(), gomock.Any()).
+				DoAndReturn(func(_ context.Context, id uint64) (*storage.Namespace, error) {
 					return stored[id], nil
 				}).
 				AnyTimes()
-			tx.EXPECT().
+
+			repos.Namespace.
+				EXPECT().
 				LastNamespaceMessage(gomock.Any(), gomock.Any()).
 				Return(storage.NamespaceMessage{Height: 100, Time: lastTime}, nil).
 				AnyTimes()
@@ -134,7 +139,7 @@ func Test_rollbackNamespaces(t *testing.T) {
 				})
 
 			module := new(Module)
-			require.NoError(t, module.rollbackNamespaces(t.Context(), tx, tt.nsMsgs, tt.deletedNs))
+			require.NoError(t, module.rollbackNamespaces(t.Context(), tx, repos.Namespace, tt.nsMsgs, tt.deletedNs))
 
 			require.Len(t, saved, len(tt.want))
 			for _, ns := range saved {
@@ -161,6 +166,6 @@ func Test_rollbackNamespaces(t *testing.T) {
 		// No call is expected on the transaction at all.
 		tx := mock.NewMockTransaction(ctrl)
 		module := new(Module)
-		require.NoError(t, module.rollbackNamespaces(t.Context(), tx, nil, nil))
+		require.NoError(t, module.rollbackNamespaces(t.Context(), tx, nil, nil, nil))
 	})
 }

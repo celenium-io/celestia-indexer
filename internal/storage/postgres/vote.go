@@ -8,7 +8,6 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	"github.com/dipdup-io/go-lib/database"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
 	"github.com/uptrace/bun"
 )
@@ -19,7 +18,7 @@ type Vote struct {
 }
 
 // NewVote -
-func NewVote(db *database.Bun) *Vote {
+func NewVote(db bun.IDB) storage.IVote {
 	return &Vote{
 		Table: postgres.NewTable[*storage.Vote](db),
 	}
@@ -121,5 +120,22 @@ func (v *Vote) ByValidatorId(ctx context.Context, validatorId uint64, fltrs stor
 		Join("left join celestial on celestial.address_id = votes.voter_id and celestial.status = 'PRIMARY'")
 	err = query.Scan(ctx, &votes)
 
+	return
+}
+
+func (v *Vote) ListByProposal(ctx context.Context, proposalId uint64, limit, offset int) (votes []storage.Vote, err error) {
+	query := v.DB().NewSelect().Model(&votes).
+		Where("proposal_id = ?", proposalId).
+		OrderExpr("id asc")
+
+	if limit < 1 {
+		limit = 10
+	}
+	query = query.Limit(limit)
+	if offset > 0 {
+		query = query.Offset(offset)
+	}
+
+	err = query.Scan(ctx)
 	return
 }

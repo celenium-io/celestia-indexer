@@ -32,6 +32,7 @@ type IAddress interface {
 	IdByAddress(ctx context.Context, address string, ids ...uint64) (uint64, error)
 	Balances(ctx context.Context, addressId uint64, limit, offset int) ([]Balance, error)
 	AddressByString(ctx context.Context, readableHash string) (Address, error)
+	LastAddressAction(ctx context.Context, address []byte) (uint64, error)
 }
 
 // Address -

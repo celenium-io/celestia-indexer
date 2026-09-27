@@ -15,7 +15,7 @@ import (
 
 func (module *Module) saveConstantUpdates(
 	ctx context.Context,
-	tx storage.Transaction,
+	tx storage.BlockTx,
 	consts *sdkSync.Map[string, *storage.Constant],
 ) error {
 

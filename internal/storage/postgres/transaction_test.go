@@ -233,7 +233,7 @@ func (s *TransactionTestSuite) TestSaveTxAddresses() {
 		addresses[i].TxId = 5 - i
 	}
 
-	err = tx.SaveSigners(ctx, addresses...)
+	err = storage.Insert(ctx, tx, addresses...)
 	s.Require().NoError(err)
 
 	s.Require().NoError(tx.Flush(ctx))
@@ -298,7 +298,7 @@ func (s *TransactionTestSuite) TestSaveNamespaceMessages() {
 		nsMsgs[i].TxId = uint64((i + 1) * 2)
 	}
 
-	err = tx.SaveNamespaceMessage(ctx, nsMsgs...)
+	err = storage.Insert(ctx, tx, nsMsgs...)
 	s.Require().NoError(err)
 
 	s.Require().NoError(tx.Flush(ctx))
@@ -825,7 +825,7 @@ func (s *TransactionTestSuite) TestSaveBlockSignatures() {
 		bs[i].Time = time.Now()
 	}
 
-	err = tx.SaveBlockSignatures(ctx, bs...)
+	err = storage.Insert(ctx, tx, bs...)
 	s.Require().NoError(err)
 
 	s.Require().NoError(tx.Flush(ctx))
@@ -839,7 +839,7 @@ func (s *TransactionTestSuite) TestSaveForwardings() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	err = tx.SaveForwardings(ctx, &storage.Forwarding{
+	err = storage.Insert(ctx, tx, &storage.Forwarding{
 		Height:        10000,
 		Time:          time.Now(),
 		DestDomain:    123,
@@ -856,39 +856,6 @@ func (s *TransactionTestSuite) TestSaveForwardings() {
 	items, err := s.storage.Forwardings.List(ctx, 10, 0, sdk.SortOrderAsc)
 	s.Require().NoError(err)
 	s.Require().Len(items, 4)
-}
-
-func (s *TransactionTestSuite) TestRollbackBlockSignatures() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	err = tx.RollbackBlockSignatures(ctx, 7965)
-	s.Require().NoError(err)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-}
-
-func (s *TransactionTestSuite) TestRollbackBlock() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	err = tx.RollbackBlock(ctx, 1000)
-	s.Require().NoError(err)
-
-	newHead, err := tx.LastBlock(ctx)
-	s.Require().NoError(err)
-	s.Require().EqualValues(999, newHead.Height)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-
 }
 
 func (s *TransactionTestSuite) TestRollbackBlockStats() {
@@ -992,24 +959,6 @@ func (s *TransactionTestSuite) TestRollbackMessages() {
 	s.Require().Len(items, 1)
 }
 
-func (s *TransactionTestSuite) TestRollbackBlobLogs() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	err = tx.RollbackBlobLog(ctx, 1000)
-	s.Require().NoError(err)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-
-	items, err := s.storage.BlobLogs.List(ctx, 10, 0, sdk.SortOrderAsc)
-	s.Require().NoError(err)
-	s.Require().Len(items, 1)
-}
-
 func (s *TransactionTestSuite) TestRollbackValidators() {
 	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
@@ -1047,24 +996,6 @@ func (s *TransactionTestSuite) TestRollbackNamespaces() {
 	s.Require().NoError(tx.Close(ctx))
 
 	items, err := s.storage.Namespace.List(ctx, 10, 0, sdk.SortOrderAsc)
-	s.Require().NoError(err)
-	s.Require().Len(items, 0)
-}
-
-func (s *TransactionTestSuite) TestRollbackUndelegations() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	err = tx.RollbackUndelegations(ctx, 1000)
-	s.Require().NoError(err)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-
-	items, err := s.storage.Undelegation.List(ctx, 10, 0, sdk.SortOrderAsc)
 	s.Require().NoError(err)
 	s.Require().Len(items, 0)
 }
@@ -1112,165 +1043,6 @@ func (s *TransactionTestSuite) TestCancelUnbondings() {
 	s.Require().Len(items, 0)
 }
 
-func (s *TransactionTestSuite) TestRollbackRedelegations() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	err = tx.RollbackRedelegations(ctx, 1000)
-	s.Require().NoError(err)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-
-	items, err := s.storage.Redelegation.List(ctx, 10, 0, sdk.SortOrderAsc)
-	s.Require().NoError(err)
-	s.Require().Len(items, 0)
-}
-
-func (s *TransactionTestSuite) TestRollbackNamespaceMessages() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	deleted, err := tx.RollbackNamespaceMessages(ctx, 1000)
-	s.Require().NoError(err)
-	s.Require().Len(deleted, 2)
-	s.Require().EqualValues(2, deleted[0].NamespaceId)
-
-	ns, err := tx.Namespace(ctx, 2)
-	s.Require().NoError(err)
-	s.Require().EqualValues(2, ns.Id)
-
-	state, err := tx.State(ctx, testIndexerName)
-	s.Require().NoError(err)
-	s.Require().EqualValues(1, state.Id)
-	s.Require().EqualValues(1000, state.LastHeight)
-	s.Require().EqualValues(394067, state.TotalTx)
-	s.Require().EqualValues(12512357, state.TotalAccounts)
-	s.Require().Equal("172635712635813", state.TotalFee.String())
-	s.Require().EqualValues(324234, state.TotalBlobsSize)
-	s.Require().Equal(testIndexerName, state.Name)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-}
-
-func (s *TransactionTestSuite) TestRollbackProposals() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	err = tx.RollbackProposals(ctx, 1000)
-	s.Require().NoError(err)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-
-	items, err := s.storage.Proposals.ListWithFilters(ctx, storage.ListProposalFilters{
-		Limit: 10,
-		Sort:  sdk.SortOrderAsc,
-	})
-	s.Require().NoError(err)
-	s.Require().Len(items, 1)
-}
-
-func (s *TransactionTestSuite) TestRollbackVotes() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	err = tx.RollbackVotes(ctx, 1000)
-	s.Require().NoError(err)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-
-	items, err := s.storage.Votes.List(ctx, 10, 0, sdk.SortOrderAsc)
-	s.Require().NoError(err)
-	s.Require().Len(items, 0)
-}
-
-func (s *TransactionTestSuite) TestRollbackHyperlaneIgps() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	err = tx.RollbackHyperlaneIgps(ctx, 1489)
-	s.Require().NoError(err)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-
-	items, err := s.storage.HLIGP.List(ctx, 10, 0)
-	s.Require().NoError(err)
-	s.Require().Len(items, 1)
-}
-
-func (s *TransactionTestSuite) TestRollbackHyperlaneIgpConfigs() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	err = tx.RollbackHyperlaneIgpConfigs(ctx, 1488)
-	s.Require().NoError(err)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-
-	items, err := s.storage.HLIGPConfig.List(ctx, 10, 0)
-	s.Require().NoError(err)
-	s.Require().Len(items, 1)
-}
-
-func (s *TransactionTestSuite) TestRollbackHyperlaneGasPayment() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	err = tx.RollbackHyperlaneGasPayment(ctx, 1488)
-	s.Require().NoError(err)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-
-	data, err := s.storage.HLGasPayment.List(ctx, 10, 0)
-	s.Require().NoError(err)
-	s.Require().Len(data, 0)
-}
-
-func (s *TransactionTestSuite) TestRollbackForwardings() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	err = tx.RollbackForwardings(ctx, 10000)
-	s.Require().NoError(err)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-
-	items, err := s.storage.Forwardings.List(ctx, 10, 0, sdk.SortOrderAsc)
-	s.Require().NoError(err)
-	s.Require().Len(items, 1)
-}
-
 func (s *TransactionTestSuite) TestDeleteBalances() {
 	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
@@ -1280,23 +1052,6 @@ func (s *TransactionTestSuite) TestDeleteBalances() {
 
 	err = tx.DeleteBalances(ctx, []uint64{1})
 	s.Require().NoError(err)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-}
-
-func (s *TransactionTestSuite) TestLastAddressAction() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	hash := testsuite.MustHexDecode("dece425b75d67115bda877e1e7a1f262f6fa51d6")
-
-	height, err := tx.LastAddressAction(ctx, hash)
-	s.Require().NoError(err)
-	s.Require().EqualValues(1000, height)
 
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))
@@ -1381,21 +1136,6 @@ func (s *TransactionTestSuite) TestSaveEventsWithCopy() {
 	}
 }
 
-func (s *TransactionTestSuite) TestGetProposerId() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	id, err := tx.GetProposerId(ctx, "81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8")
-	s.Require().NoError(err)
-	s.Require().EqualValues(1, id)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-}
-
 const testLink = "test_link"
 
 func (s *TransactionTestSuite) TestSaveUpdateAndDeleteRollup() {
@@ -1421,7 +1161,7 @@ func (s *TransactionTestSuite) TestSaveUpdateAndDeleteRollup() {
 		Links:          []string{testLink},
 		Color:          "#333",
 	}
-	err = tx.SaveRollup(ctx, rollup)
+	err = storage.Insert(ctx, tx, rollup)
 	s.Require().NoError(err)
 	s.Require().Greater(rollup.Id, uint64(0))
 
@@ -1499,7 +1239,7 @@ func (s *TransactionTestSuite) TestSaveRedelegations() {
 		},
 	}
 
-	err = tx.SaveRedelegations(ctx, redelegations...)
+	err = storage.Insert(ctx, tx, redelegations...)
 	s.Require().NoError(err)
 
 	s.Require().NoError(tx.Flush(ctx))
@@ -1528,7 +1268,7 @@ func (s *TransactionTestSuite) TestSaveUndelegations() {
 		},
 	}
 
-	err = tx.SaveUndelegations(ctx, undelegations...)
+	err = storage.Insert(ctx, tx, undelegations...)
 	s.Require().NoError(err)
 
 	s.Require().NoError(tx.Flush(ctx))
@@ -1984,8 +1724,9 @@ func (s *TransactionTestSuite) TestValidators() {
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
+	repos := NewTxRepos(tx)
 
-	validators, err := tx.BondedValidators(ctx)
+	validators, err := repos.Validators.BondedValidators(ctx)
 	s.Require().NoError(err)
 
 	s.Require().Len(validators, 2)
@@ -2009,7 +1750,9 @@ func (s *TransactionTestSuite) TestBondedValidatorsReturnStake() {
 	s.Require().NoError(err)
 	defer func() { s.Require().NoError(tx.Close(ctx)) }()
 
-	validators, err := tx.BondedValidators(ctx)
+	repos := NewTxRepos(tx)
+
+	validators, err := repos.Validators.BondedValidators(ctx)
 	s.Require().NoError(err)
 	s.Require().NotEmpty(validators)
 
@@ -2029,8 +1772,9 @@ func (s *TransactionTestSuite) TestBondedValidatorsSkipUnbonded() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 	defer func() { s.Require().NoError(tx.Close(ctx)) }()
+	repos := NewTxRepos(tx)
 
-	validators, err := tx.BondedValidators(ctx)
+	validators, err := repos.Validators.BondedValidators(ctx)
 	s.Require().NoError(err)
 	s.Require().Len(validators, 1)
 	s.Require().EqualValues(1, validators[0].Id)
@@ -2038,7 +1782,7 @@ func (s *TransactionTestSuite) TestBondedValidatorsSkipUnbonded() {
 	_, err = s.storage.Connection().DB().ExecContext(ctx, `UPDATE validator SET power = NULL WHERE id = 2`)
 	s.Require().NoError(err)
 
-	validators, err = tx.BondedValidators(ctx)
+	validators, err = repos.Validators.BondedValidators(ctx)
 	s.Require().NoError(err)
 	s.Require().Len(validators, 1)
 }
@@ -2112,97 +1856,6 @@ func (s *TransactionTestSuite) TestSaveValidatorsPowerUpdate() {
 	s.Require().Equal("Conqueror", stored.Moniker)
 	s.Require().Equal("1000100", stored.Stake.String())
 	s.Require().EqualValues(999, stored.Height)
-}
-
-func (s *TransactionTestSuite) TestProposalVotes() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	votes, err := tx.ProposalVotes(ctx, 1, 10, 0)
-	s.Require().NoError(err)
-
-	s.Require().Len(votes, 2)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-}
-
-func (s *TransactionTestSuite) TestAddressDelegations() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	delegations, err := tx.AddressDelegations(ctx, 1)
-	s.Require().NoError(err)
-
-	s.Require().Len(delegations, 1)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-}
-
-func (s *TransactionTestSuite) TestUpdateConstants() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	err = tx.SaveConstants(ctx, storage.Constant{
-		Module: "auth",
-		Name:   "tx_size_cost_per_byte",
-		Value:  "20",
-	})
-	s.Require().NoError(err)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-
-	val, err := s.storage.Constants.Get(ctx, "auth", "tx_size_cost_per_byte")
-	s.Require().NoError(err)
-	s.Require().Equal("20", val.Value)
-}
-
-func (s *TransactionTestSuite) TestProposal() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	proposal, err := tx.Proposal(ctx, 1)
-	s.Require().NoError(err)
-
-	s.Require().EqualValues(1, proposal.Id)
-	s.Require().NotNil(proposal.Changes)
-	s.Require().EqualValues(types.ProposalTypeText, proposal.Type)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-}
-
-func (s *TransactionTestSuite) TestActiveProposal() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	proposals, err := tx.ActiveProposals(ctx)
-	s.Require().NoError(err)
-	s.Require().Len(proposals, 1)
-
-	s.Require().EqualValues(2, proposals[0].Id)
-	s.Require().NotNil(proposals[0].Changes)
-	s.Require().EqualValues(types.ProposalTypeCommunityPoolSpend, proposals[0].Type)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
 }
 
 func (s *TransactionTestSuite) TestIbcClients() {
@@ -2442,208 +2095,6 @@ func (s *TransactionTestSuite) TestIbcChannels() {
 	s.Require().NoError(tx2.Close(ctx))
 }
 
-func (s *TransactionTestSuite) TestIbcTransfers() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	countBefore, err := s.storage.Connection().DB().NewSelect().
-		Model(&storage.IbcTransfer{}).
-		Count(ctx)
-	s.Require().NoError(err)
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	err = tx.SaveIbcTransfers(ctx, &storage.IbcTransfer{
-		Id:              123,
-		ConnectionId:    "connection-1",
-		ChannelId:       "channel-1",
-		Height:          10000,
-		Time:            time.Now().UTC(),
-		Amount:          types.NumericFromInt64(12123123),
-		Denom:           currency.Utia,
-		SenderId:        testsuite.Ptr(uint64(1)),
-		ReceiverAddress: testsuite.Ptr("osmo1m8wg4vxkefhs374qxmmqpyusgz289wmulex5qdwpfx7jnrxzer5s9cv83q"),
-		TxId:            3,
-	})
-	s.Require().NoError(err)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-
-	tx2, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	err = tx2.RollbackIbcTransfers(ctx, 10000)
-	s.Require().NoError(err)
-
-	s.Require().NoError(tx2.Flush(ctx))
-	s.Require().NoError(tx2.Close(ctx))
-
-	countAfter, err := s.storage.Connection().DB().NewSelect().
-		Model(&storage.IbcTransfer{}).
-		Count(ctx)
-	s.Require().NoError(err)
-
-	s.Require().EqualValues(countBefore, countAfter)
-}
-
-func (s *TransactionTestSuite) TestIbcConnection() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	conn, err := tx.IbcConnection(ctx, "connection-1")
-	s.Require().NoError(err)
-	s.Require().EqualValues("client-1", conn.ClientId)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-}
-
-func (s *TransactionTestSuite) TestHyperlaneTransfers() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	err = tx.SaveHyperlaneTransfers(ctx, &storage.HLTransfer{
-		Id:                  123,
-		Height:              10000,
-		Time:                time.Now().UTC(),
-		Amount:              types.NumericFromInt64(12123123),
-		Denom:               currency.Utia,
-		TxId:                2,
-		MailboxId:           1,
-		TokenId:             1,
-		AddressId:           1,
-		Counterparty:        1,
-		CounterpartyAddress: "1234567890",
-		Version:             2,
-		Nonce:               2,
-		Type:                types.HLTransferTypeReceive,
-		RelayerId:           2,
-	})
-	s.Require().NoError(err)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-
-	tx2, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	err = tx2.RollbackHyperlaneTransfers(ctx, 10000)
-	s.Require().NoError(err)
-
-	s.Require().NoError(tx2.Flush(ctx))
-	s.Require().NoError(tx2.Close(ctx))
-}
-
-func (s *TransactionTestSuite) TestHyperlaneTokens() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	err = tx.SaveHyperlaneTokens(ctx, &storage.HLToken{
-		Id:               123,
-		Height:           10000,
-		Time:             time.Now().UTC(),
-		Denom:            currency.Utia,
-		TxId:             2,
-		MailboxId:        1,
-		TokenId:          []byte{0, 1, 2, 3, 4, 5, 6},
-		Type:             types.HLTokenTypeCollateral,
-		SentTransfers:    1,
-		ReceiveTransfers: 1,
-		Sent:             types.NumericFromInt64(123),
-		Received:         types.NumericZero(),
-	})
-	s.Require().NoError(err)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-
-	tx2, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	err = tx2.RollbackHyperlaneTokens(ctx, 10000)
-	s.Require().NoError(err)
-
-	s.Require().NoError(tx2.Flush(ctx))
-	s.Require().NoError(tx2.Close(ctx))
-}
-
-func (s *TransactionTestSuite) TestHyperlaneMailbox() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	err = tx.SaveHyperlaneMailbox(ctx, &storage.HLMailbox{
-		Id:               123,
-		Height:           10000,
-		Time:             time.Now().UTC(),
-		TxId:             2,
-		Mailbox:          []byte{1, 2, 3, 4, 5, 6},
-		OwnerId:          1,
-		Domain:           2,
-		SentMessages:     3,
-		RequiredHook:     []byte("hook"),
-		ReceivedMessages: 44,
-		DefaultIsm:       []byte("ism"),
-		DefaultHook:      []byte("default_hook"),
-	})
-	s.Require().NoError(err)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-
-	tx2, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	err = tx2.RollbackHyperlaneMailbox(ctx, 10000)
-	s.Require().NoError(err)
-
-	s.Require().NoError(tx2.Flush(ctx))
-	s.Require().NoError(tx2.Close(ctx))
-}
-
-func (s *TransactionTestSuite) TestGetHyperlaneMailbox() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	mailbox, err := tx.HyperlaneMailbox(ctx, 1)
-	s.Require().NoError(err)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-	s.Require().EqualValues(1, mailbox.Id)
-}
-
-func (s *TransactionTestSuite) TestGetHyperlaneToken() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	token, err := tx.HyperlaneToken(ctx, []byte("token"))
-	s.Require().NoError(err)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-	s.Require().EqualValues(1, token.Id)
-}
-
 func (s *TransactionTestSuite) TestSaveSignals() {
 	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
@@ -2668,7 +2119,7 @@ func (s *TransactionTestSuite) TestSaveSignals() {
 		Jailed:            testsuite.Ptr(false),
 	}
 
-	err = tx.SaveSignals(ctx,
+	err = storage.Insert(ctx, tx,
 		&storage.SignalVersion{
 			Id:          1,
 			Height:      1111,
@@ -2779,74 +2230,6 @@ func (s *TransactionTestSuite) TestUpdateSignalsAfterUpgrade() {
 	s.Require().EqualValues("1000100", signals[0].VotingPower.String())
 }
 
-func (s *TransactionTestSuite) TestRollbackUpgrade() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	err = tx.RollbackUpgrades(ctx, 1011)
-	s.Require().NoError(err)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-
-	data, err := s.storage.Upgrade.List(ctx, storage.ListUpgradesFilter{
-		Limit: 10,
-	})
-	s.Require().NoError(err)
-	s.Require().Len(data, 1)
-}
-
-func (s *TransactionTestSuite) TestRollbackSignalVersions() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	err = tx.RollbackSignals(ctx, 102)
-	s.Require().NoError(err)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-
-	data, err := s.storage.SignalVersion.List(ctx, storage.ListSignalsFilter{
-		Limit: 10,
-	})
-	s.Require().NoError(err)
-	s.Require().Len(data, 2)
-}
-
-func (s *TransactionTestSuite) TestMsgValidator() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	err = tx.SaveMsgValidator(ctx, storage.MsgValidator{
-		ValidatorId: 1,
-		MsgId:       100,
-		Time:        time.Now(),
-		Height:      123456,
-	})
-	s.Require().NoError(err)
-
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-
-	tx2, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	err = tx2.RollbackMessageValidators(ctx, 123456)
-	s.Require().NoError(err)
-
-	s.Require().NoError(tx2.Flush(ctx))
-	s.Require().NoError(tx2.Close(ctx))
-}
-
 func (s *TransactionTestSuite) TestSaveHyperlaneIgps() {
 	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
@@ -2872,22 +2255,6 @@ func (s *TransactionTestSuite) TestSaveHyperlaneIgps() {
 		})
 	s.Require().NoError(err)
 
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-}
-
-func (s *TransactionTestSuite) TestHyperlaneIgp() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	igp, err := tx.HyperlaneIgp(ctx, []byte("igp_1"))
-	s.Require().NoError(err)
-
-	s.Require().EqualValues(1488, igp.Height)
-	s.Require().EqualValues([]byte("igp_1"), igp.IgpId)
 	s.Require().NoError(tx.Flush(ctx))
 	s.Require().NoError(tx.Close(ctx))
 }
@@ -2923,25 +2290,6 @@ func (s *TransactionTestSuite) TestSaveIgpConfig() {
 	s.Require().NoError(tx.Close(ctx))
 }
 
-func (s *TransactionTestSuite) TestHyperlaneIgpConfig() {
-	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
-	defer ctxCancel()
-
-	tx, err := BeginTransaction(ctx, s.storage.Transactable)
-	s.Require().NoError(err)
-
-	igp, err := tx.HyperlaneIgpConfig(ctx, 1)
-	s.Require().NoError(err)
-
-	s.Require().EqualValues(1488, igp.Height)
-	s.Require().True(igp.GasPrice.Equal(types.MustNumericFromString("1")), "GasPrice: expected 1, got %s", igp.GasPrice.String())
-	s.Require().True(igp.GasOverhead.Equal(types.MustNumericFromString("100000")), "GasOverhead: expected 100000, got %s", igp.GasOverhead.String())
-	s.Require().EqualValues(1234, igp.RemoteDomain)
-	s.Require().EqualValues("4321", igp.TokenExchangeRate)
-	s.Require().NoError(tx.Flush(ctx))
-	s.Require().NoError(tx.Close(ctx))
-}
-
 func (s *TransactionTestSuite) TestSaveHyperlaneGasPayments() {
 	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
@@ -2949,7 +2297,7 @@ func (s *TransactionTestSuite) TestSaveHyperlaneGasPayments() {
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
 
-	err = tx.SaveHyperlaneGasPayments(ctx,
+	err = storage.Insert(ctx, tx,
 		&storage.HLGasPayment{
 			Id:         1,
 			Height:     1111,
@@ -2975,23 +2323,24 @@ func (s *TransactionTestSuite) TestSaveBondUpdates() {
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
+	repos := NewTxRepos(tx)
 
 	power := types.NumericFromInt64(9)
 	zero := types.NumericZero()
 	blockTime := time.Date(2023, 7, 4, 3, 11, 26, 0, time.UTC)
-	s.Require().NoError(tx.SaveBondUpdates(ctx,
+	s.Require().NoError(storage.Insert(ctx, tx,
 		&storage.ValidatorBondUpdate{Height: 1001, Time: blockTime, ValidatorId: 1, Power: &power},
 		&storage.ValidatorBondUpdate{Height: 1001, Time: blockTime, ValidatorId: 2, Power: &zero},
 	))
-	s.Require().NoError(tx.SaveBondUpdates(ctx))
+	s.Require().NoError(storage.Insert[*storage.ValidatorBondUpdate](ctx, tx))
 
-	last, err := tx.LastBondUpdate(ctx, 1)
+	last, err := repos.BondUpdates.LastBondUpdate(ctx, 1)
 	s.Require().NoError(err)
 	s.Require().EqualValues(1001, last.Height)
 	s.Require().Equal("9", last.Power.String())
 	s.Require().Positive(last.Id)
 
-	last, err = tx.LastBondUpdate(ctx, 2)
+	last, err = repos.BondUpdates.LastBondUpdate(ctx, 2)
 	s.Require().NoError(err)
 	s.Require().True(last.Power.IsZero())
 
@@ -3009,6 +2358,7 @@ func (s *TransactionTestSuite) TestRollbackBondUpdates() {
 
 	tx, err := BeginTransaction(ctx, s.storage.Transactable)
 	s.Require().NoError(err)
+	repos := NewTxRepos(tx)
 
 	removed, err := tx.RollbackBondUpdates(ctx, 1000)
 	s.Require().NoError(err)
@@ -3021,12 +2371,12 @@ func (s *TransactionTestSuite) TestRollbackBondUpdates() {
 	s.Require().Equal(map[uint64]string{1: "1", 2: "1"}, ids)
 
 	// the earlier update of validator 1 survives, validator 2 has none left
-	last, err := tx.LastBondUpdate(ctx, 1)
+	last, err := repos.BondUpdates.LastBondUpdate(ctx, 1)
 	s.Require().NoError(err)
 	s.Require().EqualValues(999, last.Height)
 	s.Require().Equal("2", last.Power.String())
 
-	_, err = tx.LastBondUpdate(ctx, 2)
+	_, err = repos.BondUpdates.LastBondUpdate(ctx, 2)
 	s.Require().ErrorIs(err, sql.ErrNoRows)
 
 	removed, err = tx.RollbackBondUpdates(ctx, 1000)
@@ -3158,4 +2508,560 @@ func (s *TransactionTestSuite) TestTotalVotingPowerWithoutBondedValidators() {
 	power, err := s.storage.Validator.TotalVotingPower(ctx)
 	s.Require().NoError(err)
 	s.Require().Equal("0", power.String())
+}
+
+func (s *TransactionTestSuite) TestRollbackBlockSignatures() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.RollbackByHeight(ctx, 7965, (*storage.BlockSignature)(nil))
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestRollbackByHeightBlock() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.RollbackByHeight(ctx, 1000, (*storage.Block)(nil))
+	s.Require().NoError(err)
+
+	repos := NewTxRepos(tx)
+	newHead, err := repos.Blocks.Last(ctx)
+	s.Require().NoError(err)
+	s.Require().EqualValues(999, newHead.Height)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+}
+
+func (s *TransactionTestSuite) TestRollbackBlobLogs() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.RollbackByHeight(ctx, 1000, (*storage.BlobLog)(nil))
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	items, err := s.storage.BlobLogs.List(ctx, 10, 0, sdk.SortOrderAsc)
+	s.Require().NoError(err)
+	s.Require().Len(items, 1)
+}
+
+func (s *TransactionTestSuite) TestRollbackUndelegations() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.RollbackByHeight(ctx, 1000, (*storage.Undelegation)(nil))
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	items, err := s.storage.Undelegation.List(ctx, 10, 0, sdk.SortOrderAsc)
+	s.Require().NoError(err)
+	s.Require().Len(items, 0)
+}
+
+func (s *TransactionTestSuite) TestRollbackRedelegations() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.RollbackByHeight(ctx, 1000, (*storage.Redelegation)(nil))
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	items, err := s.storage.Redelegation.List(ctx, 10, 0, sdk.SortOrderAsc)
+	s.Require().NoError(err)
+	s.Require().Len(items, 0)
+}
+
+func (s *TransactionTestSuite) TestRollbackProposals() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.RollbackByHeight(ctx, 1000, (*storage.Proposal)(nil))
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	items, err := s.storage.Proposals.ListWithFilters(ctx, storage.ListProposalFilters{
+		Limit: 10,
+		Sort:  sdk.SortOrderAsc,
+	})
+	s.Require().NoError(err)
+	s.Require().Len(items, 1)
+}
+
+func (s *TransactionTestSuite) TestRollbackVotes() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.RollbackByHeight(ctx, 1000, (*storage.Vote)(nil))
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	items, err := s.storage.Votes.List(ctx, 10, 0, sdk.SortOrderAsc)
+	s.Require().NoError(err)
+	s.Require().Len(items, 0)
+}
+
+func (s *TransactionTestSuite) TestRollbackHyperlaneIgps() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.RollbackByHeight(ctx, 1489, (*storage.HLIGP)(nil))
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	items, err := s.storage.HLIGP.List(ctx, 10, 0)
+	s.Require().NoError(err)
+	s.Require().Len(items, 1)
+}
+
+func (s *TransactionTestSuite) TestRollbackHyperlaneIgpConfigs() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.RollbackByHeight(ctx, 1488, (*storage.HLIGPConfig)(nil))
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	items, err := s.storage.HLIGPConfig.List(ctx, 10, 0)
+	s.Require().NoError(err)
+	s.Require().Len(items, 1)
+}
+
+func (s *TransactionTestSuite) TestRollbackHyperlaneGasPayment() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.RollbackByHeight(ctx, 1488, (*storage.HLGasPayment)(nil))
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	data, err := s.storage.HLGasPayment.List(ctx, 10, 0)
+	s.Require().NoError(err)
+	s.Require().Len(data, 0)
+}
+
+func (s *TransactionTestSuite) TestRollbackForwardings() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.RollbackByHeight(ctx, 10000, (*storage.Forwarding)(nil))
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	items, err := s.storage.Forwardings.List(ctx, 10, 0, sdk.SortOrderAsc)
+	s.Require().NoError(err)
+	s.Require().Len(items, 1)
+}
+
+func (s *TransactionTestSuite) TestIbcTransfers() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	countBefore, err := s.storage.Connection().DB().NewSelect().
+		Model(&storage.IbcTransfer{}).
+		Count(ctx)
+	s.Require().NoError(err)
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = storage.Insert(ctx, tx, &storage.IbcTransfer{
+		Id:              123,
+		ConnectionId:    "connection-1",
+		ChannelId:       "channel-1",
+		Height:          10000,
+		Time:            time.Now().UTC(),
+		Amount:          types.NumericFromInt64(12123123),
+		Denom:           currency.Utia,
+		SenderId:        testsuite.Ptr(uint64(1)),
+		ReceiverAddress: testsuite.Ptr("osmo1m8wg4vxkefhs374qxmmqpyusgz289wmulex5qdwpfx7jnrxzer5s9cv83q"),
+		TxId:            3,
+	})
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	tx2, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx2.RollbackByHeight(ctx, 10000, (*storage.IbcTransfer)(nil))
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx2.Flush(ctx))
+	s.Require().NoError(tx2.Close(ctx))
+
+	countAfter, err := s.storage.Connection().DB().NewSelect().
+		Model(&storage.IbcTransfer{}).
+		Count(ctx)
+	s.Require().NoError(err)
+
+	s.Require().EqualValues(countBefore, countAfter)
+}
+
+func (s *TransactionTestSuite) TestHyperlaneTransfers() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.SaveHyperlaneTransfers(ctx, &storage.HLTransfer{
+		Id:                  123,
+		Height:              10000,
+		Time:                time.Now().UTC(),
+		Amount:              types.NumericFromInt64(12123123),
+		Denom:               currency.Utia,
+		TxId:                2,
+		MailboxId:           1,
+		TokenId:             1,
+		AddressId:           1,
+		Counterparty:        1,
+		CounterpartyAddress: "1234567890",
+		Version:             2,
+		Nonce:               2,
+		Type:                types.HLTransferTypeReceive,
+		RelayerId:           2,
+	})
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	tx2, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx2.RollbackByHeight(ctx, 10000, (*storage.HLTransfer)(nil))
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx2.Flush(ctx))
+	s.Require().NoError(tx2.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestHyperlaneTokens() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.SaveHyperlaneTokens(ctx, &storage.HLToken{
+		Id:               123,
+		Height:           10000,
+		Time:             time.Now().UTC(),
+		Denom:            currency.Utia,
+		TxId:             2,
+		MailboxId:        1,
+		TokenId:          []byte{0, 1, 2, 3, 4, 5, 6},
+		Type:             types.HLTokenTypeCollateral,
+		SentTransfers:    1,
+		ReceiveTransfers: 1,
+		Sent:             types.NumericFromInt64(123),
+		Received:         types.NumericZero(),
+	})
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	tx2, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx2.RollbackByHeight(ctx, 10000, (*storage.HLToken)(nil))
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx2.Flush(ctx))
+	s.Require().NoError(tx2.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestHyperlaneMailbox() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.SaveHyperlaneMailbox(ctx, &storage.HLMailbox{
+		Id:               123,
+		Height:           10000,
+		Time:             time.Now().UTC(),
+		TxId:             2,
+		Mailbox:          []byte{1, 2, 3, 4, 5, 6},
+		OwnerId:          1,
+		Domain:           2,
+		SentMessages:     3,
+		RequiredHook:     []byte("hook"),
+		ReceivedMessages: 44,
+		DefaultIsm:       []byte("ism"),
+		DefaultHook:      []byte("default_hook"),
+	})
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	tx2, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx2.RollbackByHeight(ctx, 10000, (*storage.HLMailbox)(nil))
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx2.Flush(ctx))
+	s.Require().NoError(tx2.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestRollbackUpgrade() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.RollbackByHeight(ctx, 1011, (*storage.Upgrade)(nil))
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	data, err := s.storage.Upgrade.List(ctx, storage.ListUpgradesFilter{
+		Limit: 10,
+	})
+	s.Require().NoError(err)
+	s.Require().Len(data, 1)
+}
+
+func (s *TransactionTestSuite) TestRollbackSignalVersions() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.RollbackByHeight(ctx, 102, (*storage.SignalVersion)(nil))
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	data, err := s.storage.SignalVersion.List(ctx, storage.ListSignalsFilter{
+		Limit: 10,
+	})
+	s.Require().NoError(err)
+	s.Require().Len(data, 2)
+}
+
+func (s *TransactionTestSuite) TestMsgValidator() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = storage.Insert(ctx, tx, storage.MsgValidator{
+		ValidatorId: 1,
+		MsgId:       100,
+		Time:        time.Now(),
+		Height:      123456,
+	})
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	tx2, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx2.RollbackByHeight(ctx, 123456, (*storage.MsgValidator)(nil))
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx2.Flush(ctx))
+	s.Require().NoError(tx2.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestRollbackGrants() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	_, err := s.storage.Connection().DB().NewUpdate().
+		Model((*storage.Grant)(nil)).
+		Set("revoked = true").
+		Set("revoke_height = 1001").
+		Where("id = 1").
+		Exec(ctx)
+	s.Require().NoError(err)
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx.RollbackGrants(ctx, 1001)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	var grant storage.Grant
+	err = s.storage.Connection().DB().NewSelect().Model(&grant).Where("id = 1").Scan(ctx)
+	s.Require().NoError(err)
+	s.Require().False(grant.Revoked)
+	s.Require().Nil(grant.RevokeHeight)
+
+	tx2, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	err = tx2.RollbackGrants(ctx, 1000)
+	s.Require().NoError(err)
+
+	s.Require().NoError(tx2.Flush(ctx))
+	s.Require().NoError(tx2.Close(ctx))
+
+	count, err := s.storage.Connection().DB().NewSelect().Model((*storage.Grant)(nil)).Count(ctx)
+	s.Require().NoError(err)
+	s.Require().Zero(count)
+}
+
+func (s *TransactionTestSuite) TestRollbackNamespaceMessages() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	deleted, err := tx.RollbackNamespaceMessages(ctx, 1000)
+	s.Require().NoError(err)
+	s.Require().Len(deleted, 2)
+	s.Require().EqualValues(2, deleted[0].NamespaceId)
+
+	repos := NewTxRepos(tx)
+	ns, err := repos.Namespace.GetByID(ctx, 2)
+	s.Require().NoError(err)
+	s.Require().EqualValues(2, ns.Id)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+}
+
+func (s *TransactionTestSuite) TestTxReposSeeUncommittedChanges() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+	repos := NewTxRepos(tx)
+
+	state, err := repos.State.ByName(ctx, testIndexerName)
+	s.Require().NoError(err)
+	s.Require().EqualValues(1000, state.LastHeight)
+
+	state.LastHeight = 1001
+	s.Require().NoError(tx.Update(ctx, &state))
+
+	// repos bound to the tx see its own writes, the pool does not
+	inTx, err := repos.State.ByName(ctx, testIndexerName)
+	s.Require().NoError(err)
+	s.Require().EqualValues(1001, inTx.LastHeight)
+
+	outside, err := s.storage.State.ByName(ctx, testIndexerName)
+	s.Require().NoError(err)
+	s.Require().EqualValues(1000, outside.LastHeight)
+
+	s.Require().NoError(tx.Rollback(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	after, err := s.storage.State.ByName(ctx, testIndexerName)
+	s.Require().NoError(err)
+	s.Require().EqualValues(1000, after.LastHeight)
+}
+
+// Tallying pages votes by 1000, so the repository must not clamp the limit like API queries do.
+func (s *TransactionTestSuite) TestVotesListByProposal() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	votes := make([]*storage.Vote, 150)
+	for i := range votes {
+		votes[i] = &storage.Vote{
+			Height:     1001,
+			Time:       time.Date(2023, 7, 4, 3, 11, 26, 0, time.UTC),
+			Option:     types.VoteOptionYes,
+			Weight:     types.NumericFromInt64(1),
+			VoterId:    1,
+			ProposalId: 1,
+		}
+	}
+	s.Require().NoError(storage.Insert(ctx, tx, votes...))
+
+	repos := NewTxRepos(tx)
+	all, err := repos.Votes.ListByProposal(ctx, 1, 1000, 0)
+	s.Require().NoError(err)
+	s.Require().Len(all, 152)
+	for i := 1; i < len(all); i++ {
+		s.Require().Less(all[i-1].Id, all[i].Id)
+	}
+
+	page, err := repos.Votes.ListByProposal(ctx, 1, 50, 100)
+	s.Require().NoError(err)
+	s.Require().Len(page, 50)
+	s.Require().Equal(all[100].Id, page[0].Id)
+
+	s.Require().NoError(tx.Rollback(ctx))
+	s.Require().NoError(tx.Close(ctx))
 }

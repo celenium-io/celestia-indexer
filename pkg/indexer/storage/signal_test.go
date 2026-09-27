@@ -32,7 +32,7 @@ func makeModule(ctrl *gomock.Controller, constants *mock.MockIConstant) (Module,
 		Return(storage.Constant{Value: "100"}, nil).
 		AnyTimes()
 
-	m := NewModule(nil, constants, nil, nil, indexerCfg.Indexer{Name: testIndexerName})
+	m := NewModule(nil, nil, indexerCfg.Indexer{Name: testIndexerName})
 	return m, tx
 }
 
@@ -47,10 +47,10 @@ func TestTryUpgrade_NilUpgrade(t *testing.T) {
 	constants := mock.NewMockIConstant(ctrl)
 	module, tx := makeModule(ctrl, constants)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
 	defer cancel()
 
-	err := module.tryUpgrade(ctx, tx, nil, storage.State{Version: 3})
+	err := module.tryUpgrade(ctx, tx, nil, nil, storage.State{Version: 3})
 	require.NoError(t, err)
 }
 
@@ -60,19 +60,21 @@ func TestTryUpgrade_NoValidatorsSignaled(t *testing.T) {
 
 	constants := mock.NewMockIConstant(ctrl)
 	module, tx := makeModule(ctrl, constants)
+	repos := mock.NewTxRepos(ctrl)
 
 	// all validators signal version 0 (no version) or <= state.Version
-	tx.EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{
+	repos.Validators.
+		EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{
 		{Id: 1, Stake: types.NumericFromInt64(1_000_000), Version: 0},
 		{Id: 2, Stake: types.NumericFromInt64(1_000_000), Version: 3},
 	}, nil)
 	// UpdateSignalsAfterUpgrade must NOT be called
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
 	defer cancel()
 
 	upgrade := &storage.Upgrade{Height: 100, Time: time.Now()}
-	err := module.tryUpgrade(ctx, tx, upgrade, storage.State{Version: 3})
+	err := module.tryUpgrade(ctx, tx, repos.Validators, upgrade, storage.State{Version: 3})
 	require.NoError(t, err)
 }
 
@@ -82,10 +84,12 @@ func TestTryUpgrade_NoQuorum(t *testing.T) {
 
 	constants := mock.NewMockIConstant(ctrl)
 	module, tx := makeModule(ctrl, constants)
+	repos := mock.NewTxRepos(ctrl)
 
 	// total stake = 3_000_000 → Shares = 3; threshold = 3 * 5/6 ≈ 2
 	// voted for v4 = 1_000_000 → Shares = 1 < threshold → no quorum
-	tx.EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{
+	repos.Validators.
+		EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{
 		{Id: 1, Stake: types.NumericFromInt64(1_000_000), Version: 4},
 		{Id: 2, Stake: types.NumericFromInt64(1_000_000), Version: 3},
 		{Id: 3, Stake: types.NumericFromInt64(1_000_000), Version: 3},
@@ -94,11 +98,11 @@ func TestTryUpgrade_NoQuorum(t *testing.T) {
 		Return(types.NumericFromInt64(1_000_000), nil)
 	// SaveUpgrades must NOT be called
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
 	defer cancel()
 
 	upgrade := &storage.Upgrade{Height: 100, Time: time.Now()}
-	err := module.tryUpgrade(ctx, tx, upgrade, storage.State{Version: 3})
+	err := module.tryUpgrade(ctx, tx, repos.Validators, upgrade, storage.State{Version: 3})
 	require.NoError(t, err)
 }
 
@@ -108,10 +112,12 @@ func TestTryUpgrade_WithQuorum(t *testing.T) {
 
 	constants := mock.NewMockIConstant(ctrl)
 	module, tx := makeModule(ctrl, constants)
+	repos := mock.NewTxRepos(ctrl)
 
 	// total stake = 6_000_000 → Shares = 6; threshold = 6 * 5/6 = 5
 	// voted for v4 raw = 6_000_000 → Shares = 6 > 5 → quorum
-	tx.EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{
+	repos.Validators.
+		EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{
 		{Id: 1, Stake: types.NumericFromInt64(2_000_000), Version: 4},
 		{Id: 2, Stake: types.NumericFromInt64(2_000_000), Version: 4},
 		{Id: 3, Stake: types.NumericFromInt64(2_000_000), Version: 4},
@@ -126,11 +132,11 @@ func TestTryUpgrade_WithQuorum(t *testing.T) {
 			return nil
 		})
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
 	defer cancel()
 
 	upgrade := &storage.Upgrade{Height: 100, Time: time.Now()}
-	err := module.tryUpgrade(ctx, tx, upgrade, storage.State{Version: 3})
+	err := module.tryUpgrade(ctx, tx, repos.Validators, upgrade, storage.State{Version: 3})
 	require.NoError(t, err)
 }
 
@@ -140,11 +146,13 @@ func TestTryUpgrade_PicksMinimumQuorumVersion(t *testing.T) {
 
 	constants := mock.NewMockIConstant(ctrl)
 	module, tx := makeModule(ctrl, constants)
+	repos := mock.NewTxRepos(ctrl)
 
 	// two versions both have quorum; should pick v4 (minimum), not v5
 	// total stake = 12_000_000 → Shares = 12; threshold = 12 * 5/6 = 10
 	// voted raw = 12_000_000 → Shares = 12 > 10 → quorum for both
-	tx.EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{
+	repos.Validators.
+		EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{
 		{Id: 1, Stake: types.NumericFromInt64(3_000_000), Version: 4},
 		{Id: 2, Stake: types.NumericFromInt64(3_000_000), Version: 4},
 		{Id: 3, Stake: types.NumericFromInt64(3_000_000), Version: 4},
@@ -162,11 +170,11 @@ func TestTryUpgrade_PicksMinimumQuorumVersion(t *testing.T) {
 			return nil
 		})
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
 	defer cancel()
 
 	upgrade := &storage.Upgrade{Height: 100, Time: time.Now()}
-	err := module.tryUpgrade(ctx, tx, upgrade, storage.State{Version: 3})
+	err := module.tryUpgrade(ctx, tx, repos.Validators, upgrade, storage.State{Version: 3})
 	require.NoError(t, err)
 }
 
@@ -180,7 +188,7 @@ func TestSaveUpgrades_EmptyMap(t *testing.T) {
 
 	tx := mock.NewMockTransaction(ctrl)
 	// nothing should be called
-	err := saveUpgrades(context.Background(), tx, sdkSync.NewMap[uint64, *storage.Upgrade](),
+	err := saveUpgrades(t.Context(), tx, sdkSync.NewMap[uint64, *storage.Upgrade](),
 		storage.State{Version: 3}, types.NumericFromInt64(3_000_000))
 	require.NoError(t, err)
 }
@@ -194,7 +202,7 @@ func TestSaveUpgrades_SkipsAlreadyAppliedVersion(t *testing.T) {
 
 	upgrades := makeUpgradesMap(&storage.Upgrade{Version: 3})
 
-	err := saveUpgrades(context.Background(), tx, upgrades,
+	err := saveUpgrades(t.Context(), tx, upgrades,
 		storage.State{Version: 3}, types.NumericFromInt64(3_000_000))
 	require.NoError(t, err)
 }
@@ -216,7 +224,7 @@ func TestSaveUpgrades_NoQuorum(t *testing.T) {
 
 	upgrades := makeUpgradesMap(&storage.Upgrade{Version: 4})
 
-	err := saveUpgrades(context.Background(), tx, upgrades,
+	err := saveUpgrades(t.Context(), tx, upgrades,
 		storage.State{Version: 3}, types.NumericFromInt64(3))
 	require.NoError(t, err)
 }
@@ -239,7 +247,7 @@ func TestSaveUpgrades_WithQuorum(t *testing.T) {
 
 	upgrades := makeUpgradesMap(&storage.Upgrade{Version: 4})
 
-	err := saveUpgrades(context.Background(), tx, upgrades,
+	err := saveUpgrades(t.Context(), tx, upgrades,
 		storage.State{Version: 3}, types.NumericFromInt64(6))
 	require.NoError(t, err)
 }
@@ -252,10 +260,9 @@ func TestSaveSignals_Empty(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	constants := mock.NewMockIConstant(ctrl)
-	module := NewModule(nil, constants, nil, nil, indexerCfg.Indexer{Name: testIndexerName})
+	module := NewModule(nil, nil, indexerCfg.Indexer{Name: testIndexerName})
 
-	err := module.saveSignals(context.Background(), nil, nil,
+	err := module.saveSignals(t.Context(), nil, nil, nil,
 		sdkSync.NewMap[uint64, *storage.Upgrade](), storage.State{})
 	require.NoError(t, err)
 }
@@ -265,19 +272,23 @@ func TestSaveSignals_WithQuorum(t *testing.T) {
 	defer ctrl.Finish()
 
 	tx := mock.NewMockTransaction(ctrl)
+	repos := mock.NewTxRepos(ctrl)
 
 	// total bonded stake
-	tx.EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{
+	repos.Validators.
+		EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{
 		{Id: 1, Stake: types.NumericFromInt64(2_000_000)},
 		{Id: 2, Stake: types.NumericFromInt64(1_000_000)},
 	}, nil)
 
-	// saveSignals resolves validator by address
-	tx.EXPECT().Validator(gomock.Any(), uint64(1)).Return(storage.Validator{
-		Id: 1, Stake: types.NumericFromInt64(2_000_000),
-	}, nil)
+	repos.Validators.
+		EXPECT().
+		GetByID(gomock.Any(), uint64(1)).
+		Return(&storage.Validator{
+			Id: 1, Stake: types.NumericFromInt64(2_000_000),
+		}, nil)
 
-	tx.EXPECT().SaveSignals(gomock.Any(), gomock.Any()).Return(nil)
+	tx.EXPECT().Insert(gomock.Any(), gomock.AssignableToTypeOf(&[]*storage.SignalVersion{})).Return(nil)
 
 	// total Shares = 3; threshold = 2; voted raw=6_000_000 → Shares=6 > 2 → quorum
 	tx.EXPECT().UpdateSignalsAfterUpgrade(gomock.Any(), uint64(4)).
@@ -289,7 +300,7 @@ func TestSaveSignals_WithQuorum(t *testing.T) {
 			return nil
 		})
 
-	module := NewModule(nil, nil, nil, nil, indexerCfg.Indexer{Name: testIndexerName})
+	module := NewModule(nil, nil, indexerCfg.Indexer{Name: testIndexerName})
 	module.validatorsByAddress["val1address"] = 1
 
 	signals := []*storage.SignalVersion{
@@ -301,10 +312,10 @@ func TestSaveSignals_WithQuorum(t *testing.T) {
 	}
 	upgrades := makeUpgradesMap(&storage.Upgrade{Version: 4})
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
 	defer cancel()
 
-	err := module.saveSignals(ctx, tx, signals, upgrades, storage.State{Version: 3})
+	err := module.saveSignals(ctx, tx, repos.Validators, signals, upgrades, storage.State{Version: 3})
 	require.NoError(t, err)
 }
 
@@ -313,9 +324,12 @@ func TestSaveSignals_UnknownValidator(t *testing.T) {
 	defer ctrl.Finish()
 
 	tx := mock.NewMockTransaction(ctrl)
-	tx.EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{}, nil)
+	repos := mock.NewTxRepos(ctrl)
 
-	module := NewModule(nil, nil, nil, nil, indexerCfg.Indexer{Name: testIndexerName})
+	repos.Validators.
+		EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{}, nil)
+
+	module := NewModule(nil, nil, indexerCfg.Indexer{Name: testIndexerName})
 	// validatorsByAddress intentionally empty
 
 	signals := []*storage.SignalVersion{
@@ -326,10 +340,10 @@ func TestSaveSignals_UnknownValidator(t *testing.T) {
 		},
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
 	defer cancel()
 
-	err := module.saveSignals(ctx, tx, signals,
+	err := module.saveSignals(ctx, tx, repos.Validators, signals,
 		sdkSync.NewMap[uint64, *storage.Upgrade](), storage.State{Version: 3})
 	require.Error(t, err)
 }

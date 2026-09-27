@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
 	"github.com/pkg/errors"
 	"github.com/uptrace/bun"
@@ -20,7 +19,7 @@ type Rollup struct {
 }
 
 // NewRollup -
-func NewRollup(db *database.Bun) *Rollup {
+func NewRollup(db bun.IDB) storage.IRollup {
 	return &Rollup{
 		Table: postgres.NewTable[*storage.Rollup](db),
 	}

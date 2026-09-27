@@ -35,9 +35,11 @@ pkg/
 internal/
   storage/              # Domain model structs + storage interfaces (IXxx)
     id.go               # Deterministic ID generation (height<<24 | position)
+    transaction.go      # Block transaction: Transaction, domain *Tx interfaces, Insert, TxRepos
     postgres/           # Bun ORM implementations of all interfaces
       scopes.go         # Reusable query filters and pagination helpers
-      transaction.go    # DB transaction: save/rollback all entities
+      transaction.go    # Transaction core: BeginTransaction, Insert, RollbackByHeight, NewTxRepos, block writes
+      transaction_*.go  # Domain writes/rollbacks: account, namespace, staking, gov, ibc, hyperlane, zkism, rollup
       core.go           # DB init, migrations, hypertables, enums, indexes
       migrations/       # Bun migrations (named by date)
     types/              # Enums (MsgType, EventType, ModuleType, etc.)
@@ -173,12 +175,22 @@ func (a *Address) ByHash(ctx context.Context, hash []byte) (address storage.Addr
 - `txFilterWithoutLimit(q, fltrs)` — sort by `time, id` (time-series ordering)
 - Message type filtering uses bitmask: `bit_count(message_types & ?::bit(115)) > 0`
 
-**DB transaction** for saving a block (`transaction.go`):
+**Repository constructors** take `bun.IDB` (`NewTable` from indexer-sdk does too), so the same repository runs on the pool (`strg.Connection().DB()`) or inside a transaction (`tx.Tx()`). Query through `x.DB()` / the `bun.IDB` field, never through `*database.Bun`, or the query escapes the transaction.
+
+**Block transaction** (`internal/storage/transaction.go`, implementation in `postgres/transaction*.go`):
 ```go
 tx, _ := postgres.BeginTransaction(ctx, module.storage)
 defer tx.Close(ctx)
-// tx.Add(), tx.Update(), tx.Flush() — then tx.HandleError() on failure
+repos := module.reposFactory(tx) // postgres.NewTxRepos: repositories bound to tx
+state, _ := repos.State.ByName(ctx, name) // reads see the tx's own writes
+// writes via tx.*, tx.Flush() — then tx.HandleError() on failure
 ```
+- `Transaction` holds **writes and rollbacks only**. It embeds `sdk.Transaction` and the domain interfaces `BlockTx`, `AccountTx`, `NamespaceTx`, `StakingTx`, `GovTx`, `IbcTx`, `HyperlaneTx`, `ZkIsmTx`, `RollupTx`. Each domain interface embeds `Inserter`.
+- **Reads** inside the transaction go through `storage.TxRepos` (repository interfaces bound to the tx). Do not add getters to `Transaction`; add the method to the entity repository and, if needed, a field to `TxRepos` **and** to `postgres.NewTxRepos` (a missing field is `nil` at runtime).
+- **Plain inserts**: `storage.Insert(ctx, tx, items...)`, a type-safe wrapper over `Inserter.Insert(ctx, *[]T)`. No new `SaveFoo` method is needed unless the insert has `ON CONFLICT`, COPY, counting or per-row logic.
+- **Plain rollbacks** (`DELETE ... WHERE height = ?`): add the model to the `tx.RollbackByHeight(ctx, height, (*storage.Foo)(nil), ...)` list in `pkg/indexer/rollback/rollback.go`. The compiler will not remind you. Tables with extra rollback logic (grants, validators, IBC counters, …) keep dedicated `RollbackFoo` methods.
+- **Narrow parameters**: `save*`/`rollback*` helpers take the narrowest type they need (`storage.IbcTx`, `storage.IValidator`, …); keep `storage.Transaction` for orchestrators and cross-domain functions.
+- **Indexer reads must not reuse API list methods blindly**: `limitScope` silently replaces limits above 100 with 10, and API methods add joins/relations. Methods used by the indexer (paging with `sdkSync.Paginate`, id lookups on hot paths) get their own lean query: explicit `ORDER BY`, no clamp, only needed columns (e.g. `IVote.ListByProposal`, `IHLIGP.IdByHash`).
 
 **Deterministic IDs** (`internal/storage/id.go`): `tx` and `message` IDs are computed at parse time as `height<<24 | position` (5 bytes height + 3 bytes position). This removes autoincrement sequences for those tables. Genesis block (height=0) uses `position+1` to avoid zero IDs. Use `idFromHeightAndPosition(height, position)` when assigning IDs in parsers.
 
@@ -294,10 +306,10 @@ stopperModule.AttachTo(r, receiver.StopOutput, stopper.InputName)
 2. `internal/storage/postgres/foo.go` — implement queries using subquery+JOIN pattern
 3. `internal/storage/postgres/core.go` — register in `Storage` struct, create hypertable if time-series
 4. `internal/storage/postgres/index.go` — add indexes
-5. `internal/storage/postgres/transaction.go` — add save/rollback methods
+5. Saving/rollback: plain inserts use `storage.Insert`, plain rollbacks go into the `RollbackByHeight` list in `pkg/indexer/rollback/rollback.go`; only non-trivial ones get a method in the matching domain `*Tx` interface (`internal/storage/transaction.go`) and `postgres/transaction_<domain>.go`. Reads needed by the indexer go to the repository + `TxRepos`/`NewTxRepos`
 6. Mock: add `//go:generate` directive, run `make generate`
 7. Parser/decode: add parsing logic; assign deterministic ID via `idFromHeightAndPosition`; accumulate into `dCtx` via `ctx.AddXxx()` methods
-8. `pkg/indexer/storage/foo.go` — add `saveFoo(ctx, tx, dCtx.Foos, ...)` function; call it from `processBlockInTransaction` in `storage.go`
+8. `pkg/indexer/storage/foo.go` — add `saveFoo(ctx, tx, dCtx.Foos, ...)` function, with `tx` typed as the domain interface (e.g. `storage.IbcTx`); call it from `processBlockInTransaction` in `storage.go`
 9. `cmd/api/handler/foo.go` — handler with Swagger annotations
 10. Register routes in `cmd/api/main.go`
 11. Run `make api-docs`
@@ -335,7 +347,10 @@ Key entities indexed (57 total storage types):
 
 ## Testing
 
-- Mocks are auto-generated in `mock/` subdirectories — never edit manually
+- Mocks are auto-generated in `mock/` subdirectories — never edit manually. Exceptions:
+  - `internal/storage/transaction.go` uses mockgen package mode (`. Transaction`), so only `MockTransaction` is generated, not the domain `*Tx` interfaces.
+  - `internal/storage/mock/tx_repos.go` is hand-written: `mock.NewTxRepos(ctrl)` returns typed repository mocks (`repos.Validators.EXPECT()`), `repos.Repos()` returns `storage.TxRepos`. Keep it in sync with `storage.TxRepos`.
+- Mocks do not apply `limitScope` or SQL semantics: a new indexer read method needs a DB test (fixtures reload per test in `TransactionTestSuite`; use `NewTxRepos(tx)` to read uncommitted data)
 - DB integration tests spin up a real TimescaleDB Docker container via testcontainers — **Docker must be running**
 - `testfixtures` for DB integration tests (`test/` directory); **avoid `0x`-prefixed strings in YAML fixtures** — testfixtures interprets them as hex-encoded bytea, causing invalid UTF-8 errors when inserting into `text` columns
 - Newman collection for API tests: `make test-api`

@@ -83,6 +83,45 @@ func (c *MockIHLIGPByHashCall) DoAndReturn(f func(context.Context, []byte) (stor
 	return c
 }
 
+// IdByHash mocks base method.
+func (m *MockIHLIGP) IdByHash(ctx context.Context, hash []byte) (uint64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IdByHash", ctx, hash)
+	ret0, _ := ret[0].(uint64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IdByHash indicates an expected call of IdByHash.
+func (mr *MockIHLIGPMockRecorder) IdByHash(ctx, hash any) *MockIHLIGPIdByHashCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IdByHash", reflect.TypeOf((*MockIHLIGP)(nil).IdByHash), ctx, hash)
+	return &MockIHLIGPIdByHashCall{Call: call}
+}
+
+// MockIHLIGPIdByHashCall wrap *gomock.Call
+type MockIHLIGPIdByHashCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIHLIGPIdByHashCall) Return(arg0 uint64, arg1 error) *MockIHLIGPIdByHashCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIHLIGPIdByHashCall) Do(f func(context.Context, []byte) (uint64, error)) *MockIHLIGPIdByHashCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIHLIGPIdByHashCall) DoAndReturn(f func(context.Context, []byte) (uint64, error)) *MockIHLIGPIdByHashCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // List mocks base method.
 func (m *MockIHLIGP) List(ctx context.Context, limit, offset int) ([]storage.HLIGP, error) {
 	m.ctrl.T.Helper()

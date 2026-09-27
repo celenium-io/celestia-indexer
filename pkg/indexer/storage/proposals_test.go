@@ -22,11 +22,11 @@ func TestFillProposalVotingPower(t *testing.T) {
 	defer ctrl.Finish()
 
 	validators := mock.NewMockIValidator(ctrl)
+	repos := storage.TxRepos{Validators: validators}
 
-	module := NewModule(nil, nil, validators, nil, config.Indexer{})
+	module := NewModule(nil, nil, config.Indexer{})
 
 	t.Run("not fill", func(t *testing.T) {
-		tx := mock.NewMockTransaction(ctrl)
 
 		proposals := sdkSync.NewMap[uint64, *storage.Proposal]()
 		proposals.Set(1, &storage.Proposal{
@@ -34,16 +34,16 @@ func TestFillProposalVotingPower(t *testing.T) {
 			Status: types.ProposalStatusActive,
 		})
 
-		filled, err := module.fillProposalsVotingPower(t.Context(), tx, 1, proposals)
+		filled, err := module.fillProposalsVotingPower(t.Context(), repos, 1, proposals)
 		require.NoError(t, err)
 		require.Len(t, filled, 1)
 	})
 
 	t.Run("no active and finished", func(t *testing.T) {
-		tx := mock.NewMockTransaction(ctrl)
-
-		tx.EXPECT().
-			ActiveProposals(t.Context()).
+		repos := mock.NewTxRepos(ctrl)
+		repos.Proposals.
+			EXPECT().
+			Active(t.Context()).
 			Return([]storage.Proposal{}, nil).
 			Times(1)
 
@@ -58,28 +58,30 @@ func TestFillProposalVotingPower(t *testing.T) {
 			NoWithVeto: 1,
 		})
 
-		filled, err := module.fillProposalsVotingPower(t.Context(), tx, 600, proposals)
+		filled, err := module.fillProposalsVotingPower(t.Context(), repos.Repos(), 600, proposals)
 		require.NoError(t, err)
 		require.Len(t, filled, 1)
 	})
 
 	t.Run("active and no finished", func(t *testing.T) {
-		tx := mock.NewMockTransaction(ctrl)
+		repos := mock.NewTxRepos(ctrl)
 
-		tx.EXPECT().
-			ActiveProposals(t.Context()).
+		repos.Proposals.
+			EXPECT().
+			Active(t.Context()).
 			Return([]storage.Proposal{{
 				Id:     1,
 				Status: types.ProposalStatusActive,
 				Type:   types.ProposalTypeParamChanged,
 			}}, nil).
 			Times(1)
-		validators.EXPECT().
+		repos.Validators.EXPECT().
 			TotalVotingPower(gomock.Any()).
 			Return(types.NumericFromInt64(10000), nil).
 			Times(1)
 
-		tx.EXPECT().
+		repos.Validators.
+			EXPECT().
 			BondedValidators(t.Context()).
 			Return([]storage.Validator{{
 				Id:    1,
@@ -90,8 +92,9 @@ func TestFillProposalVotingPower(t *testing.T) {
 			}}, nil).
 			Times(1)
 
-		tx.EXPECT().
-			ProposalVotes(t.Context(), uint64(1), 1000, 0).
+		repos.Votes.
+			EXPECT().
+			ListByProposal(t.Context(), uint64(1), 1000, 0).
 			Return([]storage.Vote{{
 				ValidatorId: testsuite.Ptr(uint64(1)),
 				VoterId:     3,
@@ -105,7 +108,8 @@ func TestFillProposalVotingPower(t *testing.T) {
 			}}, nil).
 			Times(1)
 
-		tx.EXPECT().
+		repos.Delegation.
+			EXPECT().
 			AddressDelegations(t.Context(), uint64(1)).
 			Return([]storage.Delegation{{
 				ValidatorId: 1,
@@ -114,7 +118,8 @@ func TestFillProposalVotingPower(t *testing.T) {
 			}}, nil).
 			Times(1)
 
-		tx.EXPECT().
+		repos.Delegation.
+			EXPECT().
 			AddressDelegations(t.Context(), uint64(2)).
 			Return([]storage.Delegation{{
 				ValidatorId: 1,
@@ -123,7 +128,8 @@ func TestFillProposalVotingPower(t *testing.T) {
 			}}, nil).
 			Times(1)
 
-		tx.EXPECT().
+		repos.Delegation.
+			EXPECT().
 			AddressDelegations(t.Context(), uint64(3)).
 			Return([]storage.Delegation{{
 				ValidatorId: 1,
@@ -143,7 +149,7 @@ func TestFillProposalVotingPower(t *testing.T) {
 			NoWithVeto: 1,
 		})
 
-		filled, err := module.fillProposalsVotingPower(t.Context(), tx, 600, proposals)
+		filled, err := module.fillProposalsVotingPower(t.Context(), repos.Repos(), 600, proposals)
 		require.NoError(t, err)
 		require.Len(t, filled, 1)
 
@@ -174,8 +180,9 @@ func TestModule_getConstantDuration(t *testing.T) {
 			}, nil).
 			Times(1)
 
-		module := NewModule(nil, constants, validators, nil, config.Indexer{})
-		got, err := module.getConstantDuration(ctx, types.ModuleNameGov, "voting_period")
+		module := NewModule(nil, nil, config.Indexer{})
+		repos := storage.TxRepos{Constants: constants, Validators: validators}
+		got, err := module.getConstantDuration(ctx, repos, types.ModuleNameGov, "voting_period")
 		require.NoError(t, err)
 		require.EqualValues(t, "24h0m0s", got.String())
 	})

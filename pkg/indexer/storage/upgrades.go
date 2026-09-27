@@ -15,7 +15,9 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (module *Module) upgrade(ctx context.Context, decodeContext *decodeContext.Context, currentVersion, targetVersion uint64) error {
+func (module *Module) upgrade(
+	ctx context.Context, repos storage.TxRepos, decodeContext *decodeContext.Context, currentVersion, targetVersion uint64,
+) error {
 	if currentVersion >= targetVersion {
 		return nil
 	}
@@ -25,18 +27,20 @@ func (module *Module) upgrade(ctx context.Context, decodeContext *decodeContext.
 		case 1, 2, 3, 4, 5, 8, 9:
 			// No upgrade logic needed for these versions
 		case 6:
-			// CIP-037 Reduce the validator unbonding period from 21 days to 14 days and 1 hour to improve capital efficiency while maintaining network security (https://cips.celestia.org/cip-037.html)
+			// CIP-037 Reduce the validator unbonding period from 21 days to 14 days and 1 hour to improve capital
+			// efficiency while maintaining network security (https://cips.celestia.org/cip-037.html)
 			decodeContext.AddConstant(types.ModuleNameStaking, "unbonding_time", "1213200000000000")
 
-			// CIP-041:Reduce inflation to 2.5% and increase minimum validator commission to 10% to improve TIA’s suitability for financial applications (https://cips.celestia.org/cip-041.html)
+			// CIP-041:Reduce inflation to 2.5% and increase minimum validator commission to 10% to improve TIA’s
+			// suitability for financial applications (https://cips.celestia.org/cip-041.html)
 			decodeContext.AddConstant(types.ModuleNameStaking, "min_commission_rate", "0.100000000000000000")
 
 		case 7:
-			if err := module.upgradeV7(ctx, decodeContext, version); err != nil {
+			if err := module.upgradeV7(ctx, repos, decodeContext, version); err != nil {
 				return errors.Wrap(err, "failed to upgrade to version 7")
 			}
 		case 10:
-			if err := module.seedFibreParams(ctx, decodeContext); err != nil {
+			if err := module.seedFibreParams(ctx, repos, decodeContext); err != nil {
 				return errors.Wrap(err, "failed to seed fibre params")
 			}
 		default:
@@ -51,8 +55,10 @@ func (module *Module) upgrade(ctx context.Context, decodeContext *decodeContext.
 // nothing on chain and emits no event -- the keeper just starts answering with
 // DefaultParams -- so the app defaults are the only source. A chain launched at
 // v10 already got them from genesis, so existing values are never overwritten.
-func (module *Module) seedFibreParams(ctx context.Context, decodeContext *decodeContext.Context) error {
-	existing, err := module.constants.ByModule(ctx, types.ModuleNameFibre)
+func (module *Module) seedFibreParams(
+	ctx context.Context, repos storage.TxRepos, decodeContext *decodeContext.Context,
+) error {
+	existing, err := repos.Constants.ByModule(ctx, types.ModuleNameFibre)
 	if err != nil {
 		return errors.Wrap(err, "get fibre constants")
 	}
@@ -64,7 +70,9 @@ func (module *Module) seedFibreParams(ctx context.Context, decodeContext *decode
 	return nil
 }
 
-func (module *Module) upgradeV7(ctx context.Context, decodeContext *decodeContext.Context, targetVersion uint64) error {
+func (module *Module) upgradeV7(
+	ctx context.Context, repos storage.TxRepos, decodeContext *decodeContext.Context, targetVersion uint64,
+) error {
 	if targetVersion != 7 {
 		return errors.Errorf("unsupported upgrade version: %d", targetVersion)
 	}
@@ -79,7 +87,7 @@ func (module *Module) upgradeV7(ctx context.Context, decodeContext *decodeContex
 	paginate := sdkSync.Paginate(
 		ctx, 100,
 		func(ctx context.Context, limit, offset int) ([]*storage.Validator, error) {
-			return module.validators.List(ctx, uint64(limit), uint64(offset), sdkStorage.SortOrderAsc)
+			return repos.Validators.List(ctx, uint64(limit), uint64(offset), sdkStorage.SortOrderAsc)
 		},
 	)
 

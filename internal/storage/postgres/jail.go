@@ -7,8 +7,8 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
+	"github.com/uptrace/bun"
 )
 
 // Jail -
@@ -17,7 +17,7 @@ type Jail struct {
 }
 
 // NewJail -
-func NewJail(db *database.Bun) *Jail {
+func NewJail(db bun.IDB) storage.IJail {
 	return &Jail{
 		Table: postgres.NewTable[*storage.Jail](db),
 	}

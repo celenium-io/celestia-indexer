@@ -8,9 +8,9 @@ import (
 	"time"
 
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
+	"github.com/uptrace/bun"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
 )
@@ -21,7 +21,7 @@ type Event struct {
 }
 
 // NewEvent -
-func NewEvent(db *database.Bun) *Event {
+func NewEvent(db bun.IDB) storage.IEvent {
 	return &Event{
 		Table: postgres.NewTable[*storage.Event](db),
 	}

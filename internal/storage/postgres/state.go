@@ -7,8 +7,8 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
+	"github.com/uptrace/bun"
 )
 
 // State -
@@ -17,7 +17,7 @@ type State struct {
 }
 
 // NewState -
-func NewState(db *database.Bun) *State {
+func NewState(db bun.IDB) storage.IState {
 	return &State{
 		Table: postgres.NewTable[*storage.State](db),
 	}

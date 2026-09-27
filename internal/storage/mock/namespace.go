@@ -322,6 +322,45 @@ func (c *MockINamespaceLastIDCall) DoAndReturn(f func(context.Context) (uint64, 
 	return c
 }
 
+// LastNamespaceMessage mocks base method.
+func (m *MockINamespace) LastNamespaceMessage(ctx context.Context, nsId uint64) (storage.NamespaceMessage, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LastNamespaceMessage", ctx, nsId)
+	ret0, _ := ret[0].(storage.NamespaceMessage)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// LastNamespaceMessage indicates an expected call of LastNamespaceMessage.
+func (mr *MockINamespaceMockRecorder) LastNamespaceMessage(ctx, nsId any) *MockINamespaceLastNamespaceMessageCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LastNamespaceMessage", reflect.TypeOf((*MockINamespace)(nil).LastNamespaceMessage), ctx, nsId)
+	return &MockINamespaceLastNamespaceMessageCall{Call: call}
+}
+
+// MockINamespaceLastNamespaceMessageCall wrap *gomock.Call
+type MockINamespaceLastNamespaceMessageCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockINamespaceLastNamespaceMessageCall) Return(msg storage.NamespaceMessage, err error) *MockINamespaceLastNamespaceMessageCall {
+	c.Call = c.Call.Return(msg, err)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockINamespaceLastNamespaceMessageCall) Do(f func(context.Context, uint64) (storage.NamespaceMessage, error)) *MockINamespaceLastNamespaceMessageCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockINamespaceLastNamespaceMessageCall) DoAndReturn(f func(context.Context, uint64) (storage.NamespaceMessage, error)) *MockINamespaceLastNamespaceMessageCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // List mocks base method.
 func (m *MockINamespace) List(ctx context.Context, limit, offset uint64, order storage0.SortOrder) ([]*storage.Namespace, error) {
 	m.ctrl.T.Helper()

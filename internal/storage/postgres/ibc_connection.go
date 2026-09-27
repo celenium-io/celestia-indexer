@@ -7,25 +7,24 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
 	"github.com/uptrace/bun"
 )
 
 type IbcConnection struct {
-	*database.Bun
+	db bun.IDB
 }
 
-func NewIbcConnection(conn *database.Bun) *IbcConnection {
-	return &IbcConnection{conn}
+func NewIbcConnection(db bun.IDB) storage.IIbcConnection {
+	return &IbcConnection{db}
 }
 
 func (c *IbcConnection) ById(ctx context.Context, id string) (conn storage.IbcConnection, err error) {
-	query := c.DB().NewSelect().
+	query := c.db.NewSelect().
 		Model((*storage.IbcConnection)(nil)).
 		Where("connection_id = ?", id).
 		Limit(1)
 
-	err = c.DB().NewSelect().
+	err = c.db.NewSelect().
 		TableExpr("(?) as ibc_connection", query).
 		ColumnExpr("ibc_connection.*").
 		ColumnExpr("create_tx.hash as create_tx__hash").
@@ -39,7 +38,7 @@ func (c *IbcConnection) ById(ctx context.Context, id string) (conn storage.IbcCo
 }
 
 func (c *IbcConnection) List(ctx context.Context, fltrs storage.ListConnectionFilters) (conns []storage.IbcConnection, err error) {
-	query := c.DB().NewSelect().
+	query := c.db.NewSelect().
 		Model(&conns)
 
 	if fltrs.Offset > 0 {
@@ -53,7 +52,7 @@ func (c *IbcConnection) List(ctx context.Context, fltrs storage.ListConnectionFi
 		query = query.Where("client_id = ?", fltrs.ClientId)
 	}
 
-	err = c.DB().NewSelect().
+	err = c.db.NewSelect().
 		TableExpr("(?) as ibc_connection", query).
 		ColumnExpr("ibc_connection.*").
 		ColumnExpr("create_tx.hash as create_tx__hash").
@@ -71,10 +70,23 @@ func (c *IbcConnection) IdsByClients(ctx context.Context, clientIds ...string) (
 		return res, nil
 	}
 
-	err = c.DB().NewSelect().
+	err = c.db.NewSelect().
 		Column("connection_id").
 		Model((*storage.IbcConnection)(nil)).
 		Where("client_id IN ?", bun.Tuple(clientIds)).
 		Scan(ctx, &res)
+	return
+}
+
+func (c *IbcConnection) ByIds(ctx context.Context, ids ...string) (result []storage.ConnIdAndClientId, err error) {
+	if len(ids) == 0 {
+		return
+	}
+
+	err = c.db.NewSelect().
+		Model((*storage.IbcConnection)(nil)).
+		Column("connection_id", "client_id").
+		Where("connection_id IN ?", bun.Tuple(ids)).
+		Scan(ctx, &result)
 	return
 }

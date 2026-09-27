@@ -20,6 +20,7 @@ import (
 func (module *Module) saveProposals(
 	ctx context.Context,
 	tx storage.Transaction,
+	repos storage.TxRepos,
 	height pkgTypes.Level,
 	proposals *sdkSync.Map[uint64, *storage.Proposal],
 	votes []*storage.Vote,
@@ -72,7 +73,7 @@ func (module *Module) saveProposals(
 		}
 	}
 
-	filled, err := module.fillProposalsVotingPower(ctx, tx, height, proposals)
+	filled, err := module.fillProposalsVotingPower(ctx, repos, height, proposals)
 	if err != nil {
 		return 0, errors.Wrap(err, "compute proposal shares")
 	}
@@ -87,7 +88,7 @@ func (module *Module) saveProposals(
 		}
 
 		if !filled[i].CreatedAt.IsZero() {
-			duration, err := module.getConstantDuration(ctx, types.ModuleNameGov, "max_deposit_period")
+			duration, err := module.getConstantDuration(ctx, repos, types.ModuleNameGov, "max_deposit_period")
 			if err != nil {
 				return 0, errors.Wrap(err, "getConstantDuration")
 			}
@@ -95,7 +96,7 @@ func (module *Module) saveProposals(
 		}
 
 		if filled[i].ActivationTime != nil && filled[i].EndTime == nil {
-			duration, err := module.getConstantDuration(ctx, types.ModuleNameGov, "voting_period")
+			duration, err := module.getConstantDuration(ctx, repos, types.ModuleNameGov, "voting_period")
 			if err != nil {
 				return 0, errors.Wrap(err, "getConstantDuration")
 			}
@@ -107,8 +108,10 @@ func (module *Module) saveProposals(
 	return tx.SaveProposals(ctx, filled...)
 }
 
-func (module *Module) getConstantDuration(ctx context.Context, moduleName types.ModuleName, name string) (time.Duration, error) {
-	constant, err := module.constants.Get(ctx, moduleName, name)
+func (module *Module) getConstantDuration(
+	ctx context.Context, repos storage.TxRepos, moduleName types.ModuleName, name string,
+) (time.Duration, error) {
+	constant, err := repos.Constants.Get(ctx, moduleName, name)
 	if err != nil {
 		return 0, errors.Wrapf(err, "can't find %s constant", name)
 	}
@@ -121,7 +124,7 @@ func (module *Module) getConstantDuration(ctx context.Context, moduleName types.
 
 func (module *Module) fillProposalsVotingPower(
 	ctx context.Context,
-	tx storage.Transaction,
+	repos storage.TxRepos,
 	height pkgTypes.Level,
 	proposals *sdkSync.Map[uint64, *storage.Proposal],
 ) ([]*storage.Proposal, error) {
@@ -141,7 +144,7 @@ func (module *Module) fillProposalsVotingPower(
 		return proposals.Values(), nil
 	}
 
-	active, err := tx.ActiveProposals(ctx)
+	active, err := repos.Proposals.Active(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "get active proposals")
 	}
@@ -158,7 +161,7 @@ func (module *Module) fillProposalsVotingPower(
 
 	// 2. Get all validators
 
-	validators, err := tx.BondedValidators(ctx)
+	validators, err := repos.Validators.BondedValidators(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "get validators")
 	}
@@ -171,7 +174,7 @@ func (module *Module) fillProposalsVotingPower(
 
 	const limit = 1000
 
-	totalVotingPower, err := module.validators.TotalVotingPower(ctx)
+	totalVotingPower, err := repos.Validators.TotalVotingPower(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "get total voting power")
 	}
@@ -183,25 +186,25 @@ func (module *Module) fillProposalsVotingPower(
 		if proposal.Finished() {
 			proposal.TotalVotingPower = totalVotingPower
 
-			quorum, err := module.constants.Get(ctx, types.ModuleNameGov, "quorum")
+			quorum, err := repos.Constants.Get(ctx, types.ModuleNameGov, "quorum")
 			if err != nil {
 				return nil, errors.Wrapf(err, "can't find quorum constant")
 			}
 			proposal.Quorum = quorum.Value
 
-			minDeposit, err := module.constants.Get(ctx, types.ModuleNameGov, "min_deposit")
+			minDeposit, err := repos.Constants.Get(ctx, types.ModuleNameGov, "min_deposit")
 			if err != nil {
 				return nil, errors.Wrapf(err, "can't find min_deposit constant")
 			}
 			proposal.MinDeposit = minDeposit.Value
 
-			threshold, err := module.constants.Get(ctx, types.ModuleNameGov, "threshold")
+			threshold, err := repos.Constants.Get(ctx, types.ModuleNameGov, "threshold")
 			if err != nil {
 				return nil, errors.Wrapf(err, "can't find threshold constant")
 			}
 			proposal.Threshold = threshold.Value
 
-			veto, err := module.constants.Get(ctx, types.ModuleNameGov, "veto_threshold")
+			veto, err := repos.Constants.Get(ctx, types.ModuleNameGov, "veto_threshold")
 			if err != nil {
 				return nil, errors.Wrapf(err, "can't find veto_threshold constant")
 			}
@@ -211,7 +214,7 @@ func (module *Module) fillProposalsVotingPower(
 		paginate := sdkSync.Paginate(
 			ctx, limit,
 			func(ctx context.Context, limit, offset int) ([]storage.Vote, error) {
-				return tx.ProposalVotes(ctx, proposal.Id, limit, offset)
+				return repos.Votes.ListByProposal(ctx, proposal.Id, limit, offset)
 			},
 		)
 
@@ -224,7 +227,7 @@ func (module *Module) fillProposalsVotingPower(
 				votedValidators[*vote.ValidatorId] = vote.Option
 			}
 
-			delegations, err := tx.AddressDelegations(ctx, vote.VoterId)
+			delegations, err := repos.Delegation.AddressDelegations(ctx, vote.VoterId)
 			if err != nil {
 				return nil, errors.Wrapf(err, "can't receive address delegations: %d", vote.VoterId)
 			}

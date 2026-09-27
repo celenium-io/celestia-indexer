@@ -314,14 +314,15 @@ func Test_getBalanceUpdates(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	tx := mock.NewMockTransaction(ctrl)
-	tx.EXPECT().LastAddressAction(gomock.Any(), gomock.Any()).
+	repos := mock.NewTxRepos(ctrl)
+	repos.Address.
+		EXPECT().LastAddressAction(gomock.Any(), gomock.Any()).
 		Return(100, nil).
 		AnyTimes()
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := getBalanceUpdates(t.Context(), tx, tt.args.deletedAddress, tt.args.deletedEvents)
+			got, err := getBalanceUpdates(t.Context(), repos.Address, tt.args.deletedAddress, tt.args.deletedEvents)
 			require.Equal(t, tt.wantErr, err != nil)
 			if err == nil {
 				require.Equal(t, tt.want, got)

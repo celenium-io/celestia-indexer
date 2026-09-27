@@ -7,19 +7,19 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
+	"github.com/uptrace/bun"
 )
 
 type HLGasPayment struct {
-	*database.Bun
+	db bun.IDB
 }
 
-func NewHLGasPayment(conn *database.Bun) *HLGasPayment {
-	return &HLGasPayment{conn}
+func NewHLGasPayment(db bun.IDB) storage.IHLGasPayment {
+	return &HLGasPayment{db}
 }
 
 func (hl *HLGasPayment) List(ctx context.Context, limit, offset int) (payments []storage.HLGasPayment, err error) {
-	query := hl.DB().NewSelect().
+	query := hl.db.NewSelect().
 		Model((*storage.HLGasPayment)(nil))
 
 	query = limitScope(query, limit)

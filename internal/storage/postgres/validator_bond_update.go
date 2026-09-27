@@ -7,16 +7,16 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
+	"github.com/uptrace/bun"
 )
 
 // ValidatorBondUpdate -
 type ValidatorBondUpdate struct {
-	db *database.Bun
+	db bun.IDB
 }
 
 // NewValidatorBondUpdate -
-func NewValidatorBondUpdate(db *database.Bun) *ValidatorBondUpdate {
+func NewValidatorBondUpdate(db bun.IDB) storage.IValidatorBondUpdate {
 	return &ValidatorBondUpdate{db}
 }
 
@@ -24,7 +24,7 @@ func NewValidatorBondUpdate(db *database.Bun) *ValidatorBondUpdate {
 func (bu *ValidatorBondUpdate) ListByValidator(
 	ctx context.Context, validatorId uint64, filters storage.FilterBondUpdatesListByValidator,
 ) (updates []storage.ValidatorBondUpdate, err error) {
-	query := bu.db.DB().NewSelect().Model(&updates).
+	query := bu.db.NewSelect().Model(&updates).
 		Where("validator_id = ?", validatorId)
 
 	query = limitScope(query, filters.Limit)
@@ -34,5 +34,15 @@ func (bu *ValidatorBondUpdate) ListByValidator(
 	}
 
 	err = query.Scan(ctx)
+	return
+}
+
+// LastBondUpdate -
+func (bu *ValidatorBondUpdate) LastBondUpdate(ctx context.Context, validatorId uint64) (update storage.ValidatorBondUpdate, err error) {
+	err = bu.db.NewSelect().Model(&update).
+		Where("validator_id = ?", validatorId).
+		OrderExpr("time desc, id desc").
+		Limit(1).
+		Scan(ctx)
 	return
 }

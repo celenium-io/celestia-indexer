@@ -17,7 +17,7 @@ const (
 
 func (module *Module) saveBlockSignatures(
 	ctx context.Context,
-	tx storage.Transaction,
+	tx storage.BlockTx,
 	signs []storage.BlockSignature,
 	height types.Level,
 ) error {
@@ -44,5 +44,5 @@ func (module *Module) saveBlockSignatures(
 		}
 	}
 
-	return tx.SaveBlockSignatures(ctx, signs...)
+	return storage.Insert(ctx, tx, signs...)
 }

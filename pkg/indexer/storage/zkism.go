@@ -13,7 +13,7 @@ import (
 
 func saveZkIsm(
 	ctx context.Context,
-	tx storage.Transaction,
+	tx storage.ZkIsmTx,
 	zkism []*storage.ZkISM,
 	addrToId map[string]uint64,
 ) error {
@@ -34,7 +34,8 @@ func saveZkIsm(
 
 func saveZkIsmUpdates(
 	ctx context.Context,
-	tx storage.Transaction,
+	tx storage.ZkIsmTx,
+	repo storage.IZkISM,
 	zkism *sdkSync.Map[string, *storage.ZkISM],
 	updates []*storage.ZkISMUpdate,
 	addrToId map[string]uint64,
@@ -52,7 +53,7 @@ func saveZkIsmUpdates(
 
 		if item, ok := zkism.Get(updates[i].ExternalId()); !ok {
 			// ISM from a previous block: resolve its DB id now.
-			dbIsm, err := tx.ZkISMById(ctx, updates[i].ZkISMExternalId)
+			dbIsm, err := repo.ByExternalId(ctx, updates[i].ZkISMExternalId)
 			if err != nil {
 				return errors.Wrapf(err, "can't find zk ism for update: external_id=%s", updates[i].ExternalId())
 			}
@@ -62,12 +63,13 @@ func saveZkIsmUpdates(
 		}
 	}
 
-	return tx.SaveZkISMUpdates(ctx, updates...)
+	return storage.Insert(ctx, tx, updates...)
 }
 
 func saveZkIsmMessages(
 	ctx context.Context,
-	tx storage.Transaction,
+	tx storage.ZkIsmTx,
+	repo storage.IZkISM,
 	zkism *sdkSync.Map[string, *storage.ZkISM],
 	msgs []*storage.ZkISMMessage,
 	addrToId map[string]uint64,
@@ -85,7 +87,7 @@ func saveZkIsmMessages(
 
 		if item, ok := zkism.Get(msgs[i].ExternalId()); !ok {
 			// ISM from a previous block: resolve its DB id now.
-			dbIsm, err := tx.ZkISMById(ctx, msgs[i].ZkISMExternalId)
+			dbIsm, err := repo.ByExternalId(ctx, msgs[i].ZkISMExternalId)
 			if err != nil {
 				return errors.Wrapf(err, "can't find zk ism for update: external_id=%s", msgs[i].ExternalId())
 			}
@@ -95,5 +97,5 @@ func saveZkIsmMessages(
 		}
 	}
 
-	return tx.SaveZkISMMessages(ctx, msgs...)
+	return storage.Insert(ctx, tx, msgs...)
 }

@@ -33,7 +33,7 @@ func processGrants(addrToId map[string]uint64, grant *storage.Grant) error {
 
 func saveGrants(
 	ctx context.Context,
-	tx storage.Transaction,
+	tx storage.AccountTx,
 	grants []*storage.Grant,
 	addrToId map[string]uint64,
 ) error {

@@ -39,6 +39,7 @@ type IZkISM interface {
 	ById(ctx context.Context, id uint64) (ZkISM, error)
 	Updates(ctx context.Context, id uint64, filter ZkISMUpdatesFilter) ([]ZkISMUpdate, error)
 	Messages(ctx context.Context, id uint64, filter ZkISMUpdatesFilter) ([]ZkISMMessage, error)
+	ByExternalId(ctx context.Context, externalId []byte) (ZkISM, error)
 }
 
 // ZkISM represents a ZK Interchain Security Module created via MsgCreateInterchainSecurityModule.

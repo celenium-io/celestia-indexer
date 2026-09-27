@@ -12,7 +12,7 @@ import (
 
 func saveHlMailboxes(
 	ctx context.Context,
-	tx storage.Transaction,
+	tx storage.HyperlaneTx,
 	mailboxes []*storage.HLMailbox,
 	addrToId map[string]uint64,
 ) error {
@@ -35,7 +35,8 @@ func saveHlMailboxes(
 
 func saveHlTokens(
 	ctx context.Context,
-	tx storage.Transaction,
+	tx storage.HyperlaneTx,
+	mailboxRepo storage.IHLMailbox,
 	tokens []*storage.HLToken,
 	addrToId map[string]uint64,
 ) error {
@@ -53,7 +54,7 @@ func saveHlTokens(
 		}
 
 		if tokens[i].Mailbox != nil {
-			mailbox, err := tx.HyperlaneMailbox(ctx, tokens[i].Mailbox.InternalId)
+			mailbox, err := mailboxRepo.ByInternalId(ctx, tokens[i].Mailbox.InternalId)
 			if err != nil {
 				return errors.Wrapf(err, "can't find mailbox for token: %x", tokens[i].Mailbox.InternalId)
 			}
@@ -66,7 +67,10 @@ func saveHlTokens(
 
 func saveHlTransfers(
 	ctx context.Context,
-	tx storage.Transaction,
+	tx storage.HyperlaneTx,
+	mailboxRepo storage.IHLMailbox,
+	hlTokenRepo storage.IHLToken,
+	hlIgpRepo storage.IHLIGP,
 	transfers []*storage.HLTransfer,
 	addrToId map[string]uint64,
 ) error {
@@ -92,7 +96,7 @@ func saveHlTransfers(
 		}
 
 		if transfers[i].Mailbox != nil {
-			mailbox, err := tx.HyperlaneMailbox(ctx, transfers[i].Mailbox.InternalId)
+			mailbox, err := mailboxRepo.ByInternalId(ctx, transfers[i].Mailbox.InternalId)
 			if err != nil {
 				return errors.Wrapf(err, "can't find mailbox for token: %x", transfers[i].Mailbox.InternalId)
 			}
@@ -100,20 +104,20 @@ func saveHlTransfers(
 		}
 
 		if transfers[i].Token != nil {
-			token, err := tx.HyperlaneToken(ctx, transfers[i].Token.TokenId)
+			tokenId, err := hlTokenRepo.IdByTokenId(ctx, transfers[i].Token.TokenId)
 			if err != nil {
 				return errors.Wrapf(err, "can't find token for transfer: %x", transfers[i].Token.TokenId)
 			}
-			transfers[i].TokenId = token.Id
+			transfers[i].TokenId = tokenId
 		}
 
 		if transfers[i].GasPayment != nil {
-			igp, err := tx.HyperlaneIgp(ctx, transfers[i].GasPayment.Igp.IgpId)
+			igpId, err := hlIgpRepo.IdByHash(ctx, transfers[i].GasPayment.Igp.IgpId)
 			if err != nil {
 				return errors.Wrapf(err, "can't find igp for transfer: %x", transfers[i].GasPayment.Igp.IgpId)
 			}
 
-			transfers[i].GasPayment.IgpId = igp.Id
+			transfers[i].GasPayment.IgpId = igpId
 		}
 	}
 
@@ -129,7 +133,7 @@ func saveHlTransfers(
 	}
 
 	if len(gasPayments) > 0 {
-		if err := tx.SaveHyperlaneGasPayments(ctx, gasPayments...); err != nil {
+		if err := storage.Insert(ctx, tx, gasPayments...); err != nil {
 			return errors.Wrap(err, "hyperlane gas payments saving")
 		}
 	}

@@ -12,7 +12,7 @@ import (
 
 func saveBlobLogs(
 	ctx context.Context,
-	tx storage.Transaction,
+	tx storage.NamespaceTx,
 	blobs []*storage.BlobLog,
 	addrToId map[string]uint64,
 ) error {

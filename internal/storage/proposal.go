@@ -15,8 +15,11 @@ import (
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IProposal interface {
+	sdk.Table[*Proposal]
+
 	ListWithFilters(ctx context.Context, filters ListProposalFilters) (proposals []Proposal, err error)
 	ById(ctx context.Context, id uint64) (Proposal, error)
+	Active(ctx context.Context) ([]Proposal, error)
 }
 
 type Proposal struct {

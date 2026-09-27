@@ -19,6 +19,7 @@ var signalsThreshold = types.NumericFromFloat64(5.0 / 6.0)
 func (module *Module) saveSignals(
 	ctx context.Context,
 	tx storage.Transaction,
+	validatorRepo storage.IValidator,
 	signals []*storage.SignalVersion,
 	upgrades *sdkSync.Map[uint64, *storage.Upgrade],
 	state storage.State,
@@ -27,7 +28,7 @@ func (module *Module) saveSignals(
 		return nil
 	}
 
-	votingPower, _, err := module.totalVotingPower(ctx, tx)
+	votingPower, _, err := module.totalVotingPower(ctx, validatorRepo)
 	if err != nil {
 		return errors.Wrapf(err, "receiving total voting power")
 	}
@@ -42,17 +43,17 @@ func (module *Module) saveSignals(
 			return errors.Wrap(errCantFindAddress, signals[i].Validator.Address)
 		}
 
-		validator, err := tx.Validator(ctx, validatorId)
+		validator, err := validatorRepo.GetByID(ctx, validatorId)
 		if err != nil {
 			return errors.Wrapf(err, "get validator by id: %d", validatorId)
 		}
 
 		signals[i].VotingPower = validator.Stake
 		signals[i].ValidatorId = validatorId
-		signals[i].Validator = &validator
+		signals[i].Validator = validator
 	}
 
-	if err := tx.SaveSignals(ctx, signals...); err != nil {
+	if err := storage.Insert(ctx, tx, signals...); err != nil {
 		return errors.Wrap(err, "saving signal version")
 	}
 
@@ -66,6 +67,7 @@ func (module *Module) saveSignals(
 func (module *Module) tryUpgrade(
 	ctx context.Context,
 	tx storage.Transaction,
+	validatorRepo storage.IValidator,
 	upgrade *storage.Upgrade,
 	state storage.State,
 ) error {
@@ -73,7 +75,7 @@ func (module *Module) tryUpgrade(
 		return nil
 	}
 
-	votingPower, validators, err := module.totalVotingPower(ctx, tx)
+	votingPower, validators, err := module.totalVotingPower(ctx, validatorRepo)
 	if err != nil {
 		return errors.Wrapf(err, "receiving total voting power")
 	}
@@ -114,7 +116,7 @@ func (module *Module) tryUpgrade(
 
 func saveUpgrades(
 	ctx context.Context,
-	tx storage.Transaction,
+	tx storage.GovTx,
 	upgrades *sdkSync.Map[uint64, *storage.Upgrade],
 	state storage.State,
 	votingPower types.Numeric,
@@ -151,8 +153,8 @@ func saveUpgrades(
 	return tx.SaveUpgrades(ctx, toSave...)
 }
 
-func (module *Module) totalVotingPower(ctx context.Context, tx storage.Transaction) (types.Numeric, []storage.Validator, error) {
-	validators, err := tx.BondedValidators(ctx)
+func (module *Module) totalVotingPower(ctx context.Context, repo storage.IValidator) (types.Numeric, []storage.Validator, error) {
+	validators, err := repo.BondedValidators(ctx)
 	if err != nil {
 		return types.NumericZero(), nil, errors.Wrap(err, "get validators")
 	}

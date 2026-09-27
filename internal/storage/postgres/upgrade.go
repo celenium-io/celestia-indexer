@@ -7,23 +7,23 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
+	"github.com/uptrace/bun"
 )
 
 // Upgrade -
 type Upgrade struct {
-	*database.Bun
+	db bun.IDB
 }
 
 // NewUpgrade -
-func NewUpgrade(db *database.Bun) *Upgrade {
+func NewUpgrade(db bun.IDB) storage.IUpgrade {
 	return &Upgrade{
-		Bun: db,
+		db: db,
 	}
 }
 
 func (t *Upgrade) List(ctx context.Context, filters storage.ListUpgradesFilter) (upgrades []storage.Upgrade, err error) {
-	query := t.DB().NewSelect().
+	query := t.db.NewSelect().
 		Model((*storage.Upgrade)(nil))
 
 	if filters.Offset > 0 {
@@ -45,7 +45,7 @@ func (t *Upgrade) List(ctx context.Context, filters storage.ListUpgradesFilter) 
 		query = query.Where("height = ?", filters.Height)
 	}
 
-	q := t.DB().NewSelect().
+	q := t.db.NewSelect().
 		TableExpr("(?) as upgrade", query).
 		ColumnExpr("upgrade.*").
 		ColumnExpr("signer.address as signer__address").
@@ -59,12 +59,12 @@ func (t *Upgrade) List(ctx context.Context, filters storage.ListUpgradesFilter) 
 }
 
 func (t *Upgrade) ByVersion(ctx context.Context, version uint64) (upgrade storage.Upgrade, err error) {
-	query := t.DB().NewSelect().
+	query := t.db.NewSelect().
 		Model((*storage.Upgrade)(nil)).
 		Where("version = ?", version).
 		Limit(1)
 
-	err = t.DB().NewSelect().
+	err = t.db.NewSelect().
 		TableExpr("(?) as upgrade", query).
 		ColumnExpr("upgrade.*").
 		ColumnExpr("signer.address as signer__address").

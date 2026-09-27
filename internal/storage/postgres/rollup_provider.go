@@ -7,21 +7,21 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
+	"github.com/uptrace/bun"
 )
 
 type RollupProvider struct {
-	db *database.Bun
+	db bun.IDB
 }
 
-func NewRollupProvider(db *database.Bun) *RollupProvider {
+func NewRollupProvider(db bun.IDB) storage.IRollupProvider {
 	return &RollupProvider{
 		db: db,
 	}
 }
 
 func (r *RollupProvider) ByRollupId(ctx context.Context, rollupId uint64) (providers []storage.RollupProvider, err error) {
-	err = r.db.DB().NewSelect().
+	err = r.db.NewSelect().
 		Model(&providers).
 		ColumnExpr("rollup_provider.*").
 		ColumnExpr("address.address as address__address").

@@ -19,9 +19,15 @@ type ListConnectionFilters struct {
 	ClientId string
 }
 
+type ConnIdAndClientId struct {
+	ConnectionId string `bun:"connection_id"`
+	ClientId     string `bun:"client_id"`
+}
+
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IIbcConnection interface {
 	ById(ctx context.Context, id string) (IbcConnection, error)
+	ByIds(ctx context.Context, id ...string) ([]ConnIdAndClientId, error)
 	IdsByClients(ctx context.Context, clientIds ...string) ([]string, error)
 	List(ctx context.Context, fltrs ListConnectionFilters) ([]IbcConnection, error)
 }

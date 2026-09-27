@@ -50,7 +50,7 @@ func (module *Module) saveValidators(
 			return 0, err
 		}
 
-		if err := tx.SaveJails(ctx, jailsArr...); err != nil {
+		if err := storage.Insert(ctx, tx, jailsArr...); err != nil {
 			return 0, err
 		}
 	}
@@ -90,7 +90,7 @@ func (module *Module) fillValidatorsCache(validators []*storage.Validator) {
 // processValidatorBondUpdates resolves the operator address of every bond update and merges its power into dCtx.Validators.
 func (module *Module) processValidatorBondUpdates(
 	ctx context.Context,
-	tx storage.Transaction,
+	validatorsRepo storage.IValidator,
 	dCtx *decodeContext.Context,
 ) error {
 	if dCtx.ValidatorUpdates.Len() == 0 {
@@ -123,7 +123,7 @@ func (module *Module) processValidatorBondUpdates(
 			}
 			if validator.Address == "" {
 				// genesis validators are not cached on a sync from scratch
-				stored, err := module.validatorByConsAddress(ctx, tx, consAddress)
+				stored, err := module.validatorByConsAddress(ctx, validatorsRepo, consAddress)
 				if err != nil {
 					return err
 				}
@@ -139,14 +139,10 @@ func (module *Module) processValidatorBondUpdates(
 }
 
 // validatorByConsAddress loads the validator from the DB and caches it for saveValidatorBondUpdates.
-func (module *Module) validatorByConsAddress(ctx context.Context, tx storage.Transaction, consAddress string) (storage.Validator, error) {
-	id, err := tx.GetProposerId(ctx, consAddress)
+func (module *Module) validatorByConsAddress(ctx context.Context, validatorsRepo storage.IValidator, consAddress string) (storage.Validator, error) {
+	validator, err := validatorsRepo.ByConsAddress(ctx, consAddress)
 	if err != nil {
-		return storage.Validator{}, errors.Wrapf(err, "unknown validator in bond update: %s", consAddress)
-	}
-	validator, err := tx.Validator(ctx, id)
-	if err != nil {
-		return storage.Validator{}, errors.Wrapf(err, "receiving validator %d", id)
+		return storage.Validator{}, errors.Wrapf(err, "receiving validator %s", consAddress)
 	}
 	module.fillValidatorsCache([]*storage.Validator{&validator})
 	return validator, nil
@@ -155,7 +151,7 @@ func (module *Module) validatorByConsAddress(ctx context.Context, tx storage.Tra
 // saveValidatorBondUpdates must run after saveValidators, which caches ids of validators created in this block.
 func (module *Module) saveValidatorBondUpdates(
 	ctx context.Context,
-	tx storage.Transaction,
+	tx storage.StakingTx,
 	updates *sdkSync.Map[string, *storage.ValidatorBondUpdate],
 ) error {
 	if updates.Len() == 0 {
@@ -171,5 +167,5 @@ func (module *Module) saveValidatorBondUpdates(
 		update.ValidatorId = id
 		data = append(data, update)
 	}
-	return tx.SaveBondUpdates(ctx, data...)
+	return storage.Insert(ctx, tx, data...)
 }

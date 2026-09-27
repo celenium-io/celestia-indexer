@@ -22,6 +22,7 @@ type FilterBondUpdatesListByValidator struct {
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IValidatorBondUpdate interface {
 	ListByValidator(ctx context.Context, validatorId uint64, filters FilterBondUpdatesListByValidator) ([]ValidatorBondUpdate, error)
+	LastBondUpdate(ctx context.Context, validatorId uint64) (ValidatorBondUpdate, error)
 }
 
 type ValidatorBondUpdate struct {

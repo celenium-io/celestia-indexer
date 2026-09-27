@@ -7,17 +7,16 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/uptrace/bun"
 )
 
 type ZkISM struct {
-	*database.Bun
+	db bun.IDB
 }
 
-func NewZkISM(conn *database.Bun) *ZkISM {
-	return &ZkISM{conn}
+func NewZkISM(db bun.IDB) storage.IZkISM {
+	return &ZkISM{db}
 }
 
 func (z *ZkISM) List(ctx context.Context, filter storage.ZkISMFilter) (items []storage.ZkISM, err error) {
@@ -25,7 +24,7 @@ func (z *ZkISM) List(ctx context.Context, filter storage.ZkISMFilter) (items []s
 		filter.Sort = sdk.SortOrderDesc
 	}
 
-	query := z.DB().NewSelect().
+	query := z.db.NewSelect().
 		Model((*storage.ZkISM)(nil))
 
 	if filter.CreatorId != nil {
@@ -41,7 +40,7 @@ func (z *ZkISM) List(ctx context.Context, filter storage.ZkISMFilter) (items []s
 		query = query.Offset(filter.Offset)
 	}
 
-	err = z.DB().NewSelect().
+	err = z.db.NewSelect().
 		TableExpr("(?) as zk_ism", query).
 		ColumnExpr("zk_ism.*").
 		ColumnExpr("tx.hash as tx__hash").
@@ -56,12 +55,12 @@ func (z *ZkISM) List(ctx context.Context, filter storage.ZkISMFilter) (items []s
 }
 
 func (z *ZkISM) ById(ctx context.Context, id uint64) (item storage.ZkISM, err error) {
-	query := z.DB().NewSelect().
+	query := z.db.NewSelect().
 		Model(&item).
 		Where("zk_ism.id = ?", id).
 		Limit(1)
 
-	err = z.DB().NewSelect().
+	err = z.db.NewSelect().
 		TableExpr("(?) as zk_ism", query).
 		ColumnExpr("zk_ism.*").
 		ColumnExpr("tx.hash as tx__hash").
@@ -79,7 +78,7 @@ func (z *ZkISM) Updates(ctx context.Context, id uint64, filter storage.ZkISMUpda
 		filter.Sort = sdk.SortOrderDesc
 	}
 
-	query := z.DB().NewSelect().
+	query := z.db.NewSelect().
 		Model((*storage.ZkISMUpdate)(nil)).
 		Where("zk_ism_id = ?", id)
 
@@ -102,7 +101,7 @@ func (z *ZkISM) Updates(ctx context.Context, id uint64, filter storage.ZkISMUpda
 		query = query.Offset(filter.Offset)
 	}
 
-	err = z.DB().NewSelect().
+	err = z.db.NewSelect().
 		TableExpr("(?) as u", query).
 		ColumnExpr("u.*").
 		ColumnExpr("tx.hash as tx__hash").
@@ -121,7 +120,7 @@ func (z *ZkISM) Messages(ctx context.Context, id uint64, filter storage.ZkISMUpd
 		filter.Sort = sdk.SortOrderDesc
 	}
 
-	query := z.DB().NewSelect().
+	query := z.db.NewSelect().
 		Model((*storage.ZkISMMessage)(nil)).
 		Where("zk_ism_id = ?", id)
 
@@ -144,7 +143,7 @@ func (z *ZkISM) Messages(ctx context.Context, id uint64, filter storage.ZkISMUpd
 		query = query.Offset(filter.Offset)
 	}
 
-	err = z.DB().NewSelect().
+	err = z.db.NewSelect().
 		TableExpr("(?) as m", query).
 		ColumnExpr("m.*").
 		ColumnExpr("tx.hash as tx__hash").
@@ -155,5 +154,13 @@ func (z *ZkISM) Messages(ctx context.Context, id uint64, filter storage.ZkISMUpd
 		Join("left join celestial on celestial.address_id = m.signer_id and celestial.status = 'PRIMARY'").
 		OrderExpr("m.time ?0, m.id ?0", bun.Safe(filter.Sort)).
 		Scan(ctx, &items)
+	return
+}
+
+func (z *ZkISM) ByExternalId(ctx context.Context, externalId []byte) (item storage.ZkISM, err error) {
+	err = z.db.NewSelect().Model(&item).
+		Where("external_id = ?", externalId).
+		Column("id").
+		Scan(ctx)
 	return
 }

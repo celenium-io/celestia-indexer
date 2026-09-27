@@ -10,10 +10,10 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 )
 
-func (module *Module) rollbackTransactions(ctx context.Context, tx storage.Transaction, height types.Level) error {
+func (module *Module) rollbackTransactions(ctx context.Context, tx storage.BlockTx, height types.Level) error {
 	txs, err := tx.RollbackTxs(ctx, height)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	if len(txs) == 0 {

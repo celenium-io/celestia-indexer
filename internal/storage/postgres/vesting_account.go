@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
+	"github.com/uptrace/bun"
 )
 
 // VestingAccount -
@@ -18,7 +18,7 @@ type VestingAccount struct {
 }
 
 // NewVestingAccount -
-func NewVestingAccount(db *database.Bun) *VestingAccount {
+func NewVestingAccount(db bun.IDB) storage.IVestingAccount {
 	return &VestingAccount{
 		Table: postgres.NewTable[*storage.VestingAccount](db),
 	}

@@ -49,6 +49,7 @@ adr:
 
 generate:
 	go generate -v ./internal/blob ./internal/storage ./internal/storage/types ./pkg/node ./cmd/api/gas ./cmd/api/hyperlane
+	update-license -path=./ -license=./HEADER
 
 api-docs:
 	cd cmd/api && swag init --md markdown -parseDependency --parseInternal --parseDepth 1 --outputTypes json

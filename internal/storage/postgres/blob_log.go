@@ -10,7 +10,6 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/dipdup-io/go-lib/database"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
 	"github.com/uptrace/bun"
 )
@@ -23,7 +22,7 @@ type BlobLog struct {
 }
 
 // NewBlobLog -
-func NewBlobLog(db *database.Bun, export *Export) *BlobLog {
+func NewBlobLog(db bun.IDB, export *Export) storage.IBlobLog {
 	return &BlobLog{
 		Table:  postgres.NewTable[*storage.BlobLog](db),
 		export: export,

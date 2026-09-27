@@ -139,3 +139,16 @@ func (s *StorageTestSuite) TestTotalPowerSkipsUnbonded() {
 	s.Require().NoError(err)
 	s.Require().Equal("1", power.String())
 }
+
+func (s *StorageTestSuite) TestValidatorByConsAddress() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	validator, err := s.storage.Validator.ByConsAddress(ctx, "81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8")
+	s.Require().NoError(err)
+	s.Require().EqualValues(1, validator.Id)
+	s.Require().Equal("81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8", validator.ConsAddress)
+
+	_, err = s.storage.Validator.ByConsAddress(ctx, "DEAD")
+	s.Require().True(s.storage.Validator.IsNoRows(err))
+}

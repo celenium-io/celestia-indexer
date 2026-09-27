@@ -14,7 +14,8 @@ import (
 
 func saveIgps(
 	ctx context.Context,
-	tx storage.Transaction,
+	tx storage.HyperlaneTx,
+	repo storage.IHLIGP,
 	dCtx *decodeContext.Context,
 	addrToId map[string]uint64,
 ) error {
@@ -40,11 +41,11 @@ func saveIgps(
 				return errors.Wrap(err, "decode igp address")
 			}
 
-			igp, err := tx.HyperlaneIgp(ctx, hexAddress.Bytes())
+			igpId, err := repo.IdByHash(ctx, hexAddress.Bytes())
 			if err != nil {
 				return errors.Wrapf(err, "can't find igp with this address %s", hexAddress)
 			}
-			value.Id = igp.Id
+			value.Id = igpId
 
 			configs = append(configs, *value)
 		}

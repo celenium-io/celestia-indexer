@@ -64,10 +64,12 @@ func TestModule_saveSigners(t *testing.T) {
 	for _, tt := range tests {
 		tx := mock.NewMockTransaction(ctrl)
 		tx.EXPECT().
-			SaveSigners(gomock.Any(), gomock.Any()).
+			Insert(gomock.Any(), gomock.AssignableToTypeOf(&[]storage.Signer{})).
 			Times(1).
-			DoAndReturn(func(_ context.Context, addresses ...storage.Signer) error {
-				require.Equal(t, tt.want, addresses)
+			DoAndReturn(func(_ context.Context, data any) error {
+				signers, ok := data.(*[]storage.Signer)
+				require.True(t, ok)
+				require.Equal(t, tt.want, *signers)
 				return nil
 			})
 

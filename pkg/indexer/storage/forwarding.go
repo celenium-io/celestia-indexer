@@ -12,7 +12,8 @@ import (
 
 func saveForwarding(
 	ctx context.Context,
-	tx storage.Transaction,
+	tx storage.HyperlaneTx,
+	hlTokenRepo storage.IHLToken,
 	forwardings []*storage.Forwarding,
 	addrToId map[string]uint64,
 ) error {
@@ -27,15 +28,15 @@ func saveForwarding(
 			}
 		}
 		if forwardings[i].Token != nil {
-			token, err := tx.HyperlaneToken(ctx, forwardings[i].Token.TokenId)
+			tokenId, err := hlTokenRepo.IdByTokenId(ctx, forwardings[i].Token.TokenId)
 			if err != nil {
 				return errors.Wrapf(err, "can't find token for forwarding: %x", forwardings[i].Token.TokenId)
 			}
-			forwardings[i].TokenId = token.Id
+			forwardings[i].TokenId = tokenId
 		} else {
 			return errors.Errorf("token is nil in forwarding")
 		}
 	}
 
-	return tx.SaveForwardings(ctx, forwardings...)
+	return storage.Insert(ctx, tx, forwardings...)
 }

@@ -92,7 +92,7 @@ func (s *AuthTestSuite) TestBulk() {
 		Times(1)
 
 	txUpdate.EXPECT().
-		SaveProviders(gomock.Any(), gomock.Any()).
+		Insert(gomock.Any(), gomock.AssignableToTypeOf(&[]storage.RollupProvider{})).
 		Return(nil).
 		Times(1)
 
@@ -108,15 +108,17 @@ func (s *AuthTestSuite) TestBulk() {
 
 	// second rollup: create new
 	txCreate.EXPECT().
-		SaveRollup(gomock.Any(), gomock.Any()).
-		DoAndReturn(func(ctx context.Context, r *storage.Rollup) error {
-			r.Id = 2
+		Insert(gomock.Any(), gomock.AssignableToTypeOf(&[]*storage.Rollup{})).
+		DoAndReturn(func(ctx context.Context, data any) error {
+			rollups, ok := data.(*[]*storage.Rollup)
+			s.Require().True(ok)
+			(*rollups)[0].Id = 2
 			return nil
 		}).
 		Times(1)
 
 	txCreate.EXPECT().
-		SaveProviders(gomock.Any(), gomock.Any()).
+		Insert(gomock.Any(), gomock.AssignableToTypeOf(&[]storage.RollupProvider{})).
 		Return(nil).
 		Times(1)
 
@@ -206,15 +208,17 @@ func (s *AuthTestSuite) TestBulkPartialError() {
 
 	// first rollup succeeds
 	txSuccess.EXPECT().
-		SaveRollup(gomock.Any(), gomock.Any()).
-		DoAndReturn(func(ctx context.Context, r *storage.Rollup) error {
-			r.Id = 1
+		Insert(gomock.Any(), gomock.AssignableToTypeOf(&[]*storage.Rollup{})).
+		DoAndReturn(func(ctx context.Context, data any) error {
+			rollups, ok := data.(*[]*storage.Rollup)
+			s.Require().True(ok)
+			(*rollups)[0].Id = 1
 			return nil
 		}).
 		Times(1)
 
 	txSuccess.EXPECT().
-		SaveProviders(gomock.Any(), gomock.Any()).
+		Insert(gomock.Any(), gomock.AssignableToTypeOf(&[]storage.RollupProvider{})).
 		Return(nil).
 		Times(1)
 
@@ -223,9 +227,9 @@ func (s *AuthTestSuite) TestBulkPartialError() {
 		Return(nil).
 		Times(1)
 
-	// second rollup fails on SaveRollup
+	// second rollup fails on rollup insert
 	txFail.EXPECT().
-		SaveRollup(gomock.Any(), gomock.Any()).
+		Insert(gomock.Any(), gomock.AssignableToTypeOf(&[]*storage.Rollup{})).
 		Return(errors.New("duplicate slug")).
 		Times(1)
 

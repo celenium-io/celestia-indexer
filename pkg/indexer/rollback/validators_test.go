@@ -20,6 +20,7 @@ import (
 // rollbackTx wires the calls rollbackValidators always makes and captures what it writes back.
 type rollbackTx struct {
 	tx          *mock.MockTransaction
+	bondUpdates *mock.MockIValidatorBondUpdate
 	validators  []*storage.Validator
 	balances    []storage.Balance
 	delegations []storage.Delegation
@@ -38,12 +39,10 @@ func newRollbackTxWithBondUpdates(
 ) *rollbackTx {
 	ctrl := gomock.NewController(t)
 	tx := mock.NewMockTransaction(ctrl)
-	captured := &rollbackTx{tx: tx}
+	captured := &rollbackTx{tx: tx, bondUpdates: mock.NewMockIValidatorBondUpdate(ctrl)}
 
 	tx.EXPECT().RollbackValidators(gomock.Any(), gomock.Any()).Return(removed, nil)
 	tx.EXPECT().RollbackBondUpdates(gomock.Any(), gomock.Any()).Return(bondUpdates, nil)
-	tx.EXPECT().RollbackUndelegations(gomock.Any(), gomock.Any()).Return(nil)
-	tx.EXPECT().RollbackRedelegations(gomock.Any(), gomock.Any()).Return(nil)
 	tx.EXPECT().RollbackJails(gomock.Any(), gomock.Any()).Return(jails, nil)
 	tx.EXPECT().RollbackStakingLogs(gomock.Any(), gomock.Any()).Return(logs, nil)
 
@@ -87,7 +86,7 @@ func Test_rollbackValidators_UnbondingRestoresStake(t *testing.T) {
 	}
 	captured := newRollbackTx(t, nil, logs)
 
-	result, err := rollbackValidators(t.Context(), captured.tx, types.Level(100))
+	result, err := rollbackValidators(t.Context(), captured.tx, captured.bondUpdates, types.Level(100))
 	require.NoError(t, err)
 	require.Equal(t, 0, result.count)
 
@@ -112,7 +111,7 @@ func Test_rollbackValidators_CancelledUnbondingTakesStake(t *testing.T) {
 	}
 	captured := newRollbackTx(t, nil, logs)
 
-	_, err := rollbackValidators(t.Context(), captured.tx, types.Level(100))
+	_, err := rollbackValidators(t.Context(), captured.tx, captured.bondUpdates, types.Level(100))
 	require.NoError(t, err)
 	require.Equal(t, "-300", captured.validator(t, 5).Stake.String())
 }
@@ -125,7 +124,7 @@ func Test_rollbackValidators_DelegationTakesStake(t *testing.T) {
 	}
 	captured := newRollbackTx(t, nil, logs)
 
-	_, err := rollbackValidators(t.Context(), captured.tx, types.Level(100))
+	_, err := rollbackValidators(t.Context(), captured.tx, captured.bondUpdates, types.Level(100))
 	require.NoError(t, err)
 	require.Equal(t, "-500", captured.validator(t, 5).Stake.String())
 	require.Equal(t, "-500", captured.balances[0].Delegated.String())
@@ -143,7 +142,7 @@ func Test_rollbackValidators_JailedFlagOnlyFromJails(t *testing.T) {
 	}
 	captured := newRollbackTx(t, jails, logs)
 
-	_, err := rollbackValidators(t.Context(), captured.tx, types.Level(100))
+	_, err := rollbackValidators(t.Context(), captured.tx, captured.bondUpdates, types.Level(100))
 	require.NoError(t, err)
 	require.Len(t, captured.validators, 2)
 
@@ -168,11 +167,11 @@ func Test_rollbackValidators_BondUpdateRestoresPower(t *testing.T) {
 	captured := newRollbackTxWithBondUpdates(t, nil,
 		[]storage.ValidatorBondUpdate{{ValidatorId: 5, Height: 100, Power: numericPtr(0)}},
 		nil, nil)
-	captured.tx.EXPECT().LastBondUpdate(gomock.Any(), uint64(5)).
+	captured.bondUpdates.EXPECT().LastBondUpdate(gomock.Any(), uint64(5)).
 		Return(storage.ValidatorBondUpdate{ValidatorId: 5, Height: 90, Power: numericPtr(42)}, nil).
 		Times(1)
 
-	_, err := rollbackValidators(t.Context(), captured.tx, types.Level(100))
+	_, err := rollbackValidators(t.Context(), captured.tx, captured.bondUpdates, types.Level(100))
 	require.NoError(t, err)
 
 	val := captured.validator(t, 5)
@@ -187,11 +186,11 @@ func Test_rollbackValidators_FirstBondUpdateResetsPower(t *testing.T) {
 	captured := newRollbackTxWithBondUpdates(t, nil,
 		[]storage.ValidatorBondUpdate{{ValidatorId: 5, Height: 100, Power: numericPtr(10)}},
 		nil, nil)
-	captured.tx.EXPECT().LastBondUpdate(gomock.Any(), uint64(5)).
+	captured.bondUpdates.EXPECT().LastBondUpdate(gomock.Any(), uint64(5)).
 		Return(storage.ValidatorBondUpdate{}, sql.ErrNoRows).
 		Times(1)
 
-	_, err := rollbackValidators(t.Context(), captured.tx, types.Level(100))
+	_, err := rollbackValidators(t.Context(), captured.tx, captured.bondUpdates, types.Level(100))
 	require.NoError(t, err)
 
 	val := captured.validator(t, 5)
@@ -206,10 +205,11 @@ func Test_rollbackValidators_LastBondUpdateError(t *testing.T) {
 	tx.EXPECT().RollbackValidators(gomock.Any(), gomock.Any()).Return(nil, nil)
 	tx.EXPECT().RollbackBondUpdates(gomock.Any(), gomock.Any()).
 		Return([]storage.ValidatorBondUpdate{{ValidatorId: 5, Power: numericPtr(1)}}, nil)
-	tx.EXPECT().LastBondUpdate(gomock.Any(), uint64(5)).
+	bondUpdates := mock.NewMockIValidatorBondUpdate(ctrl)
+	bondUpdates.EXPECT().LastBondUpdate(gomock.Any(), uint64(5)).
 		Return(storage.ValidatorBondUpdate{}, errors.New("db is down"))
 
-	_, err := rollbackValidators(t.Context(), tx, types.Level(100))
+	_, err := rollbackValidators(t.Context(), tx, bondUpdates, types.Level(100))
 	require.Error(t, err)
 }
 
@@ -222,7 +222,7 @@ func Test_rollbackValidators_BondUpdateOfRemovedValidator(t *testing.T) {
 	captured.tx.EXPECT().DeleteDelegationsByValidator(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	captured.tx.EXPECT().DeleteBalances(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 
-	_, err := rollbackValidators(t.Context(), captured.tx, types.Level(100))
+	_, err := rollbackValidators(t.Context(), captured.tx, captured.bondUpdates, types.Level(100))
 	require.NoError(t, err)
 
 	for i := range captured.validators {
@@ -236,10 +236,10 @@ func Test_rollbackValidators_BondUpdateWithJail(t *testing.T) {
 		[]storage.ValidatorBondUpdate{{ValidatorId: 5, Height: 100, Power: numericPtr(0)}},
 		[]storage.Jail{{ValidatorId: 5, Height: 100}},
 		nil)
-	captured.tx.EXPECT().LastBondUpdate(gomock.Any(), uint64(5)).
+	captured.bondUpdates.EXPECT().LastBondUpdate(gomock.Any(), uint64(5)).
 		Return(storage.ValidatorBondUpdate{ValidatorId: 5, Power: numericPtr(7)}, nil)
 
-	_, err := rollbackValidators(t.Context(), captured.tx, types.Level(100))
+	_, err := rollbackValidators(t.Context(), captured.tx, captured.bondUpdates, types.Level(100))
 	require.NoError(t, err)
 
 	require.Len(t, captured.validators, 1)

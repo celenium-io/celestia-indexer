@@ -15,7 +15,8 @@ import (
 
 func (module *Module) rollbackBalances(
 	ctx context.Context,
-	tx storage.Transaction,
+	tx storage.AccountTx,
+	accountRepo storage.IAddress,
 	deletedEvents []storage.Event,
 	deletedAddresses []storage.Address,
 ) error {
@@ -36,7 +37,7 @@ func (module *Module) rollbackBalances(
 		return nil
 	}
 
-	updates, err := getBalanceUpdates(ctx, tx, deleted, deletedEvents)
+	updates, err := getBalanceUpdates(ctx, accountRepo, deleted, deletedEvents)
 	if err != nil {
 		return err
 	}
@@ -57,7 +58,7 @@ func (module *Module) rollbackBalances(
 
 func getBalanceUpdates(
 	ctx context.Context,
-	tx storage.Transaction,
+	accountRepo storage.IAddress,
 	deletedAddress map[string]struct{},
 	deletedEvents []storage.Event,
 ) ([]*storage.Address, error) {
@@ -101,7 +102,7 @@ func getBalanceUpdates(
 				}
 			}
 		} else {
-			lastHeight, err := tx.LastAddressAction(ctx, address.Hash)
+			lastHeight, err := accountRepo.LastAddressAction(ctx, address.Hash)
 			if err != nil {
 				return nil, err
 			}

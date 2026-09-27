@@ -8,8 +8,8 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
-	"github.com/dipdup-io/go-lib/database"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
+	"github.com/uptrace/bun"
 )
 
 // Validator -
@@ -18,7 +18,7 @@ type Validator struct {
 }
 
 // NewValidator -
-func NewValidator(db *database.Bun) *Validator {
+func NewValidator(db bun.IDB) storage.IValidator {
 	return &Validator{
 		Table: postgres.NewTable[*storage.Validator](db),
 	}
@@ -132,5 +132,24 @@ func (v *Validator) CountByStatus(ctx context.Context) (response storage.CountBy
 		ColumnExpr("count(*) FILTER (WHERE jailed IS NOT TRUE AND COALESCE(power, 0) = 0) AS not_active").
 		ColumnExpr("count(*) FILTER (WHERE jailed IS NOT TRUE AND power > 0) AS active").
 		Scan(ctx, &response)
+	return
+}
+
+func (v *Validator) ByConsAddress(ctx context.Context, address string) (validator storage.Validator, err error) {
+	err = v.DB().NewSelect().
+		Model(&validator).
+		Where("cons_address = ?", address).
+		Order("id desc").
+		Limit(1).
+		Scan(ctx)
+	return
+}
+
+func (v *Validator) BondedValidators(ctx context.Context) (validators []storage.Validator, err error) {
+	err = v.DB().NewSelect().Model(&validators).
+		Column("id", "power", "version", "stake").
+		Where("coalesce(power, 0) > 0").
+		OrderExpr("power desc").
+		Scan(ctx)
 	return
 }

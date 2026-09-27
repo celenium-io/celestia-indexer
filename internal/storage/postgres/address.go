@@ -8,7 +8,6 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/currency"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
-	"github.com/dipdup-io/go-lib/database"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
 	"github.com/pkg/errors"
 	"github.com/uptrace/bun"
@@ -20,7 +19,7 @@ type Address struct {
 }
 
 // NewAddress -
-func NewAddress(db *database.Bun) *Address {
+func NewAddress(db bun.IDB) storage.IAddress {
 	return &Address{
 		Table: postgres.NewTable[*storage.Address](db),
 	}
@@ -167,4 +166,22 @@ func (a *Address) Balances(ctx context.Context, addressId uint64, limit, offset 
 
 	err = query.Scan(ctx, &balances)
 	return
+}
+
+// LastAddressAction -
+func (a *Address) LastAddressAction(ctx context.Context, address []byte) (uint64, error) {
+	var height uint64
+	err := a.DB().NewSelect().
+		Model((*storage.MsgAddress)(nil)).
+		ExcludeColumn("msg_id", "address_id", "type").
+		Where("address.hash = ?", address).
+		Order("msg_id desc").
+		Relation("Msg", func(q *bun.SelectQuery) *bun.SelectQuery {
+			return q.Column("height")
+		}).
+		Relation("Address", func(q *bun.SelectQuery) *bun.SelectQuery {
+			return q.ExcludeColumn("*")
+		}).
+		Scan(ctx, &height)
+	return height, err
 }

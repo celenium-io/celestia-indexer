@@ -10,7 +10,6 @@ import (
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
-	"github.com/dipdup-io/go-lib/database"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	"github.com/dipdup-net/indexer-sdk/pkg/storage/postgres"
 	"github.com/uptrace/bun"
@@ -22,7 +21,7 @@ type Forwarding struct {
 }
 
 // NewForwarding -
-func NewForwarding(db *database.Bun) *Forwarding {
+func NewForwarding(db bun.IDB) storage.IForwarding {
 	return &Forwarding{
 		Table: postgres.NewTable[*storage.Forwarding](db),
 	}
