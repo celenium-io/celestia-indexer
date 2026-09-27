@@ -266,10 +266,10 @@ func TestIpsIndependentCounters(t *testing.T) {
 
 func TestIpsConcurrentCheckAndSet(t *testing.T) {
 	const (
-		max     = 10
+		limit   = 10
 		workers = 100
 	)
-	ips := NewIps(max)
+	ips := NewIps(limit)
 
 	var (
 		wg            gosync.WaitGroup
@@ -290,14 +290,14 @@ func TestIpsConcurrentCheckAndSet(t *testing.T) {
 	}
 	wg.Wait()
 
-	require.Equal(t, max, acceptedCount, "exactly max connections must be accepted")
+	require.Equal(t, limit, acceptedCount, "exactly max connections must be accepted")
 
 	count, ok := ips.Get(testIp)
 	require.True(t, ok)
-	require.Equal(t, max, count)
+	require.Equal(t, limit, count)
 
 	// concurrent disconnects release all slots and remove the entry
-	for i := 0; i < max; i++ {
+	for i := 0; i < limit; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()

@@ -27,6 +27,7 @@ type rollbackTx struct {
 }
 
 func newRollbackTx(t *testing.T, jails []storage.Jail, logs []storage.StakingLog) *rollbackTx {
+	t.Helper()
 	return newRollbackTxWithBondUpdates(t, nil, nil, jails, logs)
 }
 
@@ -37,6 +38,7 @@ func newRollbackTxWithBondUpdates(
 	jails []storage.Jail,
 	logs []storage.StakingLog,
 ) *rollbackTx {
+	t.Helper()
 	ctrl := gomock.NewController(t)
 	tx := mock.NewMockTransaction(ctrl)
 	captured := &rollbackTx{tx: tx, bondUpdates: mock.NewMockIValidatorBondUpdate(ctrl)}

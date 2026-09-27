@@ -196,6 +196,7 @@ func TestParseBalances_ExistingAddressNewCurrency(t *testing.T) {
 }
 
 func loadGenesisFixture(t *testing.T) types.Genesis {
+	t.Helper()
 	f, err := os.Open("../../../test/json/genesis.json")
 	require.NoError(t, err)
 	defer f.Close()

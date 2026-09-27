@@ -6,7 +6,6 @@ package dal
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io"
 	"net/http"
 	"sync/atomic"
@@ -99,7 +98,7 @@ func (node *Node) post(ctx context.Context, method string, params []any, output 
 		return err
 	}
 	request.Header.Add("Content-Type", "application/json")
-	request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", node.token))
+	request.Header.Add("Authorization", "Bearer "+node.token)
 
 	if node.rateLimit != nil {
 		if err := node.rateLimit.Wait(ctx); err != nil {
@@ -109,7 +108,7 @@ func (node *Node) post(ctx context.Context, method string, params []any, output 
 
 	start := time.Now()
 
-	response, err := node.client.Do(request) //nolint:gosec,bodyclose
+	response, err := node.client.Do(request) //nolint:bodyclose
 	if err != nil {
 		return err
 	}

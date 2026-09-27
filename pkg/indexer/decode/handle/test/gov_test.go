@@ -589,7 +589,7 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1WithRecoverClient(t *testing.T) 
 }
 
 func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1Beta1ClientUpdate(t *testing.T) {
-	content, err := (&ibcClientTypes.ClientUpdateProposal{ //nolint
+	content, err := (&ibcClientTypes.ClientUpdateProposal{ //nolint:staticcheck
 		Title:              "Recover client",
 		Description:        "Recover expired client",
 		SubjectClientId:    "07-tendermint-1",

@@ -313,7 +313,7 @@ func NestedMessage(
 		d.Msg.Type, err = handle.MsgIBCSoftwareUpgrade(ctx, d.Msg.Id, typedMsg)
 	case *coreClient.MsgUpdateParams:
 		d.Msg.Type, err = handle.MsgUpdateParams(ctx, d.Msg.Id, typedMsg)
-	case *coreClient.MsgSubmitMisbehaviour: //nolint
+	case *coreClient.MsgSubmitMisbehaviour: //nolint:staticcheck
 		d.Msg.Type, err = handle.MsgSubmitMisbehaviour(ctx, d.Msg.Id, typedMsg)
 
 	// coreConnection module

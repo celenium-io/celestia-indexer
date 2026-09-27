@@ -387,7 +387,7 @@ func Test_handleForward(t *testing.T) {
 			{
 				Height: 10727934,
 				Type:   types.EventTypeCelestiaforwardingv1EventTokenForwarded,
-				Data: map[string]string{ //nolint:gosec
+				Data: map[string]string{
 					"amount":       "\"1000000\"",
 					"denom":        "\"hyperlane/0x726f757465725f61707000000000000000000000000000020000000000000024\"",
 					"error":        "\"\"",
@@ -400,7 +400,7 @@ func Test_handleForward(t *testing.T) {
 			{
 				Height: 10727934,
 				Type:   types.EventTypeCelestiaforwardingv1EventForwardingComplete,
-				Data: map[string]string{ //nolint:gosec
+				Data: map[string]string{
 					"dest_domain":      "2147483647",
 					"dest_recipient":   "\"0x00000000000000000000000050cB97b8613003DB9B278Bb89d3ab3C377F99727\"",
 					"forward_addr":     "\"celestia184xycj78zfyhxd07rmg0wpc70r8scjm7jwj403\"",

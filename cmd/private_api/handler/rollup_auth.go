@@ -320,7 +320,7 @@ func (handler RollupAuthHandler) Update(c echo.Context) error {
 	}
 
 	if err := handler.runTx(c.Request().Context(), func(ctx context.Context, tx storage.Transaction) error {
-		return handler.updateRollup(c.Request().Context(), tx, req, apiKey.Admin)
+		return handler.updateRollup(ctx, tx, req, apiKey.Admin)
 	}); err != nil {
 		return handleError(c, err, handler.rollups)
 	}

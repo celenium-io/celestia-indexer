@@ -11,10 +11,10 @@ type Ips struct {
 	max int
 }
 
-func NewIps(max int) *Ips {
+func NewIps(limit int) *Ips {
 	return &Ips{
 		ips: make(map[string]int),
-		max: max,
+		max: limit,
 	}
 }
 

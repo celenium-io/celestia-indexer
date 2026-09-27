@@ -51,7 +51,7 @@ func (module *Module) rollbackNamespaces(
 
 		// The deleted namespace_message row carries both the size it added and
 		// the source it came from, so the message payload is never parsed here.
-		size := int64(nsMsgs[i].Size) //nolint:gosec // sizes are bounded by the max blob size
+		size := int64(nsMsgs[i].Size)
 		diff.BlobsCount -= 1
 		switch nsMsgs[i].Source {
 		case storageTypes.BlobSourceFibre:

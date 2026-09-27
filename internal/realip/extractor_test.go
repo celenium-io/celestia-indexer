@@ -12,6 +12,7 @@ import (
 )
 
 func newRequest(t *testing.T, remoteAddr, xff string) *http.Request {
+	t.Helper()
 	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/", nil)
 	req.RemoteAddr = remoteAddr
 	if xff != "" {

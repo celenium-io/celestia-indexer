@@ -95,7 +95,7 @@ func (api *API) get(ctx context.Context, path string, args map[string]string, ou
 	}
 	req.Header.Set("User-Agent", celeniumUserAgent)
 
-	response, err := api.client.Do(req) //nolint:gosec,bodyclose
+	response, err := api.client.Do(req) //nolint:bodyclose
 	if err != nil {
 		return err
 	}
