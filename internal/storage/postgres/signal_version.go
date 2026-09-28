@@ -66,30 +66,18 @@ func (t *SignalVersion) List(ctx context.Context, filters storage.ListSignalsFil
 	return
 }
 
-// latestSignals selects the signal each validator counts with in x/signal:
-// its latest one since the last applied upgrade (ResetTally wipes older ones).
-func latestSignals(db bun.IDB) *bun.SelectQuery {
-	lastApplied := db.NewSelect().
+// Latest returns the signals x/signal tallies; the indexer weighs them with the power it saw before the block.
+func (t *SignalVersion) Latest(ctx context.Context) (signals []storage.SignalVersion, err error) {
+	lastApplied := t.db.NewSelect().
 		Table("upgrade").
 		ColumnExpr("COALESCE(MAX(applied_at_level), 0)").
 		Where("status = ?", storageTypes.UpgradeStatusApplied)
 
-	return db.NewSelect().
-		Model((*storage.SignalVersion)(nil)).
+	err = t.db.NewSelect().
+		Model(&signals).
 		ColumnExpr("DISTINCT ON (validator_id) id, validator_id, version").
 		Where("height >= (?)", lastApplied).
-		OrderExpr("validator_id, height DESC")
-}
-
-// Tally mirrors x/signal TallyVotingPower: the consensus power of bonded validators whose latest signal is version.
-func (t *SignalVersion) Tally(ctx context.Context, version uint64) (storageTypes.Numeric, error) {
-	var sum storageTypes.Numeric
-	err := t.db.NewSelect().
-		TableExpr("(?) AS latest", latestSignals(t.db)).
-		ColumnExpr("COALESCE(SUM(validator.power), 0)").
-		Join("JOIN validator ON validator.id = latest.validator_id").
-		Where("latest.version = ?", version).
-		Where("validator.power > 0").
-		Scan(ctx, &sum)
-	return sum, err
+		OrderExpr("validator_id, height DESC").
+		Scan(ctx)
+	return
 }

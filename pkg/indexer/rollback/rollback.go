@@ -164,6 +164,11 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 
 	repos := module.reposFactory(tx)
 
+	// needs the block's signals, so before they are deleted by height
+	if err := tx.RollbackUpgrades(ctx, height); err != nil {
+		return tx.HandleError(ctx, err)
+	}
+
 	if err := tx.RollbackByHeight(
 		ctx,
 		height,
@@ -252,6 +257,7 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 	state.LastHeight = newBlock.Height
 	state.LastHash = newBlock.Hash
 	state.LastTime = newBlock.Time
+	state.Version = newBlock.VersionApp
 	state.TotalTx -= blockStats.TxCount
 	state.TotalBlobsSize -= blockStats.BlobsSize
 	state.TotalNamespaces -= totalNamespaces

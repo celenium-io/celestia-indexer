@@ -105,7 +105,9 @@ type GovTx interface {
 	SaveVotes(ctx context.Context, votes ...*Vote) (map[uint64]*VotesCount, error)
 	SaveUpgrades(ctx context.Context, upgrades ...*Upgrade) error
 	UpdateUpgradeTally(ctx context.Context, version uint64, votingPower, votedPower types.Numeric, status types.UpgradeStatus) error
-	FixSignalsPower(ctx context.Context, version uint64) error
+	// FixSignalsPower closes the open round: counted signals get their power (by signal id), the rest 0.
+	FixSignalsPower(ctx context.Context, powers map[uint64]types.Numeric) error
+	RollbackUpgrades(ctx context.Context, height pkgTypes.Level) error
 }
 
 // IbcTx covers IBC clients, connections and channels.

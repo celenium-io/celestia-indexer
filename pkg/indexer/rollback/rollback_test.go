@@ -162,6 +162,8 @@ func (s *ModuleTestSuite) TestModule_SuccessOnRollbackTwoBlocks() {
 			s.Require().True(ok, "got wrong type %T", msg)
 
 			s.Require().Equal(types.Level(999), state.LastHeight)
+			// restored from the new last block, fixture state has none
+			s.Require().EqualValues(1, state.Version)
 			s.Require().Equal(expectedHash, state.LastHash)
 			s.Require().Equal("2023-07-04 03:10:56", state.LastTime.Format(time.DateTime))
 			s.Require().Equal(int64(1), state.TotalTx)

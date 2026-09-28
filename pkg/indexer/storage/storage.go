@@ -288,8 +288,10 @@ func (module *Module) processBlockInTransaction(
 		return state, errors.Wrap(err, "upgrade failed")
 	}
 
-	if err := module.processValidatorBondUpdates(ctx, repos.Validators, dCtx); err != nil {
-		return state, errors.Wrap(err, "process validator bond updates")
+	// before any validator write: x/signal weighs this block's messages with the previous block's power
+	powers, err := takePowerSnapshot(ctx, repos.Validators)
+	if err != nil {
+		return state, errors.Wrap(err, "take power snapshot")
 	}
 
 	if err := module.saveConstantUpdates(ctx, tx, dCtx.Constants); err != nil {
@@ -332,6 +334,10 @@ func (module *Module) processBlockInTransaction(
 
 	if err := saveNamespaceMessages(ctx, tx, dCtx.NamespaceMessages.Values()); err != nil {
 		return state, errors.Wrap(err, "save namespace messages")
+	}
+
+	if err := module.processValidatorBondUpdates(ctx, repos.Validators, dCtx); err != nil {
+		return state, errors.Wrap(err, "process validator bond updates")
 	}
 
 	totalValidators, err := module.saveValidators(ctx, tx, dCtx.Validators.Values(), dCtx.Jails)
@@ -417,28 +423,8 @@ func (module *Module) processBlockInTransaction(
 		return state, err
 	}
 
-	// closes the round if MsgTryUpgrade was not seen (e.g. sent via authz); a no-op otherwise
-	if state.Version < block.VersionApp {
-		if err := tx.FixSignalsPower(ctx, block.VersionApp); err != nil {
-			return state, errors.Wrap(err, "fix signals power")
-		}
-	}
-
-	// before signals: the tally only counts signals since the last applied upgrade
-	if err := module.setUpgradeApplied(ctx, tx, state.Version, dCtx.Block); err != nil {
-		return state, errors.Wrap(err, "set upgrade applied")
-	}
-
-	if err := module.saveSignals(ctx, tx, dCtx.Signals); err != nil {
-		return state, err
-	}
-
-	if err := recountUpgrades(ctx, tx, repos, dCtx.Upgrades, block.VersionApp); err != nil {
-		return state, errors.Wrap(err, "recount upgrades")
-	}
-
-	if err := tryUpgrade(ctx, tx, repos, dCtx.TryUpgrade, block.VersionApp, block.ChainId, addrToId); err != nil {
-		return state, err
+	if err := module.processSignalModule(ctx, tx, repos, dCtx, state.Version, addrToId, powers); err != nil {
+		return state, errors.Wrap(err, "process signal module")
 	}
 
 	updateState(block, totalAccounts, totalNamespaces, totalProposals, ibcClientsCount, totalValidators, dCtx.Block.VersionApp, &state)
@@ -482,6 +468,7 @@ func (module *Module) setUpgradeApplied(ctx context.Context, tx storage.GovTx, c
 		Status:         types.UpgradeStatusApplied,
 		AppliedAt:      block.Time,
 		AppliedAtLevel: block.Height,
+		ExpectedHeight: block.Height - 1,
 	}
 
 	return tx.SaveUpgrades(ctx, &upgrade)

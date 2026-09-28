@@ -14,6 +14,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	indexerCfg "github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 	decodeContext "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/dipdup-io/go-lib/config"
 	"github.com/dipdup-io/go-lib/testhelpers"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"
@@ -194,6 +195,8 @@ func (s *ModuleTestSuite) TestSignalInUpgradeBlockKeepsAppliedUpgrade() {
 	s.Require().NoError(err)
 	s.Require().Equal(types.UpgradeStatusApplied, upgrade.Status)
 	s.Require().EqualValues(height, upgrade.AppliedAtLevel)
+	// no MsgTryUpgrade was seen: the scheduled height is the block before the applied one
+	s.Require().EqualValues(height-1, upgrade.ExpectedHeight)
 	s.Require().Equal("2", upgrade.VotedPower.String())
 	s.Require().Equal("2", upgrade.VotingPower.String())
 	s.Require().EqualValues(2, upgrade.SignalsCount)
@@ -346,6 +349,10 @@ func (s *ModuleTestSuite) TestAppliedUpgradeClosesRound() {
 	s.Require().NotNil(notCounted)
 	s.Require().Equal("1", counted.VotingPower.String())
 	s.Require().Equal("0", notCounted.VotingPower.String())
+
+	upgrade, err := s.storage.Upgrade.ByVersion(ctx, 5)
+	s.Require().NoError(err)
+	s.Require().EqualValues(state.LastHeight, upgrade.ExpectedHeight)
 }
 
 func (s *ModuleTestSuite) TestTryUpgradeClosesRound() {
@@ -443,6 +450,155 @@ func (s *ModuleTestSuite) TestTryUpgradeClosesRound() {
 	}
 	// counted: validator 1 for v5; not counted: its old v4 vote and the unbonded validator 2
 	s.Require().Equal(map[int64]string{2980: "0", 2990: "0", 2995: "1"}, power)
+}
+
+func (s *ModuleTestSuite) setSignalState(ctx context.Context, version uint64, height int64) storage.State {
+	_, err := s.storage.Connection().DB().NewUpdate().Table("state").
+		Set("version = ?", version).
+		Set("last_height = ?", height).
+		Where("name = ?", testIndexerName).
+		Exec(ctx)
+	s.Require().NoError(err)
+	state, err := s.storage.State.ByName(ctx, testIndexerName)
+	s.Require().NoError(err)
+	return state
+}
+
+func (s *ModuleTestSuite) tryUpgradeBlock(height pkgTypes.Level, blockTime time.Time) *decodeContext.Context {
+	const signer = "celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8"
+	dCtx := decodeContext.NewContext()
+	dCtx.Block = &storage.Block{
+		Height:          height,
+		Hash:            []byte{0x0d, 0x0e, 0x0f},
+		VersionBlock:    11,
+		VersionApp:      3,
+		ChainId:         "celestia",
+		ProposerAddress: "81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8",
+		Time:            blockTime,
+		MessageTypes:    types.NewMsgTypeBitMask(),
+	}
+	signerAddress := &storage.Address{Address: signer, Height: height, LastHeight: height}
+	s.Require().NoError(dCtx.AddAddress(signerAddress))
+	dCtx.TryUpgrade = &storage.Upgrade{
+		Height:    height,
+		Time:      blockTime,
+		EndTime:   blockTime,
+		EndHeight: height,
+		Signer:    signerAddress,
+		TxId:      9,
+		MsgId:     9,
+	}
+	return dCtx
+}
+
+func addSignal(dCtx *decodeContext.Context, address string, version, id uint64) {
+	validator := storage.EmptyValidator()
+	validator.Address = address
+	validator.Version = version
+	dCtx.AddValidator(validator)
+	dCtx.AddSignal(&storage.SignalVersion{
+		Height:    dCtx.Block.Height,
+		Time:      dCtx.Block.Time,
+		Version:   version,
+		Validator: &storage.Validator{Address: address},
+		TxId:      id,
+		MsgId:     id,
+	})
+	dCtx.AddUpgrade(storage.Upgrade{Version: version, SignalsCount: 1, Height: dCtx.Block.Height, Time: dCtx.Block.Time})
+}
+
+// The decisive signals and MsgTryUpgrade in one block: candidates include versions of this block's signals.
+func (s *ModuleTestSuite) TestSignalAndTryUpgradeInOneBlock() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 10*time.Second)
+	defer ctxCancel()
+
+	state := s.setSignalState(ctx, 3, 3000)
+
+	module := NewModule(s.storage.Transactable, s.storage.Notificator, indexerCfg.Indexer{Name: testIndexerName})
+	module.Start(ctx)
+	defer func() {
+		ctxCancel()
+		s.Require().NoError(module.Close())
+	}()
+
+	height := state.LastHeight + 1
+	dCtx := s.tryUpgradeBlock(height, state.LastTime.Add(time.Minute))
+	addSignal(dCtx, "celestiavaloper17vmk8m246t648hpmde2q7kp4ft9uwrayy09dmw", 4, 1)
+	addSignal(dCtx, "celestiavaloper189ecvq5avj0wehrcfnagpd5sd8pup9aqmdglmr", 4, 2)
+
+	_, err := module.saveBlock(ctx, dCtx)
+	s.Require().NoError(err)
+
+	upgrade, err := s.storage.Upgrade.ByVersion(ctx, 4)
+	s.Require().NoError(err)
+	s.Require().Equal(types.UpgradeStatusWaitingUpgrade, upgrade.Status)
+	s.Require().EqualValues(height, upgrade.EndHeight)
+	s.Require().Equal("2", upgrade.VotedPower.String())
+	s.Require().Equal("2", upgrade.VotingPower.String())
+}
+
+// MsgCreateValidator and MsgSignalVersion of the new validator in the block that closes the round,
+// with a bond update at the block's EndBlock.
+func (s *ModuleTestSuite) TestNewValidatorSignalsInCreationBlock() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 10*time.Second)
+	defer ctxCancel()
+
+	state := s.setSignalState(ctx, 3, 3000)
+
+	tx, err := postgres.BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+	signalTime := time.Date(2023, 7, 4, 0, 0, 0, 0, time.UTC)
+	s.Require().NoError(storage.Insert(ctx, tx,
+		&storage.SignalVersion{Height: 2980, ValidatorId: 1, Version: 4, Time: signalTime, TxId: 1, MsgId: 1},
+		&storage.SignalVersion{Height: 2990, ValidatorId: 2, Version: 4, Time: signalTime, TxId: 2, MsgId: 2},
+	))
+	s.Require().NoError(tx.SaveUpgrades(ctx, &storage.Upgrade{Version: 4, Height: 2980, Time: signalTime, SignalsCount: 2}))
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	module := NewModule(s.storage.Transactable, s.storage.Notificator, indexerCfg.Indexer{Name: testIndexerName})
+	module.Start(ctx)
+	defer func() {
+		ctxCancel()
+		s.Require().NoError(module.Close())
+	}()
+
+	const (
+		newAddress     = "celestiavaloper1newvalidator"
+		newConsAddress = "AE216C2EF5247A3782C135EFA279A3E4CDC61094"
+	)
+	height := state.LastHeight + 1
+	dCtx := s.tryUpgradeBlock(height, state.LastTime.Add(time.Minute))
+	created := storage.EmptyValidator()
+	created.Address = newAddress
+	created.ConsAddress = newConsAddress
+	created.Height = height
+	dCtx.AddValidator(created)
+	addSignal(dCtx, newAddress, 4, 3)
+	bond := powerUpdate(newConsAddress, 5)
+	bond.Height = height
+	dCtx.AddValidatorUpdate(bond)
+
+	_, err = module.saveBlock(ctx, dCtx)
+	s.Require().NoError(err)
+
+	upgrade, err := s.storage.Upgrade.ByVersion(ctx, 4)
+	s.Require().NoError(err)
+	s.Require().Equal(types.UpgradeStatusWaitingUpgrade, upgrade.Status)
+	// the power of the previous block: the new validator had none, EndBlock's 5 is not counted
+	s.Require().Equal("2", upgrade.VotedPower.String())
+	s.Require().Equal("2", upgrade.VotingPower.String())
+
+	var power *string
+	err = s.storage.Connection().DB().NewSelect().Table("signal_version").
+		ColumnExpr("signal_version.voting_power::text").
+		Join("JOIN validator ON validator.id = signal_version.validator_id").
+		Where("validator.address = ?", newAddress).
+		Scan(ctx, &power)
+	s.Require().NoError(err)
+	// not counted: 0, not null, or the applied block would give it the power of 5
+	s.Require().NotNil(power)
+	s.Require().Equal("0", *power)
 }
 
 func (s *ModuleTestSuite) TestPowerChangeRecountsWithoutSignals() {

@@ -28,7 +28,8 @@ type ListSignalsFilter struct {
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type ISignalVersion interface {
 	List(ctx context.Context, flts ListSignalsFilter) ([]SignalVersion, error)
-	Tally(ctx context.Context, version uint64) (types.Numeric, error)
+	// Latest returns each validator's latest signal since the last applied upgrade: id, validator_id and version.
+	Latest(ctx context.Context) ([]SignalVersion, error)
 }
 
 type SignalVersion struct {

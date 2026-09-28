@@ -190,6 +190,7 @@ state, _ := repos.State.ByName(ctx, name) // reads see the tx's own writes
 - **Plain inserts**: `storage.Insert(ctx, tx, items...)`, a type-safe wrapper over `Inserter.Insert(ctx, *[]T)`. No new `SaveFoo` method is needed unless the insert has `ON CONFLICT`, COPY, counting or per-row logic.
 - **Plain rollbacks** (`DELETE ... WHERE height = ?`): add the model to the `tx.RollbackByHeight(ctx, height, (*storage.Foo)(nil), ...)` list in `pkg/indexer/rollback/rollback.go`. The compiler will not remind you. Tables with extra rollback logic (grants, validators, IBC counters, …) keep dedicated `RollbackFoo` methods.
 - **Narrow parameters**: `save*`/`rollback*` helpers take the narrowest type they need (`storage.IbcTx`, `storage.IValidator`, …); keep `storage.Transaction` for orchestrators and cross-domain functions.
+- **TimescaleDB**: an `UPDATE` of a hypertable (`signal_version`, …) with subqueries in `WHERE` can fail with `variable not found in subplan target list`. Compute those values in separate queries first.
 - **Indexer reads must not reuse API list methods blindly**: `limitScope` silently replaces limits above 100 with 10, and API methods add joins/relations. Methods used by the indexer (paging with `sdkSync.Paginate`, id lookups on hot paths) get their own lean query: explicit `ORDER BY`, no clamp, only needed columns (e.g. `IVote.ListByProposal`, `IHLIGP.IdByHash`).
 
 **Deterministic IDs** (`internal/storage/id.go`): `tx` and `message` IDs are computed at parse time as `height<<24 | position` (5 bytes height + 3 bytes position). This removes autoincrement sequences for those tables. Genesis block (height=0) uses `position+1` to avoid zero IDs. Use `idFromHeightAndPosition(height, position)` when assigning IDs in parsers.
@@ -202,17 +203,19 @@ state, _ := repos.State.ByName(ctx, name) // reads see the tx's own writes
 
 ## Signals and Upgrades (x/signal)
 
-The tally mirrors `celestia-app/x/signal`. It is built only from chain data, with no node queries. Code: `pkg/indexer/storage/signal.go`, `SignalVersion.Tally`, `FixSignalsPower`.
+The tally mirrors `celestia-app/x/signal`. It is built only from chain data, with no node queries. Code: `pkg/indexer/storage/signal.go`, `SignalVersion.Latest`, `FixSignalsPower`.
 
-- **Tally** (`ISignalVersion.Tally`): each validator's latest signal since the last applied upgrade (`ResetTally` wipes older ones), counting only bonded validators (`validator.power > 0`), summed as `validator.power`. Total power comes from `IValidator.TotalVotingPower`. The threshold is `signalThreshold` = `ceil(signal.Threshold(v) × total)`, compared with `>=`.
+- **Power snapshot** (`takePowerSnapshot`): the power of bonded validators, read at the start of `processBlockInTransaction` before any validator write. This is the power x/signal sees during the block (left by the previous EndBlock). A validator created in the block is not in it.
+- **Tally** (`signalTally`, in Go): each validator's latest signal since the last applied upgrade (`ISignalVersion.Latest`; `ResetTally` wipes older ones), weighted by the snapshot. The total is the snapshot's sum. The threshold is `signalThreshold` = `ceil(signal.Threshold(v) × total)`, compared with `>=`. `tryUpgrade` takes its candidates from these signals, as `TallyVotingPower` does.
 - **Current version** is `block.VersionApp`, the header version x/signal uses, not `state.Version`, which belongs to the previous block.
-- **Order in `processBlockInTransaction`**: `FixSignalsPower` (upgrade applied) → `setUpgradeApplied` → `saveSignals` → `recountUpgrades` → `tryUpgrade`.
+- **Order in `processSignalModule`** (called at the end of `processBlockInTransaction`, after `saveValidators`, so new validators have ids): `FixSignalsPower` (upgrade applied) → `setUpgradeApplied` → `saveSignals` → `recountUpgrades` → `tryUpgrade`.
 - **`recountUpgrades` runs on every block** for `IUpgrade.PendingVersions(currentVersion)`: versions above the current one, not applied, with no `MsgTryUpgrade` (`end_height = 0`). It writes through `UpdateUpgradeTally`. `SaveUpgrades` skips zero fields, so it cannot record a lost quorum.
 - **`waiting_upgrade`** means the quorum is reached. It goes back to `processing` if the quorum is lost before `MsgTryUpgrade`.
 - **`signal_version.voting_power`**: `NULL` while the round is open (the API shows the current `validator.power`), the counted power after `FixSignalsPower`, or `0` if the signal was not counted. The API multiplies signal power by 10^6, because the field has always been in utia. Upgrade `voting_power`/`voted_power` are consensus power, with no multiplication.
-- **`validator.version`** is the version of the validator's latest signal, not the max. `tryUpgrade` takes its candidates from it.
-- **`expected_upgrade_height`** = `end_height + appconsts.GetUpgradeHeightDelay(chainID)`, set on `MsgTryUpgrade`. The actual switch is `applied_at_level` (scheduled height + 1).
+- **`validator.version`** is the version of the validator's latest signal, not the max. Nothing in the tally reads it.
+- **`expected_upgrade_height`** = `end_height + appconsts.GetUpgradeHeightDelay(chainID)`, set on `MsgTryUpgrade` and written once. If no `MsgTryUpgrade` was seen, it is `applied_at_level − 1`, set when the upgrade is applied. `NULL` until then (`nullzero`). The actual switch is `applied_at_level` (scheduled height + 1).
 - **`MsgSignalVersion` / `MsgTryUpgrade` inside `MsgExec`** are parsed from events in `pkg/indexer/parser/events/exec.go`.
+- **Rollback**: `RollbackUpgrades(height)` runs before `RollbackByHeight`, because it needs the block's signals. It lowers `signals_count`, undoes `MsgTryUpgrade` (`end_height = height`) and the applied upgrade (`applied_at_level = height`), and reopens the round (signals back to `NULL`) when that block closed it. `rollbackBlock` also restores `state.Version` from the new last block. Without that, a re-indexed upgrade block would not count as a version change.
 
 ## API Handler Pattern
 
