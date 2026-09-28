@@ -45,10 +45,10 @@ func (m *MockIIbcChannel) EXPECT() *MockIIbcChannelMockRecorder {
 }
 
 // BusiestChannel1m mocks base method.
-func (m *MockIIbcChannel) BusiestChannel1m(ctx context.Context) (storage.BusiestChannel, error) {
+func (m *MockIIbcChannel) BusiestChannel1m(ctx context.Context) (*storage.BusiestChannel, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "BusiestChannel1m", ctx)
-	ret0, _ := ret[0].(storage.BusiestChannel)
+	ret0, _ := ret[0].(*storage.BusiestChannel)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -66,19 +66,19 @@ type MockIIbcChannelBusiestChannel1mCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIIbcChannelBusiestChannel1mCall) Return(arg0 storage.BusiestChannel, arg1 error) *MockIIbcChannelBusiestChannel1mCall {
+func (c *MockIIbcChannelBusiestChannel1mCall) Return(arg0 *storage.BusiestChannel, arg1 error) *MockIIbcChannelBusiestChannel1mCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIIbcChannelBusiestChannel1mCall) Do(f func(context.Context) (storage.BusiestChannel, error)) *MockIIbcChannelBusiestChannel1mCall {
+func (c *MockIIbcChannelBusiestChannel1mCall) Do(f func(context.Context) (*storage.BusiestChannel, error)) *MockIIbcChannelBusiestChannel1mCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIIbcChannelBusiestChannel1mCall) DoAndReturn(f func(context.Context) (storage.BusiestChannel, error)) *MockIIbcChannelBusiestChannel1mCall {
+func (c *MockIIbcChannelBusiestChannel1mCall) DoAndReturn(f func(context.Context) (*storage.BusiestChannel, error)) *MockIIbcChannelBusiestChannel1mCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

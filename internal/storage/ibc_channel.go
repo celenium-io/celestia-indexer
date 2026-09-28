@@ -40,7 +40,7 @@ type IIbcChannel interface {
 	ById(ctx context.Context, id string) (IbcChannel, error)
 	List(ctx context.Context, fltrs ListChannelFilters) ([]IbcChannel, error)
 	StatsByChain(ctx context.Context, limit, offset int) ([]ChainStats, error)
-	BusiestChannel1m(ctx context.Context) (BusiestChannel, error)
+	BusiestChannel1m(ctx context.Context) (*BusiestChannel, error)
 }
 
 type IbcChannel struct {

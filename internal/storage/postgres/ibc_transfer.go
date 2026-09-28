@@ -112,14 +112,15 @@ func (c *IbcTransfer) Series(ctx context.Context, channelId string, timeframe st
 	return
 }
 
-func (c *IbcTransfer) LargestTransfer24h(ctx context.Context) (transfer storage.IbcTransfer, err error) {
+func (c *IbcTransfer) LargestTransfer24h(ctx context.Context) (*storage.IbcTransfer, error) {
 	query := c.db.NewSelect().
 		Model((*storage.IbcTransfer)(nil)).
 		Where("time >= NOW() - INTERVAL '24 hours'").
 		Order("amount DESC").
 		Limit(1)
 
-	err = c.db.NewSelect().
+	var transfer storage.IbcTransfer
+	if err := c.db.NewSelect().
 		TableExpr("(?) as ibc_transfer", query).
 		ColumnExpr("ibc_transfer.*").
 		ColumnExpr("tx.hash as tx__hash").
@@ -135,8 +136,10 @@ func (c *IbcTransfer) LargestTransfer24h(ctx context.Context) (transfer storage.
 		Join("left join celestial as cel_sender on cel_sender.address_id = sender_id and cel_sender.status = 'PRIMARY'").
 		Join("left join ibc_connection on ibc_connection.connection_id = ibc_transfer.connection_id").
 		Join("left join ibc_client on ibc_connection.client_id = ibc_client.id").
-		Scan(ctx, &transfer)
-	return
+		Scan(ctx, &transfer); err != nil {
+		return nil, err
+	}
+	return &transfer, nil
 }
 
 func (c *IbcTransfer) ById(ctx context.Context, id uint64) (transfer storage.IbcTransferWithSigner, err error) {

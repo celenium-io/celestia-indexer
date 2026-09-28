@@ -37,7 +37,7 @@ type IIbcTransfer interface {
 	ById(ctx context.Context, id uint64) (IbcTransferWithSigner, error)
 	List(ctx context.Context, fltrs ListIbcTransferFilters) ([]IbcTransferWithSigner, error)
 	Series(ctx context.Context, channelId string, timeframe Timeframe, column string, req SeriesRequest) (items []HistogramItem, err error)
-	LargestTransfer24h(ctx context.Context) (IbcTransfer, error)
+	LargestTransfer24h(ctx context.Context) (*IbcTransfer, error)
 }
 
 type IbcTransfer struct {

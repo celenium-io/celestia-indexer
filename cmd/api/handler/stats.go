@@ -537,11 +537,15 @@ func (sh StatsHandler) IbcByChains(c echo.Context) error {
 func (sh StatsHandler) IbcSummary(c echo.Context) error {
 	transfer, err := sh.ibc.LargestTransfer24h(c.Request().Context())
 	if err != nil {
-		return handleError(c, err, sh.nsRepo)
+		if !sh.nsRepo.IsNoRows(err) {
+			return handleError(c, err, sh.nsRepo)
+		}
 	}
 	channel, err := sh.ibcChannels.BusiestChannel1m(c.Request().Context())
 	if err != nil {
-		return handleError(c, err, sh.nsRepo)
+		if !sh.nsRepo.IsNoRows(err) {
+			return handleError(c, err, sh.nsRepo)
+		}
 	}
 
 	return c.JSON(http.StatusOK, responses.NewIbcSummaryStats(transfer, channel))

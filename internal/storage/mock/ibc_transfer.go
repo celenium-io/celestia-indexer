@@ -84,10 +84,10 @@ func (c *MockIIbcTransferByIdCall) DoAndReturn(f func(context.Context, uint64) (
 }
 
 // LargestTransfer24h mocks base method.
-func (m *MockIIbcTransfer) LargestTransfer24h(ctx context.Context) (storage.IbcTransfer, error) {
+func (m *MockIIbcTransfer) LargestTransfer24h(ctx context.Context) (*storage.IbcTransfer, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "LargestTransfer24h", ctx)
-	ret0, _ := ret[0].(storage.IbcTransfer)
+	ret0, _ := ret[0].(*storage.IbcTransfer)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -105,19 +105,19 @@ type MockIIbcTransferLargestTransfer24hCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIIbcTransferLargestTransfer24hCall) Return(arg0 storage.IbcTransfer, arg1 error) *MockIIbcTransferLargestTransfer24hCall {
+func (c *MockIIbcTransferLargestTransfer24hCall) Return(arg0 *storage.IbcTransfer, arg1 error) *MockIIbcTransferLargestTransfer24hCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIIbcTransferLargestTransfer24hCall) Do(f func(context.Context) (storage.IbcTransfer, error)) *MockIIbcTransferLargestTransfer24hCall {
+func (c *MockIIbcTransferLargestTransfer24hCall) Do(f func(context.Context) (*storage.IbcTransfer, error)) *MockIIbcTransferLargestTransfer24hCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIIbcTransferLargestTransfer24hCall) DoAndReturn(f func(context.Context) (storage.IbcTransfer, error)) *MockIIbcTransferLargestTransfer24hCall {
+func (c *MockIIbcTransferLargestTransfer24hCall) DoAndReturn(f func(context.Context) (*storage.IbcTransfer, error)) *MockIIbcTransferLargestTransfer24hCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
