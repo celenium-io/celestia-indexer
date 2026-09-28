@@ -208,7 +208,7 @@ func (api *API) getStream(ctx context.Context, path string, args map[string]stri
 		req.Header.Set("Accept-Encoding", "gzip")
 	}
 
-	response, err := api.client.Do(req) //nolint:gosec,bodyclose
+	response, err := api.client.Do(req) //nolint:bodyclose
 	if err != nil {
 		return err
 	}
@@ -260,7 +260,7 @@ func (api *API) postStream(ctx context.Context, requests []types.Request, fn fun
 		req.Header.Set("Accept-Encoding", "gzip")
 	}
 
-	response, err := api.client.Do(req) //nolint:gosec,bodyclose
+	response, err := api.client.Do(req) //nolint:bodyclose
 	if err != nil {
 		return err
 	}

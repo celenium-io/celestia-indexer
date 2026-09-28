@@ -6,7 +6,6 @@ package hyperlane
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"gopkg.in/yaml.v3"
 	"io"
 	"time"
@@ -74,7 +73,7 @@ func (api Api) ChainMetadata(ctx context.Context) (map[uint64]ChainMetadata, err
 
 	lines := bytes.SplitN(body, []byte("\n"), 2)
 	if len(lines) < 2 {
-		return nil, fmt.Errorf("unexpected file format: not enough lines")
+		return nil, errors.New("unexpected file format: not enough lines")
 	}
 
 	var raw map[string]ChainMetadata

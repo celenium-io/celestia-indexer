@@ -21,7 +21,9 @@ type TxRepos struct {
 	IbcConnections   *MockIIbcConnection
 	Namespace        *MockINamespace
 	Proposals        *MockIProposal
+	SignalVersion    *MockISignalVersion
 	State            *MockIState
+	Upgrades         *MockIUpgrade
 	Validators       *MockIValidator
 	Votes            *MockIVote
 	ZkIsm            *MockIZkISM
@@ -40,7 +42,9 @@ func NewTxRepos(ctrl *gomock.Controller) *TxRepos {
 		IbcConnections:   NewMockIIbcConnection(ctrl),
 		Namespace:        NewMockINamespace(ctrl),
 		Proposals:        NewMockIProposal(ctrl),
+		SignalVersion:    NewMockISignalVersion(ctrl),
 		State:            NewMockIState(ctrl),
+		Upgrades:         NewMockIUpgrade(ctrl),
 		Validators:       NewMockIValidator(ctrl),
 		Votes:            NewMockIVote(ctrl),
 		ZkIsm:            NewMockIZkISM(ctrl),
@@ -61,7 +65,9 @@ func (r *TxRepos) Repos() storage.TxRepos {
 		IbcConnections:   r.IbcConnections,
 		Namespace:        r.Namespace,
 		Proposals:        r.Proposals,
+		SignalVersion:    r.SignalVersion,
 		State:            r.State,
+		Upgrades:         r.Upgrades,
 		Validators:       r.Validators,
 		Votes:            r.Votes,
 		ZkIsm:            r.ZkIsm,

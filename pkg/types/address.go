@@ -47,7 +47,7 @@ func (a Address) Decimal() (decimal.Decimal, error) {
 func NewAddressFromBytes(data []byte) (Address, error) {
 	s, err := bech32.ConvertAndEncode(AddressPrefixCelestia, data)
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 	return Address(s), nil
 }
@@ -55,7 +55,7 @@ func NewAddressFromBytes(data []byte) (Address, error) {
 func NewConsAddressFromBytes(data []byte) (Address, error) {
 	s, err := bech32.ConvertAndEncode(AddressPrefixValCons, data)
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 	return Address(s), nil
 }
@@ -63,7 +63,7 @@ func NewConsAddressFromBytes(data []byte) (Address, error) {
 func NewValoperAddressFromBytes(data []byte) (Address, error) {
 	s, err := bech32.ConvertAndEncode(AddressPrefixValoper, data)
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 
 	return Address(s), nil

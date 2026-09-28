@@ -288,8 +288,10 @@ func (module *Module) processBlockInTransaction(
 		return state, errors.Wrap(err, "upgrade failed")
 	}
 
-	if err := module.processValidatorBondUpdates(ctx, repos.Validators, dCtx); err != nil {
-		return state, errors.Wrap(err, "process validator bond updates")
+	// before any validator write: x/signal weighs this block's messages with the previous block's power
+	signalRound, err := prepareSignalRound(ctx, repos, dCtx, state.Version)
+	if err != nil {
+		return state, errors.Wrap(err, "prepare signal round")
 	}
 
 	if err := module.saveConstantUpdates(ctx, tx, dCtx.Constants); err != nil {
@@ -332,6 +334,10 @@ func (module *Module) processBlockInTransaction(
 
 	if err := saveNamespaceMessages(ctx, tx, dCtx.NamespaceMessages.Values()); err != nil {
 		return state, errors.Wrap(err, "save namespace messages")
+	}
+
+	if err := module.processValidatorBondUpdates(ctx, repos.Validators, dCtx); err != nil {
+		return state, errors.Wrap(err, "process validator bond updates")
 	}
 
 	totalValidators, err := module.saveValidators(ctx, tx, dCtx.Validators.Values(), dCtx.Jails)
@@ -417,16 +423,8 @@ func (module *Module) processBlockInTransaction(
 		return state, err
 	}
 
-	if err := module.saveSignals(ctx, tx, repos.Validators, dCtx.Signals, dCtx.Upgrades, state); err != nil {
-		return state, err
-	}
-
-	if err := module.tryUpgrade(ctx, tx, repos.Validators, dCtx.TryUpgrade, state); err != nil {
-		return state, err
-	}
-
-	if err := module.setUpgradeApplied(ctx, tx, state.Version, dCtx.Block); err != nil {
-		return state, errors.Wrap(err, "set upgrade applied")
+	if err := module.processSignalModule(ctx, tx, repos, dCtx, state.Version, addrToId, signalRound); err != nil {
+		return state, errors.Wrap(err, "process signal module")
 	}
 
 	updateState(block, totalAccounts, totalNamespaces, totalProposals, ibcClientsCount, totalValidators, dCtx.Block.VersionApp, &state)
@@ -470,6 +468,7 @@ func (module *Module) setUpgradeApplied(ctx context.Context, tx storage.GovTx, c
 		Status:         types.UpgradeStatusApplied,
 		AppliedAt:      block.Time,
 		AppliedAtLevel: block.Height,
+		ExpectedHeight: block.Height - 1,
 	}
 
 	return tx.SaveUpgrades(ctx, &upgrade)

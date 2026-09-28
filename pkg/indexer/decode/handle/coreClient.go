@@ -146,7 +146,7 @@ func MsgUpgradeClient(ctx *context.Context, status storageTypes.Status, data sto
 }
 
 // MsgSubmitMisbehaviour defines a sdk.Msg type that submits Evidence for light client misbehavior
-func MsgSubmitMisbehaviour(ctx *context.Context, msgId uint64, m *coreClient.MsgSubmitMisbehaviour) (storageTypes.MsgType, error) { //nolint
+func MsgSubmitMisbehaviour(ctx *context.Context, msgId uint64, m *coreClient.MsgSubmitMisbehaviour) (storageTypes.MsgType, error) { //nolint:staticcheck
 	msgType := storageTypes.MsgSubmitMisbehaviour
 	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSigner, address: m.Signer},

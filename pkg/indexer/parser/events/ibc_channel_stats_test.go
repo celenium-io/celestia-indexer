@@ -25,6 +25,7 @@ const (
 )
 
 func statsPacket(t *testing.T, seq uint64, srcChannel, dstChannel, sender, receiver string) coreChannel.Packet {
+	t.Helper()
 	data, err := json.Marshal(transferTypes.FungibleTokenPacketData{
 		Denom:    "utia",
 		Amount:   "1000",

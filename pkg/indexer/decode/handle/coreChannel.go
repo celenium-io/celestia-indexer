@@ -293,7 +293,7 @@ func logSkippedPacket(ctx *context.Context, packet coreChannel.Packet, port, cha
 func ibcTransferParty(ctx *context.Context, address string, msgId uint64, typ storageTypes.MsgAddressType) (*storage.Address, *string, error) {
 	prefix, hash, err := pkgTypes.Address(address).Decode()
 	if err != nil || prefix != pkgTypes.AddressPrefixCelestia {
-		return nil, &address, nil
+		return nil, &address, nil //nolint:nilerr // non-celestia addresses are kept raw
 	}
 	addr := &storage.Address{
 		Address:    address,

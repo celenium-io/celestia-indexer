@@ -115,11 +115,11 @@ func MsgSubmitProposalV1(ctx *context.Context, codec codec.Codec, status storage
 			ctx.AddConstant(storageTypes.ModuleNameDistribution, "community_tax", communityTax)
 			changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameDistribution.String(), "community_tax", communityTax))
 
-			baseProposerReward := params.Params.BaseProposerReward.String() //nolint
+			baseProposerReward := params.Params.BaseProposerReward.String() //nolint:staticcheck
 			ctx.AddConstant(storageTypes.ModuleNameDistribution, "base_proposer_reward", baseProposerReward)
 			changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameDistribution.String(), "base_proposer_reward", baseProposerReward))
 
-			bonusProposerReward := params.Params.BonusProposerReward.String() //nolint
+			bonusProposerReward := params.Params.BonusProposerReward.String() //nolint:staticcheck
 			ctx.AddConstant(storageTypes.ModuleNameDistribution, "bonus_proposer_reward", bonusProposerReward)
 			changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameDistribution.String(), "bonus_proposer_reward", bonusProposerReward))
 
@@ -345,7 +345,7 @@ func MsgSubmitProposalV1Beta(ctx *context.Context, codec codec.Codec, status sto
 
 		return msgType, proposal, prpsl, nil
 	case "/ibc.core.client.v1.ClientUpdateProposal":
-		var proposal ibcTypes.ClientUpdateProposal //nolint
+		var proposal ibcTypes.ClientUpdateProposal //nolint:staticcheck
 		if err := proposal.Unmarshal(msg.Content.Value); err != nil {
 			return msgType, nil, nil, errors.Wrap(err, "unmarshalling client update proposal for submit proposal content")
 		}
@@ -363,7 +363,7 @@ func MsgSubmitProposalV1Beta(ctx *context.Context, codec codec.Codec, status sto
 		return msgType, proposal, prpsl, nil
 
 	case "/cosmos.distribution.v1beta1.CommunityPoolSpendProposal":
-		var proposal distributionTypes.CommunityPoolSpendProposal //nolint
+		var proposal distributionTypes.CommunityPoolSpendProposal //nolint:staticcheck
 		if err := proposal.Unmarshal(msg.Content.Value); err != nil {
 			return msgType, nil, nil, errors.Wrap(err, "unmarshalling community pool spend proposal for submit proposal content")
 		}

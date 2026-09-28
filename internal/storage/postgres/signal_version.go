@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/uptrace/bun"
 )
 
@@ -52,7 +53,8 @@ func (t *SignalVersion) List(ctx context.Context, filters storage.ListSignalsFil
 
 	q := t.db.NewSelect().
 		TableExpr("(?) as signal_version", query).
-		ColumnExpr("signal_version.*").
+		ColumnExpr("signal_version.id, signal_version.height, signal_version.validator_id, signal_version.time, signal_version.version, signal_version.msg_id, signal_version.tx_id").
+		ColumnExpr("COALESCE(signal_version.voting_power, validator.power, 0) AS voting_power").
 		ColumnExpr("validator.cons_address as validator__cons_address, validator.moniker as validator__moniker, validator.id as validator__id").
 		ColumnExpr("tx.hash as tx__hash").
 		Join("left join validator as validator on validator.id = validator_id").
@@ -61,5 +63,21 @@ func (t *SignalVersion) List(ctx context.Context, filters storage.ListSignalsFil
 	q = sortScope(q, "time", filters.Sort)
 	err = q.Scan(ctx, &signals)
 
+	return
+}
+
+// Latest returns the signals x/signal tallies; the indexer weighs them with the power it saw before the block.
+func (t *SignalVersion) Latest(ctx context.Context) (signals []storage.SignalVersion, err error) {
+	lastApplied := t.db.NewSelect().
+		Table("upgrade").
+		ColumnExpr("COALESCE(MAX(applied_at_level), 0)").
+		Where("status = ?", storageTypes.UpgradeStatusApplied)
+
+	err = t.db.NewSelect().
+		Model(&signals).
+		ColumnExpr("DISTINCT ON (validator_id) id, validator_id, version").
+		Where("height >= (?)", lastApplied).
+		OrderExpr("validator_id, height DESC, id DESC").
+		Scan(ctx)
 	return
 }

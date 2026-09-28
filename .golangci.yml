@@ -29,7 +29,16 @@ linters:
     - errorlint
     - forcetypeassert
     - goprintffuncname
+    - nilerr
+    - nolintlint
+    - contextcheck
+    - thelper
+    - predeclared
+    - perfsprint
+    - sqlclosecheck
   settings:
+    nolintlint:
+      require-specific: true
     gosec:
       excludes:
         - G115

@@ -16,8 +16,8 @@ import (
 
 // buildBlobTx encodes a BlobTx proto message containing blobs whose Data fields
 // are filled with the given byte pattern, each of length dataLen.
-func buildBlobTx(t testing.TB, nsID []byte, dataLen int, nBlobs int) tmTypes.Tx {
-	t.Helper()
+func buildBlobTx(tb testing.TB, nsID []byte, dataLen int, nBlobs int) tmTypes.Tx {
+	tb.Helper()
 
 	blobData := bytes.Repeat([]byte{0xAB}, dataLen)
 

@@ -294,14 +294,14 @@ func (s *ModuleTestSuite) TestModule_SequencerGracefullyStops() {
 
 	receiverModule := s.createModuleEmptyState(nil)
 
-	ctx, cancelCtx := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancelCtx := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer cancelCtx()
 
 	stopperModule := stopper.NewModule(cancelCtx)
 	err := stopperModule.AttachTo(receiverModule, StopOutput, stopper.InputName)
 	s.Require().NoError(err)
 
-	stopperCtx, stopperCtxCancel := context.WithCancel(context.Background())
+	stopperCtx, stopperCtxCancel := context.WithCancel(s.T().Context())
 	defer stopperCtxCancel()
 
 	stopperModule.Start(stopperCtx)
@@ -334,7 +334,7 @@ func (s *ModuleTestSuite) TestModule_SequencerCallsRollback() {
 	err = rollbackModule.AttachTo(receiverModule, RollbackOutput, rollback.InputName)
 	s.Require().NoError(err)
 
-	ctx, cancelCtx := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancelCtx := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer cancelCtx()
 
 	rolledBack := make(chan struct{}, 1)
@@ -427,7 +427,7 @@ func (s *ModuleTestSuite) TestModule_SequencerOrderedBlocksLenAccurate() {
 	err := blocksReaderModule.AttachTo(receiverModule, BlocksOutput, orderedBlocksChannel)
 	s.Require().NoError(err)
 
-	ctx, cancelCtx := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancelCtx := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer cancelCtx()
 
 	receiverModule.setLevel(1000, hashOf1000Block)
@@ -488,7 +488,7 @@ func (s *ModuleTestSuite) TestModule_SequencerOrderedBlocksLenResetsOnRollback()
 	err = rollbackModule.AttachTo(receiverModule, RollbackOutput, rollback.InputName)
 	s.Require().NoError(err)
 
-	ctx, cancelCtx := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancelCtx := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer cancelCtx()
 
 	go func() {
@@ -565,7 +565,7 @@ func (s *ModuleTestSuite) TestModule_SequencerCallsRollbackWithinPreSavedBlocks(
 	err = rollbackModule.AttachTo(receiverModule, RollbackOutput, rollback.InputName)
 	s.Require().NoError(err)
 
-	ctx, cancelCtx := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancelCtx := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer cancelCtx()
 
 	go func() {
@@ -632,7 +632,7 @@ func (s *ModuleTestSuite) TestModule_SequencerIgnoresStaleAndDuplicateBlocks() {
 	err := blocksReaderModule.AttachTo(receiverModule, BlocksOutput, orderedBlocksChannel)
 	s.Require().NoError(err)
 
-	ctx, cancelCtx := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancelCtx := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer cancelCtx()
 
 	receiverModule.setLevel(1000, hashOf1000Block)

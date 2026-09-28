@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
+	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/uptrace/bun"
 )
 
@@ -72,5 +73,19 @@ func (t *Upgrade) ByVersion(ctx context.Context, version uint64) (upgrade storag
 		Join("left join address as signer on signer.id = signer_id").
 		Join("left join tx on tx_id = tx.id").
 		Scan(ctx, &upgrade)
+	return
+}
+
+// PendingVersions returns versions whose tally can still change: above the current version,
+// not applied and not locked by MsgTryUpgrade.
+func (t *Upgrade) PendingVersions(ctx context.Context, currentVersion uint64) (versions []uint64, err error) {
+	err = t.db.NewSelect().
+		Model((*storage.Upgrade)(nil)).
+		Column("version").
+		Where("version > ?", currentVersion).
+		Where("status != ?", storageTypes.UpgradeStatusApplied).
+		Where("end_height = 0").
+		Order("version").
+		Scan(ctx, &versions)
 	return
 }

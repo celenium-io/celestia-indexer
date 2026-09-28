@@ -83,7 +83,7 @@ func TestUpgradeV7(t *testing.T) {
 		Return(testValidators(), nil).
 		Times(1)
 
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, ctxCancel := context.WithTimeout(t.Context(), 10*time.Second)
 	defer ctxCancel()
 
 	module := NewModule(nil, nil, indexerCfg.Indexer{Name: testIndexerName})
@@ -117,7 +117,7 @@ func TestUpgrade_V8WithoutPriorV7(t *testing.T) {
 		Return(testValidators(), nil).
 		Times(1)
 
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, ctxCancel := context.WithTimeout(t.Context(), 10*time.Second)
 	defer ctxCancel()
 
 	module := NewModule(nil, nil, indexerCfg.Indexer{Name: testIndexerName})
@@ -156,7 +156,7 @@ func TestUpgrade_V8WithPriorV7(t *testing.T) {
 		List(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 		Times(0)
 
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, ctxCancel := context.WithTimeout(t.Context(), 10*time.Second)
 	defer ctxCancel()
 
 	module := NewModule(nil, nil, indexerCfg.Indexer{Name: testIndexerName})
@@ -177,7 +177,7 @@ func TestUpgrade_NoOpWhenCurrentGTE(t *testing.T) {
 	validators := mock.NewMockIValidator(ctrl)
 	validators.EXPECT().List(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
 
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, ctxCancel := context.WithTimeout(t.Context(), 10*time.Second)
 	defer ctxCancel()
 
 	module := NewModule(nil, nil, indexerCfg.Indexer{Name: testIndexerName})
@@ -206,7 +206,7 @@ func TestUpgrade_V10SeedsFibreParams(t *testing.T) {
 		Return(nil, nil).
 		Times(1)
 
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, ctxCancel := context.WithTimeout(t.Context(), 10*time.Second)
 	defer ctxCancel()
 
 	module := NewModule(nil, nil, indexerCfg.Indexer{Name: testIndexerName})
@@ -257,7 +257,7 @@ func TestUpgrade_V10KeepsGenesisFibreParams(t *testing.T) {
 		}}, nil).
 		Times(1)
 
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, ctxCancel := context.WithTimeout(t.Context(), 10*time.Second)
 	defer ctxCancel()
 
 	module := NewModule(nil, nil, indexerCfg.Indexer{Name: testIndexerName})
@@ -289,7 +289,7 @@ func TestUpgrade_V10ChainsThroughEarlierVersions(t *testing.T) {
 		Return(nil, nil).
 		Times(1)
 
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, ctxCancel := context.WithTimeout(t.Context(), 10*time.Second)
 	defer ctxCancel()
 
 	module := NewModule(nil, nil, indexerCfg.Indexer{Name: testIndexerName})

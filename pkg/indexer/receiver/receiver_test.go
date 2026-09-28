@@ -74,14 +74,14 @@ func (s *ModuleTestSuite) TestModule_SuccessOnStop() {
 
 	receiverModule := s.createModule()
 
-	ctx, cancelCtx := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancelCtx := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer cancelCtx()
 
 	stopperModule := stopper.NewModule(cancelCtx)
 	err := stopperModule.AttachTo(receiverModule, StopOutput, stopper.InputName)
 	s.Require().NoError(err)
 
-	stopperCtx, stopperCtxCancel := context.WithCancel(context.Background())
+	stopperCtx, stopperCtxCancel := context.WithCancel(s.T().Context())
 	defer stopperCtxCancel()
 
 	stopperModule.Start(stopperCtx)

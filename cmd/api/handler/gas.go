@@ -72,7 +72,6 @@ func (handler GasHandler) EstimateForPfb(c echo.Context) error {
 		if err != nil {
 			return badRequestError(c, err)
 		}
-		//nolint:gosec
 		sizes[i] = uint32(size)
 	}
 
@@ -90,7 +89,6 @@ func (handler GasHandler) EstimateForPfb(c echo.Context) error {
 			if v > uint64(share.ShareVersionOne) {
 				return badRequestError(c, errors.Errorf("invalid share version: %d", v))
 			}
-			//nolint:gosec
 			versions[i] = uint32(v)
 		}
 	} else {

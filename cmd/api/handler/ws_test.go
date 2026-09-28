@@ -105,7 +105,7 @@ func TestWebsocket(t *testing.T) {
 		func(w http.ResponseWriter, r *http.Request) {
 			e := echo.New()
 			c := e.NewContext(r, w)
-			err := manager.Handle(c)
+			err := manager.Handle(c) //nolint:contextcheck // context comes from the request
 			require.NoError(t, err, "handle")
 			<-ctx.Done()
 		},

@@ -76,6 +76,10 @@ func processExec(ctx *context.Context, c *Cursor, msg *storage.Message) error {
 			if err := processSignalVersion(ctx, c, msg, data); err != nil {
 				return err
 			}
+		case "/celestia.signal.v1.MsgTryUpgrade":
+			if err := processTryUpgrade(ctx, c, msg, internalMessage.Data); err != nil {
+				return err
+			}
 		case "/cosmos.gov.v1beta1.MsgVote", "/cosmos.gov.v1.MsgVote", "/cosmos.gov.v1.MsgVoteWeighted", "/cosmos.gov.v1beta1.MsgVoteWeighted":
 			if err := processVote(ctx, c, internalMessage); err != nil {
 				return err

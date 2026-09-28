@@ -17,7 +17,7 @@ import (
 )
 
 func (s *StorageTestSuite) TestTxByHash() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	txHash, err := hex.DecodeString("652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF")
@@ -44,7 +44,7 @@ func (s *StorageTestSuite) TestTxByHash() {
 }
 
 func (s *StorageTestSuite) TestTxIdAndTimeByHash() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	txHash, err := hex.DecodeString("652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF")
@@ -57,7 +57,7 @@ func (s *StorageTestSuite) TestTxIdAndTimeByHash() {
 }
 
 func (s *StorageTestSuite) TestTxFilterSuccessUnjailAsc() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	txs, err := s.storage.Tx.Filter(ctx, storage.TxFilter{
@@ -90,7 +90,7 @@ func (s *StorageTestSuite) TestTxFilterSuccessUnjailAsc() {
 }
 
 func (s *StorageTestSuite) TestTxFilterExcludedMessageTypes() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	txs, err := s.storage.Tx.Filter(ctx, storage.TxFilter{
@@ -122,7 +122,7 @@ func (s *StorageTestSuite) TestTxFilterExcludedMessageTypes() {
 }
 
 func (s *StorageTestSuite) TestTxFilterSuccessDesc() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	txs, err := s.storage.Tx.Filter(ctx, storage.TxFilter{
@@ -154,7 +154,7 @@ func (s *StorageTestSuite) TestTxFilterSuccessDesc() {
 }
 
 func (s *StorageTestSuite) TestTxFilterHeight() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	txs, err := s.storage.Tx.Filter(ctx, storage.TxFilter{
@@ -187,7 +187,7 @@ func (s *StorageTestSuite) TestTxFilterHeight() {
 }
 
 func (s *StorageTestSuite) TestTxFilterTime() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	txs, err := s.storage.Tx.Filter(ctx, storage.TxFilter{
@@ -215,7 +215,7 @@ func (s *StorageTestSuite) TestTxFilterTime() {
 }
 
 func (s *StorageTestSuite) TestTxFilterWithRelations() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	txs, err := s.storage.Tx.Filter(ctx, storage.TxFilter{
@@ -234,7 +234,7 @@ func (s *StorageTestSuite) TestTxFilterWithRelations() {
 }
 
 func (s *StorageTestSuite) TestTxByIdWithRelations() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	tx, err := s.storage.Tx.ByIdWithRelations(ctx, 2)
@@ -259,7 +259,7 @@ func (s *StorageTestSuite) TestTxByIdWithRelations() {
 }
 
 func (s *StorageTestSuite) TestTxGenesis() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	txs, err := s.storage.Tx.Genesis(ctx, 10, 0, sdk.SortOrderAsc)
@@ -283,7 +283,7 @@ func (s *StorageTestSuite) TestTxGenesis() {
 }
 
 func (s *StorageTestSuite) TestTxByAddressAndTime() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	txs, err := s.storage.Tx.ByAddress(ctx, 1, storage.TxFilter{
@@ -321,7 +321,7 @@ func (s *StorageTestSuite) TestTxByAddressAndTime() {
 }
 
 func (s *StorageTestSuite) TestTxByAddress() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	txs, err := s.storage.Tx.ByAddress(ctx, 1, storage.TxFilter{
@@ -332,7 +332,7 @@ func (s *StorageTestSuite) TestTxByAddress() {
 }
 
 func (s *StorageTestSuite) TestTxByAddressLimitOffset() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	txs, err := s.storage.Tx.ByAddress(ctx, 1, storage.TxFilter{
@@ -344,7 +344,7 @@ func (s *StorageTestSuite) TestTxByAddressLimitOffset() {
 }
 
 func (s *StorageTestSuite) TestTxFilterCursorAsc() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	// cursor=3, sort=ASC → WHERE id > 3 ORDER BY time ASC, id ASC
@@ -362,7 +362,7 @@ func (s *StorageTestSuite) TestTxFilterCursorAsc() {
 }
 
 func (s *StorageTestSuite) TestTxFilterCursorDesc() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	// cursor=3, sort=DESC → WHERE id < 3 ORDER BY time DESC, id DESC
@@ -380,7 +380,7 @@ func (s *StorageTestSuite) TestTxFilterCursorDesc() {
 }
 
 func (s *StorageTestSuite) TestTxFilterCursorWithLimit() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	// cursor=3, sort=ASC, limit=1 → returns only the first record after cursor
@@ -396,7 +396,7 @@ func (s *StorageTestSuite) TestTxFilterCursorWithLimit() {
 }
 
 func (s *StorageTestSuite) TestTxFilterCursorZeroMeansNoCursor() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	// cursor=0 → condition not applied, all records returned
@@ -410,7 +410,7 @@ func (s *StorageTestSuite) TestTxFilterCursorZeroMeansNoCursor() {
 }
 
 func (s *StorageTestSuite) TestTxFilterCursorWithStatus() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	// cursor=1, sort=ASC, status=success → WHERE id > 1 AND status = 'success'
@@ -430,7 +430,7 @@ func (s *StorageTestSuite) TestTxFilterCursorWithStatus() {
 }
 
 func (s *StorageTestSuite) TestTxGas() {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
 
 	ts, err := time.Parse(time.RFC3339, "2023-07-04T03:10:57+00:00")

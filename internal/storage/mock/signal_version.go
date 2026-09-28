@@ -44,6 +44,45 @@ func (m *MockISignalVersion) EXPECT() *MockISignalVersionMockRecorder {
 	return m.recorder
 }
 
+// Latest mocks base method.
+func (m *MockISignalVersion) Latest(ctx context.Context) ([]storage.SignalVersion, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Latest", ctx)
+	ret0, _ := ret[0].([]storage.SignalVersion)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Latest indicates an expected call of Latest.
+func (mr *MockISignalVersionMockRecorder) Latest(ctx any) *MockISignalVersionLatestCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Latest", reflect.TypeOf((*MockISignalVersion)(nil).Latest), ctx)
+	return &MockISignalVersionLatestCall{Call: call}
+}
+
+// MockISignalVersionLatestCall wrap *gomock.Call
+type MockISignalVersionLatestCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockISignalVersionLatestCall) Return(arg0 []storage.SignalVersion, arg1 error) *MockISignalVersionLatestCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockISignalVersionLatestCall) Do(f func(context.Context) ([]storage.SignalVersion, error)) *MockISignalVersionLatestCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockISignalVersionLatestCall) DoAndReturn(f func(context.Context) ([]storage.SignalVersion, error)) *MockISignalVersionLatestCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // List mocks base method.
 func (m *MockISignalVersion) List(ctx context.Context, flts storage.ListSignalsFilter) ([]storage.SignalVersion, error) {
 	m.ctrl.T.Helper()

@@ -26,8 +26,8 @@ import (
 //	  repeated uint32 share_indexes = 2; // packed
 //	  string          type_id       = 3;
 //	}
-func buildIndexWrapperTx(t testing.TB, innerTx []byte, shareIndexes []uint32) tmTypes.Tx {
-	t.Helper()
+func buildIndexWrapperTx(tb testing.TB, innerTx []byte, shareIndexes []uint32) tmTypes.Tx {
+	tb.Helper()
 
 	var b []byte
 	b = protowire.AppendTag(b, 1, protowire.BytesType)
@@ -53,10 +53,10 @@ func buildIndexWrapperTx(t testing.TB, innerTx []byte, shareIndexes []uint32) tm
 var minimalDeliverTx = nodeTypes.ResponseDeliverTx{}
 
 // mustDecodeB64 is a test helper that base64-decodes a string or fails the test.
-func mustDecodeB64(t testing.TB, s string) []byte {
-	t.Helper()
+func mustDecodeB64(tb testing.TB, s string) []byte {
+	tb.Helper()
 	b, err := base64.StdEncoding.DecodeString(s)
-	require.NoError(t, err)
+	require.NoError(tb, err)
 	return b
 }
 

@@ -29,6 +29,7 @@ func TestCheckDatabaseExists(t *testing.T) {
 	psqlContainer, err := testhelpers.NewPostgreSQLContainer(ctx, containerCfg)
 	require.NoError(t, err)
 	t.Cleanup(func() {
+		// not t.Context(): it is canceled before cleanup runs
 		ctx, ctxCancel := context.WithTimeout(context.Background(), 20*time.Second)
 		defer ctxCancel()
 		require.NoError(t, psqlContainer.Terminate(ctx))

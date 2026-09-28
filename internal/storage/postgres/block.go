@@ -112,10 +112,8 @@ func (b *Blocks) ListWithStats(ctx context.Context, limit, offset uint64, order 
 	subQuery := b.DB().NewSelect().
 		Model(&blocks)
 
-	//nolint:gosec
 	subQuery = limitScope(subQuery, int(limit))
 	if offset > 0 {
-		//nolint:gosec
 		subQuery = subQuery.Offset(int(offset))
 	}
 

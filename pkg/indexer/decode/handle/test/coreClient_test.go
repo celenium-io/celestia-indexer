@@ -167,7 +167,7 @@ func TestDecodeMsg_SuccessOnMsgUpdateClient(t *testing.T) {
 }
 
 func TestDecodeMsg_SuccessOnMsgSubmitMisbehaviour(t *testing.T) {
-	msg := &coreClient.MsgSubmitMisbehaviour{ //nolint
+	msg := &coreClient.MsgSubmitMisbehaviour{ //nolint:staticcheck
 		Signer: "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6",
 	}
 	block, now := testsuite.EmptyBlock()

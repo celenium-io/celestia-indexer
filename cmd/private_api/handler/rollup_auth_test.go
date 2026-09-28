@@ -43,7 +43,7 @@ func (s *AuthTestSuite) SetupSuite() {
 // TearDownSuite -
 func (s *AuthTestSuite) TearDownSuite() {
 	s.ctrl.Finish()
-	s.Require().NoError(s.echo.Shutdown(context.Background()))
+	s.Require().NoError(s.echo.Shutdown(s.T().Context()))
 }
 
 func TestSuiteAuth_Run(t *testing.T) {
@@ -70,7 +70,7 @@ func (s *AuthTestSuite) TestBulk() {
 		]
 	}`
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/", strings.NewReader(body))
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodPost, "/", strings.NewReader(body))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 
 	rec := httptest.NewRecorder()
@@ -191,7 +191,7 @@ func (s *AuthTestSuite) TestBulkPartialError() {
 		]
 	}`
 
-	req := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/", strings.NewReader(body))
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodPost, "/", strings.NewReader(body))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 
 	rec := httptest.NewRecorder()

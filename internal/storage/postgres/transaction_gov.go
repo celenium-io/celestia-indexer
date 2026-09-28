@@ -5,9 +5,11 @@ package postgres
 
 import (
 	"context"
+	"time"
 
 	models "github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
+	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
 	"github.com/uptrace/bun"
 )
@@ -23,7 +25,9 @@ func (tx Transaction) SaveUpgrades(ctx context.Context, upgrades ...*models.Upgr
 		}
 
 		query := tx.Tx().NewInsert().Model(upgrades[i]).
-			Column("version", "height", "time", "end_height", "end_time", "applied_at_level", "applied_at", "signer_id", "msg_id", "tx_id", "voting_power", "voted_power", "signals_count", "status").
+			Column("version", "height", "time", "end_height", "end_time", "applied_at_level", "applied_at",
+				"expected_upgrade_height", "signer_id", "msg_id", "tx_id", "voting_power", "voted_power",
+				"signals_count", "status").
 			On("CONFLICT (version) DO UPDATE")
 
 		if upgrades[i].EndHeight > 0 {
@@ -37,6 +41,10 @@ func (tx Transaction) SaveUpgrades(ctx context.Context, upgrades ...*models.Upgr
 		}
 		if !upgrades[i].AppliedAt.IsZero() {
 			query = query.Set("applied_at = EXCLUDED.applied_at")
+		}
+		if upgrades[i].ExpectedHeight > 0 {
+			// write-once: the MsgTryUpgrade forecast is kept when the upgrade is applied
+			query = query.Set("expected_upgrade_height = COALESCE(NULLIF(upgrade.expected_upgrade_height, 0), EXCLUDED.expected_upgrade_height)")
 		}
 		if upgrades[i].SignerId > 0 {
 			query = query.Set("signer_id = EXCLUDED.signer_id")
@@ -246,26 +254,133 @@ func (tx Transaction) Proposal(ctx context.Context, id uint64) (proposal models.
 	return
 }
 
-func (tx Transaction) UpdateSignalsAfterUpgrade(ctx context.Context, version uint64) (storageTypes.Numeric, error) {
-	_, err := tx.Tx().NewUpdate().Table("signal_version", "validator").
-		SetColumn("voting_power", "validator.stake").
-		Where("signal_version.version = ?", version).
-		Where("validator.id = validator_id").
-		Exec(ctx)
-	if err != nil {
-		return storageTypes.NumericZero(), err
+// FixSignalsPower closes the open round: counted signals keep the power they contributed, the rest get 0.
+// Updates go row by row: a round has at most one signal per validator.
+func (tx Transaction) FixSignalsPower(ctx context.Context, powers map[uint64]storageTypes.Numeric) error {
+	if len(powers) > 0 {
+		signals := make([]models.SignalVersion, 0, len(powers))
+		for id, power := range powers {
+			signals = append(signals, models.SignalVersion{
+				Id:          id,
+				VotingPower: power,
+			})
+		}
+
+		if _, err := tx.Tx().NewUpdate().
+			With("_data", tx.Tx().NewValues(&signals).Column("id", "voting_power")).
+			Model((*models.SignalVersion)(nil)).
+			TableExpr("_data").
+			Set("voting_power = _data.voting_power").
+			Where("signal_version.id = _data.id").
+			Where("signal_version.voting_power IS NULL").
+			Exec(ctx); err != nil {
+			return errors.Wrap(err, "fix counted signals")
+		}
 	}
 
-	var sum storageTypes.Numeric
-	err = tx.Tx().NewSelect().
-		TableExpr("(?) AS latest",
-			tx.Tx().NewSelect().
-				Table("signal_version").
-				ColumnExpr("DISTINCT ON (validator_id) voting_power").
-				Where("version = ?", version).
-				OrderExpr("validator_id, height DESC"),
-		).
-		ColumnExpr("COALESCE(SUM(voting_power), 0)").
-		Scan(ctx, &sum)
-	return sum, err
+	// the round is every signal still open; older rounds are closed already
+	if _, err := tx.Tx().NewUpdate().
+		Table("signal_version").
+		Set("voting_power = 0").
+		Where("voting_power IS NULL").
+		Exec(ctx); err != nil {
+		return errors.Wrap(err, "zero not counted signals")
+	}
+	return nil
+}
+
+// RollbackUpgrades reverts what a block wrote over existing upgrades and signals.
+// It must run before the block's signals and upgrades are deleted by height.
+func (tx Transaction) RollbackUpgrades(ctx context.Context, height pkgTypes.Level) error {
+	// signals only counted for versions above the block's app version
+	if _, err := tx.Tx().ExecContext(ctx, `
+		UPDATE upgrade SET signals_count = upgrade.signals_count - c.cnt
+		FROM (
+			SELECT version, count(*) AS cnt FROM signal_version
+			WHERE height = ? AND version > (SELECT version_app FROM block WHERE height = ?)
+			GROUP BY version
+		) AS c
+		WHERE upgrade.version = c.version
+	`, height, height); err != nil {
+		return errors.Wrap(err, "rollback signals count")
+	}
+
+	// reopen the round closed by the block: by MsgTryUpgrade or, without it, by the applied upgrade;
+	// plain queries, as TimescaleDB fails to plan subqueries in an UPDATE of a hypertable
+	closed, err := tx.Tx().NewSelect().
+		Model((*models.Upgrade)(nil)).
+		WhereOr("end_height = ?", height).
+		WhereOr("applied_at_level = ? AND end_height = 0", height).
+		Exists(ctx)
+	if err != nil {
+		return errors.Wrap(err, "find closed round")
+	}
+	if closed {
+		var roundStart pkgTypes.Level
+		if err := tx.Tx().NewSelect().
+			Model((*models.Upgrade)(nil)).
+			ColumnExpr("COALESCE(MAX(applied_at_level), 0)").
+			Where("status = ?", storageTypes.UpgradeStatusApplied).
+			Where("applied_at_level < ?", height).
+			Scan(ctx, &roundStart); err != nil {
+			return errors.Wrap(err, "find round start")
+		}
+		if _, err := tx.Tx().NewUpdate().
+			Model((*models.SignalVersion)(nil)).
+			Set("voting_power = NULL").
+			Where("height >= ?", roundStart).
+			Where("height < ?", height).
+			Exec(ctx); err != nil {
+			return errors.Wrap(err, "reopen signals round")
+		}
+	}
+
+	if _, err := tx.Tx().NewUpdate().
+		Model((*models.Upgrade)(nil)).
+		Set("end_height = 0").
+		Set("end_time = ?", time.Time{}).
+		Set("expected_upgrade_height = NULL").
+		Set("signer_id = 0").
+		Set("msg_id = 0").
+		Set("tx_id = 0").
+		Set("status = ?", storageTypes.UpgradeStatusProcessing).
+		Where("end_height = ?", height).
+		Exec(ctx); err != nil {
+		return errors.Wrap(err, "rollback try upgrade")
+	}
+
+	// rows created by setUpgradeApplied alone have no signal height
+	if _, err := tx.Tx().NewDelete().
+		Model((*models.Upgrade)(nil)).
+		Where("applied_at_level = ?", height).
+		Where("height = 0").
+		Exec(ctx); err != nil {
+		return errors.Wrap(err, "delete applied upgrade")
+	}
+	if _, err := tx.Tx().NewUpdate().
+		Model((*models.Upgrade)(nil)).
+		Set("applied_at_level = 0").
+		Set("applied_at = ?", time.Time{}).
+		// without MsgTryUpgrade the height was taken from the applied block
+		Set("expected_upgrade_height = CASE WHEN end_height > 0 THEN expected_upgrade_height ELSE NULL END").
+		Set("status = CASE WHEN end_height > 0 THEN ?::upgrade_status ELSE ?::upgrade_status END",
+			storageTypes.UpgradeStatusWaitingUpgrade, storageTypes.UpgradeStatusProcessing).
+		Where("applied_at_level = ?", height).
+		Exec(ctx); err != nil {
+		return errors.Wrap(err, "rollback applied upgrade")
+	}
+	return nil
+}
+
+// UpdateUpgradeTally writes a recounted tally; unlike SaveUpgrades it stores zero power and lowers the status back.
+func (tx Transaction) UpdateUpgradeTally(ctx context.Context, version uint64, votingPower, votedPower storageTypes.Numeric, status storageTypes.UpgradeStatus) error {
+	_, err := tx.Tx().NewUpdate().
+		Model((*models.Upgrade)(nil)).
+		Set("voting_power = ?", votingPower).
+		Set("voted_power = ?", votedPower).
+		Set("status = ?", status).
+		Where("version = ?", version).
+		Where("(voting_power, voted_power, status) IS DISTINCT FROM (?, ?, ?)", votingPower, votedPower, status).
+		Exec(ctx)
+	return err
 }
