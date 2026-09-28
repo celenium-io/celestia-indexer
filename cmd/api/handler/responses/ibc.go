@@ -264,17 +264,18 @@ type BusiestChannel struct {
 }
 
 type IbcSummaryStats struct {
-	LargestTransfer IbcTransfer    `json:"largest_transfer,omitempty"`
-	BusiestChannel  BusiestChannel `json:"busiest_channel,omitempty"`
+	LargestTransfer *IbcTransfer    `json:"largest_transfer,omitempty"`
+	BusiestChannel  *BusiestChannel `json:"busiest_channel,omitempty"`
 }
 
 func NewIbcSummaryStats(transfer *storage.IbcTransfer, channel *storage.BusiestChannel) IbcSummaryStats {
 	var stats IbcSummaryStats
 	if transfer != nil {
-		stats.LargestTransfer = NewIbcTransfer(*transfer)
+		largestTransfer := NewIbcTransfer(*transfer)
+		stats.LargestTransfer = &largestTransfer
 	}
 	if channel != nil {
-		stats.BusiestChannel = BusiestChannel{
+		stats.BusiestChannel = &BusiestChannel{
 			ChannelId:      channel.ChannelId,
 			TransfersCount: channel.TransfersCount,
 			ChainId:        channel.ChainId,
