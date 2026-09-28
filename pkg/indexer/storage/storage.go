@@ -289,9 +289,9 @@ func (module *Module) processBlockInTransaction(
 	}
 
 	// before any validator write: x/signal weighs this block's messages with the previous block's power
-	powers, err := takePowerSnapshot(ctx, repos.Validators)
+	signalRound, err := prepareSignalRound(ctx, repos, dCtx, state.Version)
 	if err != nil {
-		return state, errors.Wrap(err, "take power snapshot")
+		return state, errors.Wrap(err, "prepare signal round")
 	}
 
 	if err := module.saveConstantUpdates(ctx, tx, dCtx.Constants); err != nil {
@@ -423,7 +423,7 @@ func (module *Module) processBlockInTransaction(
 		return state, err
 	}
 
-	if err := module.processSignalModule(ctx, tx, repos, dCtx, state.Version, addrToId, powers); err != nil {
+	if err := module.processSignalModule(ctx, tx, repos, dCtx, state.Version, addrToId, signalRound); err != nil {
 		return state, errors.Wrap(err, "process signal module")
 	}
 

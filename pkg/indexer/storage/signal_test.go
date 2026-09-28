@@ -12,6 +12,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	indexerCfg "github.com/celenium-io/celestia-indexer/pkg/indexer/config"
+	decodeContext "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
@@ -61,6 +62,54 @@ func TestTakePowerSnapshot(t *testing.T) {
 	require.Equal(t, "3", snapshot.total.String())
 	require.Len(t, snapshot.powers, 1)
 	require.Equal(t, "3", snapshot.powers[1].String())
+}
+
+func TestPrepareSignalRound(t *testing.T) {
+	for _, tt := range []struct {
+		name         string
+		stateVersion uint64
+		pending      []uint64
+		upgrades     []*storage.Upgrade
+		tryUpgrade   *storage.Upgrade
+		wantSnapshot bool
+	}{
+		{name: "quiet block", stateVersion: 3},
+		// a signal for the current version only withdraws a vote
+		{name: "signal for current version", stateVersion: 3, upgrades: []*storage.Upgrade{{Version: 3}}},
+		{name: "open round", stateVersion: 3, pending: []uint64{4}, wantSnapshot: true},
+		{name: "first signal for a version", stateVersion: 3, upgrades: []*storage.Upgrade{{Version: 4}}, wantSnapshot: true},
+		{name: "try upgrade", stateVersion: 3, tryUpgrade: &storage.Upgrade{}, wantSnapshot: true},
+		{name: "applied upgrade", stateVersion: 2, wantSnapshot: true},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			repos := mock.NewTxRepos(ctrl)
+			repos.Upgrades.EXPECT().PendingVersions(gomock.Any(), uint64(3)).Return(tt.pending, nil)
+			if tt.wantSnapshot {
+				one := types.NumericFromInt64(1)
+				repos.Validators.EXPECT().BondedValidators(gomock.Any()).Return([]storage.Validator{{Id: 1, Power: &one}}, nil)
+			}
+
+			dCtx := decodeContext.NewContext()
+			dCtx.Block = &storage.Block{VersionApp: 3}
+			dCtx.TryUpgrade = tt.tryUpgrade
+			for _, upgrade := range tt.upgrades {
+				dCtx.AddUpgrade(*upgrade)
+			}
+
+			round, err := prepareSignalRound(t.Context(), repos.Repos(), dCtx, tt.stateVersion)
+			require.NoError(t, err)
+			require.Equal(t, tt.pending, round.pending)
+			require.Equal(t, tt.wantSnapshot, round.snapshot != nil)
+		})
+	}
+}
+
+func TestSignalRoundTallyWithoutSnapshot(t *testing.T) {
+	_, err := signalRound{}.tally(t.Context(), nil)
+	require.Error(t, err)
 }
 
 func TestSignalTally(t *testing.T) {

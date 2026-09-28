@@ -43,6 +43,59 @@ func takePowerSnapshot(ctx context.Context, validators storage.IValidator) (powe
 	return snapshot, nil
 }
 
+// signalRound is what processSignalModule needs from the state before the block's validator writes.
+type signalRound struct {
+	pending  []uint64
+	snapshot *powerSnapshot
+}
+
+// prepareSignalRound takes the power snapshot only if the block can tally. The upgrade table
+// is written only by processSignalModule, so the pending versions read here are still valid there.
+func prepareSignalRound(
+	ctx context.Context,
+	repos storage.TxRepos,
+	decodeContext *decodeContext.Context,
+	stateVersion uint64,
+) (signalRound, error) {
+	currentVersion := decodeContext.Block.VersionApp
+	pending, err := repos.Upgrades.PendingVersions(ctx, currentVersion)
+	if err != nil {
+		return signalRound{}, errors.Wrap(err, "get pending upgrades")
+	}
+	round := signalRound{pending: pending}
+
+	if len(pending) == 0 &&
+		decodeContext.TryUpgrade == nil &&
+		stateVersion >= currentVersion &&
+		!hasFutureVersions(decodeContext.Upgrades, currentVersion) {
+		return round, nil
+	}
+
+	snapshot, err := takePowerSnapshot(ctx, repos.Validators)
+	if err != nil {
+		return round, err
+	}
+	round.snapshot = &snapshot
+	return round, nil
+}
+
+// hasFutureVersions tells if the block's signals open or extend a round.
+func hasFutureVersions(upgrades *sdkSync.Map[uint64, *storage.Upgrade], currentVersion uint64) bool {
+	for version := range upgrades.AllKeys() {
+		if version > currentVersion {
+			return true
+		}
+	}
+	return false
+}
+
+func (r signalRound) tally(ctx context.Context, signals storage.ISignalVersion) (signalTally, error) {
+	if r.snapshot == nil {
+		return signalTally{}, errors.New("power snapshot was not taken")
+	}
+	return loadTally(ctx, signals, *r.snapshot)
+}
+
 // signalTally mirrors x/signal TallyVotingPower: latest signals of bonded validators weighted by the snapshot.
 type signalTally struct {
 	latest    []storage.SignalVersion
@@ -116,13 +169,13 @@ func (module *Module) processSignalModule(
 	decodeContext *decodeContext.Context,
 	stateVersion uint64,
 	addrToId map[string]uint64,
-	snapshot powerSnapshot,
+	round signalRound,
 ) error {
 	currentVersion := decodeContext.Block.VersionApp
 
 	// closes the round if MsgTryUpgrade was not seen (e.g. sent via authz); a no-op otherwise
 	if stateVersion < currentVersion {
-		tally, err := loadTally(ctx, repos.SignalVersion, snapshot)
+		tally, err := round.tally(ctx, repos.SignalVersion)
 		if err != nil {
 			return err
 		}
@@ -144,15 +197,19 @@ func (module *Module) processSignalModule(
 		return err
 	}
 
-	pending, err := repos.Upgrades.PendingVersions(ctx, currentVersion)
-	if err != nil {
-		return errors.Wrap(err, "get pending upgrades")
+	pending := round.pending
+	// the block's signals may have opened new versions
+	if hasFutureVersions(decodeContext.Upgrades, currentVersion) {
+		var err error
+		if pending, err = repos.Upgrades.PendingVersions(ctx, currentVersion); err != nil {
+			return errors.Wrap(err, "get pending upgrades")
+		}
 	}
 	if len(pending) == 0 && decodeContext.TryUpgrade == nil {
 		return nil
 	}
 
-	tally, err := loadTally(ctx, repos.SignalVersion, snapshot)
+	tally, err := round.tally(ctx, repos.SignalVersion)
 	if err != nil {
 		return err
 	}
