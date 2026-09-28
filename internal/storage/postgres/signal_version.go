@@ -77,7 +77,7 @@ func (t *SignalVersion) Latest(ctx context.Context) (signals []storage.SignalVer
 		Model(&signals).
 		ColumnExpr("DISTINCT ON (validator_id) id, validator_id, version").
 		Where("height >= (?)", lastApplied).
-		OrderExpr("validator_id, height DESC").
+		OrderExpr("validator_id, height DESC, id DESC").
 		Scan(ctx)
 	return
 }
