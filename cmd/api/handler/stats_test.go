@@ -632,7 +632,7 @@ func (s *StatsTestSuite) TestIbcSummaryStats() {
 
 	s.ibc.EXPECT().
 		LargestTransfer24h(gomock.Any()).Return(
-		storage.IbcTransfer{
+		&storage.IbcTransfer{
 			Id:              1,
 			Time:            testTime,
 			Height:          1000,
@@ -658,7 +658,7 @@ func (s *StatsTestSuite) TestIbcSummaryStats() {
 
 	s.channels.EXPECT().
 		BusiestChannel1m(gomock.Any()).
-		Return(storage.BusiestChannel{
+		Return(&storage.BusiestChannel{
 			ChannelId:      "channel-111",
 			TransfersCount: 1000,
 			ChainId:        "chain-1",

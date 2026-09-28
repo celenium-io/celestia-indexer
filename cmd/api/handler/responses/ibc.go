@@ -268,13 +268,17 @@ type IbcSummaryStats struct {
 	BusiestChannel  BusiestChannel `json:"busiest_channel,omitempty"`
 }
 
-func NewIbcSummaryStats(transfer storage.IbcTransfer, channel storage.BusiestChannel) IbcSummaryStats {
-	return IbcSummaryStats{
-		LargestTransfer: NewIbcTransfer(transfer),
-		BusiestChannel: BusiestChannel{
+func NewIbcSummaryStats(transfer *storage.IbcTransfer, channel *storage.BusiestChannel) IbcSummaryStats {
+	var stats IbcSummaryStats
+	if transfer != nil {
+		stats.LargestTransfer = NewIbcTransfer(*transfer)
+	}
+	if channel != nil {
+		stats.BusiestChannel = BusiestChannel{
 			ChannelId:      channel.ChannelId,
 			TransfersCount: channel.TransfersCount,
 			ChainId:        channel.ChainId,
-		},
+		}
 	}
+	return stats
 }
