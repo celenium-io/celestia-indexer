@@ -152,7 +152,7 @@ func createConstantIfNotExists(
 	module types.ModuleName,
 	name, value string,
 ) error {
-	if _, err := constants.Get(ctx, module, "expedited_voting_period"); err != nil {
+	if _, err := constants.Get(ctx, module, name); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			decodeContext.AddConstant(module, name, value)
 		} else {

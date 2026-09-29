@@ -343,6 +343,9 @@ func (ctx *Context) AddProposal(proposal *storage.Proposal) {
 		if proposal.Deposit.IsPositive() {
 			p.Deposit = p.Deposit.Add(proposal.Deposit)
 		}
+		if proposal.ExpeditedProposalRejected {
+			p.ExpeditedProposalRejected = proposal.ExpeditedProposalRejected
+		}
 	} else {
 		ctx.Proposals.Set(proposal.Id, proposal)
 	}
