@@ -5,6 +5,7 @@ package migrations
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
@@ -18,7 +19,7 @@ func init() {
 
 func upAddExpeditedProposal(ctx context.Context, db *bun.DB) error {
 	return db.RunInTx(ctx, nil, func(ctx context.Context, tx bun.Tx) error {
-		if _, err := tx.ExecContext(ctx, `ALTER TABLE proposal ADD COLUMN expedited boolean NOT NULL DEFAULT false`); err != nil {
+		if _, err := tx.ExecContext(ctx, `ALTER TABLE proposal ADD COLUMN IF NOT EXISTS expedited boolean NOT NULL DEFAULT false`); err != nil {
 			return errors.Wrap(err, "add expedited")
 		}
 
@@ -27,6 +28,9 @@ func upAddExpeditedProposal(ctx context.Context, db *bun.DB) error {
 			Model(&state).
 			Limit(1).
 			Scan(ctx); err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return nil
+			}
 			return err
 		}
 		if state.Version < 4 {
