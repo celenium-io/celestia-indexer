@@ -69,7 +69,11 @@ type Proposal struct {
 	MinDeposit string `bun:"min_deposit" comment:"Minimum deposit for a proposal to enter voting period"`
 	Error      string `bun:"error"       comment:"Proposal error"`
 
+	Expedited *bool `bun:"expedited,default:false,notnull" comment:"Is proposal expedited"`
+
 	Proposer *Address `bun:"rel:belongs-to,join:proposer_id=id"`
+
+	ExpeditedProposalRejected bool `bun:"-"`
 }
 
 // TableName -
@@ -83,6 +87,10 @@ func (p Proposal) EmptyStatus() bool {
 
 func (p Proposal) Finished() bool {
 	return p.Status == types.ProposalStatusApplied || p.Status == types.ProposalStatusRejected || p.Status == types.ProposalStatusFailed
+}
+
+func (p Proposal) IsExpedited() bool {
+	return p.Expedited != nil && *p.Expedited
 }
 
 type ListProposalFilters struct {

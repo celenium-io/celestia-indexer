@@ -294,3 +294,52 @@ func TestModule_OnParseError_PushesStopOutput(t *testing.T) {
 		require.Equal(t, struct{}{}, msg)
 	}
 }
+
+// Chains launched before SDK 0.50 have only deposit/voting/tally params, without gov.params
+func TestParseConstants_LegacyGovParams_NoExpedited(t *testing.T) {
+	g := loadGenesisFixture(t)
+	require.Nil(t, g.AppState.Gov.Params, "fixture is expected to have legacy gov params")
+
+	module := NewModule(postgres.Storage{}, config.Indexer{})
+	ctx := decodeContext.NewContext()
+	require.NoError(t, module.parseConstants(ctx, g.AppState, g.ConsensusParams))
+
+	for _, name := range []string{"expedited_voting_period", "expedited_threshold", "expedited_min_deposit"} {
+		_, ok := ctx.Constants.Get(string(storageTypes.ModuleNameGov) + "_" + name)
+		require.False(t, ok, name)
+	}
+}
+
+func TestParseConstants_GovParams_Expedited(t *testing.T) {
+	g := loadGenesisFixture(t)
+	g.AppState.Gov.DepositParams = nil
+	g.AppState.Gov.VotingParams = nil
+	g.AppState.Gov.TallyParams = nil
+	g.AppState.Gov.Params = &types.GovParams{
+		MinDeposit:            []types.Coins{{Denom: "utia", Amount: "10000000000"}},
+		MaxDepositPeriod:      "604800s",
+		VotingPeriod:          "604800s",
+		Quorum:                "0.334000000000000000",
+		Threshold:             "0.500000000000000000",
+		VetoThreshold:         "0.334000000000000000",
+		ExpeditedVotingPeriod: "86400s",
+		ExpeditedThreshold:    "0.667000000000000000",
+		ExpeditedMinDeposit:   []types.Coins{{Denom: "utia", Amount: "50000000000"}},
+	}
+
+	module := NewModule(postgres.Storage{}, config.Indexer{})
+	ctx := decodeContext.NewContext()
+	require.NoError(t, module.parseConstants(ctx, g.AppState, g.ConsensusParams))
+
+	get := func(name string) string {
+		c, ok := ctx.Constants.Get(string(storageTypes.ModuleNameGov) + "_" + name)
+		require.True(t, ok, name)
+		return c.Value
+	}
+	require.Equal(t, "86400000000000", get("expedited_voting_period"))
+	require.Equal(t, "0.667000000000000000", get("expedited_threshold"))
+	// the same format as min_deposit from the same genesis
+	minDeposit := get("min_deposit")
+	require.Equal(t, "10000000000utia", minDeposit)
+	require.Equal(t, "50000000000utia", get("expedited_min_deposit"))
+}

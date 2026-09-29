@@ -176,6 +176,33 @@ func (module *Module) parseConstants(ctx *decodeContext.Context, appState types.
 		"veto_threshold",
 		tallyParams.VetoThreshold,
 	)
+	if params := appState.Gov.Params; params != nil {
+		if params.ExpeditedVotingPeriod != "" {
+			expeditedVotingPeriod, err := time.ParseDuration(params.ExpeditedVotingPeriod)
+			if err != nil {
+				return errors.Wrap(err, "expedited voting period")
+			}
+			ctx.AddConstant(
+				storageTypes.ModuleNameGov,
+				"expedited_voting_period",
+				strconv.FormatInt(expeditedVotingPeriod.Nanoseconds(), 10),
+			)
+		}
+		if params.ExpeditedThreshold != "" {
+			ctx.AddConstant(
+				storageTypes.ModuleNameGov,
+				"expedited_threshold",
+				params.ExpeditedThreshold,
+			)
+		}
+		if len(params.ExpeditedMinDeposit) > 0 {
+			ctx.AddConstant(
+				storageTypes.ModuleNameGov,
+				"expedited_min_deposit",
+				params.ExpeditedMinDeposit[0].String(),
+			)
+		}
+	}
 
 	// slashing
 	ctx.AddConstant(

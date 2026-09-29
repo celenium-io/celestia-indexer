@@ -11,7 +11,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
-	indexerCfg "github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 	decodeContext "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
@@ -86,11 +85,10 @@ func TestUpgradeV7(t *testing.T) {
 	ctx, ctxCancel := context.WithTimeout(t.Context(), 10*time.Second)
 	defer ctxCancel()
 
-	module := NewModule(nil, nil, indexerCfg.Indexer{Name: testIndexerName})
 	repos := storage.TxRepos{Validators: validators}
 	dCtx := decodeContext.NewContext()
 
-	err := module.upgradeV7(ctx, repos, dCtx, 7)
+	err := upgradeV7(ctx, repos, dCtx, 7)
 	require.NoError(t, err)
 
 	requireV7CommissionRates(t, dCtx)
@@ -120,11 +118,10 @@ func TestUpgrade_V8WithoutPriorV7(t *testing.T) {
 	ctx, ctxCancel := context.WithTimeout(t.Context(), 10*time.Second)
 	defer ctxCancel()
 
-	module := NewModule(nil, nil, indexerCfg.Indexer{Name: testIndexerName})
 	repos := storage.TxRepos{Validators: validators}
 	dCtx := decodeContext.NewContext()
 
-	err := module.upgrade(ctx, repos, dCtx, 6, 8)
+	err := upgrade(ctx, repos, dCtx, 6, 8)
 	require.NoError(t, err)
 
 	requireV7CommissionRates(t, dCtx)
@@ -159,11 +156,10 @@ func TestUpgrade_V8WithPriorV7(t *testing.T) {
 	ctx, ctxCancel := context.WithTimeout(t.Context(), 10*time.Second)
 	defer ctxCancel()
 
-	module := NewModule(nil, nil, indexerCfg.Indexer{Name: testIndexerName})
 	repos := storage.TxRepos{Validators: validators}
 	dCtx := decodeContext.NewContext()
 
-	err := module.upgrade(ctx, repos, dCtx, 7, 8)
+	err := upgrade(ctx, repos, dCtx, 7, 8)
 	require.NoError(t, err)
 
 	require.Zero(t, dCtx.Validators.Len(), "no validators should be modified when v7 was already applied")
@@ -180,14 +176,13 @@ func TestUpgrade_NoOpWhenCurrentGTE(t *testing.T) {
 	ctx, ctxCancel := context.WithTimeout(t.Context(), 10*time.Second)
 	defer ctxCancel()
 
-	module := NewModule(nil, nil, indexerCfg.Indexer{Name: testIndexerName})
 	repos := storage.TxRepos{Validators: validators}
 	dCtx := decodeContext.NewContext()
 
-	err := module.upgrade(ctx, repos, dCtx, 8, 8)
+	err := upgrade(ctx, repos, dCtx, 8, 8)
 	require.NoError(t, err)
 
-	err = module.upgrade(ctx, repos, dCtx, 9, 8)
+	err = upgrade(ctx, repos, dCtx, 9, 8)
 	require.NoError(t, err)
 }
 
@@ -209,11 +204,10 @@ func TestUpgrade_V10SeedsFibreParams(t *testing.T) {
 	ctx, ctxCancel := context.WithTimeout(t.Context(), 10*time.Second)
 	defer ctxCancel()
 
-	module := NewModule(nil, nil, indexerCfg.Indexer{Name: testIndexerName})
 	repos := storage.TxRepos{Validators: validators, Constants: constants}
 	dCtx := decodeContext.NewContext()
 
-	err := module.upgrade(ctx, repos, dCtx, 9, 10)
+	err := upgrade(ctx, repos, dCtx, 9, 10)
 	require.NoError(t, err)
 
 	got := make(map[string]string)
@@ -260,11 +254,10 @@ func TestUpgrade_V10KeepsGenesisFibreParams(t *testing.T) {
 	ctx, ctxCancel := context.WithTimeout(t.Context(), 10*time.Second)
 	defer ctxCancel()
 
-	module := NewModule(nil, nil, indexerCfg.Indexer{Name: testIndexerName})
 	repos := storage.TxRepos{Validators: validators, Constants: constants}
 	dCtx := decodeContext.NewContext()
 
-	err := module.upgrade(ctx, repos, dCtx, 9, 10)
+	err := upgrade(ctx, repos, dCtx, 9, 10)
 	require.NoError(t, err)
 	require.Zero(t, dCtx.Constants.Len(), "genesis params must be left alone")
 }
@@ -292,11 +285,10 @@ func TestUpgrade_V10ChainsThroughEarlierVersions(t *testing.T) {
 	ctx, ctxCancel := context.WithTimeout(t.Context(), 10*time.Second)
 	defer ctxCancel()
 
-	module := NewModule(nil, nil, indexerCfg.Indexer{Name: testIndexerName})
 	repos := storage.TxRepos{Validators: validators, Constants: constants}
 	dCtx := decodeContext.NewContext()
 
-	err := module.upgrade(ctx, repos, dCtx, 6, 10)
+	err := upgrade(ctx, repos, dCtx, 6, 10)
 	require.NoError(t, err)
 
 	// v7's validator commission adjustment ran

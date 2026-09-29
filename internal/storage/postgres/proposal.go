@@ -71,7 +71,7 @@ func (p *Proposal) Active(ctx context.Context) (proposals []storage.Proposal, er
 	err = p.DB().NewSelect().Model(&proposals).
 		Column("id", "proposer_id", "height", "created_at", "deposit_time").
 		Column("activation_time", "status", "type", "title", "description", "metadata", "changes").
-		Column("quorum", "veto_quorum", "threshold", "min_deposit", "end_time", "error").
+		Column("quorum", "veto_quorum", "threshold", "min_deposit", "end_time", "error", "expedited").
 		Where("status = ?", types.ProposalStatusActive).
 		Scan(ctx)
 	return

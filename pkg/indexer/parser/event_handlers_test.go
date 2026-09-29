@@ -604,3 +604,69 @@ func Test_parseSlash(t *testing.T) {
 		require.EqualValues(t, 0, ctx.Jails.Len())
 	})
 }
+
+func Test_parseProposal(t *testing.T) {
+	tests := []struct {
+		name       string
+		result     string
+		log        string
+		wantStatus types.ProposalStatus
+		wantError  string
+	}{
+		{name: "passed", result: "proposal_passed", wantStatus: types.ProposalStatusApplied},
+		{name: "rejected", result: "proposal_rejected", wantStatus: types.ProposalStatusRejected},
+		{name: "dropped", result: "proposal_dropped", wantStatus: types.ProposalStatusRemoved},
+		{name: "failed", result: "proposal_failed", log: "msg 0 failed", wantStatus: types.ProposalStatusFailed, wantError: "msg 0 failed"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.NewContext()
+			ctx.Block = &testBlock
+
+			err := parseProposal(ctx, map[string]string{
+				"proposal_id":     "7",
+				"proposal_result": tt.result,
+				"proposal_log":    tt.log,
+			})
+			require.NoError(t, err)
+
+			proposal, ok := ctx.Proposals.Get(7)
+			require.True(t, ok)
+			require.Equal(t, tt.wantStatus, proposal.Status)
+			require.Equal(t, tt.wantError, proposal.Error)
+			require.False(t, proposal.ExpeditedProposalRejected)
+		})
+	}
+
+	// x/gov converts a failed expedited proposal to a regular one: voting goes on, nothing is finished
+	t.Run("expedited proposal rejected", func(t *testing.T) {
+		ctx := context.NewContext()
+		ctx.Block = &testBlock
+
+		err := parseProposal(ctx, map[string]string{
+			"proposal_id":     "7",
+			"proposal_result": "expedited_proposal_rejected",
+			"proposal_log":    "expedited proposal converted to regular",
+		})
+		require.NoError(t, err)
+
+		proposal, ok := ctx.Proposals.Get(7)
+		require.True(t, ok)
+		require.True(t, proposal.ExpeditedProposalRejected)
+		require.Equal(t, types.ProposalStatusActive, proposal.Status)
+		require.False(t, proposal.Finished())
+		require.Empty(t, proposal.Error)
+	})
+
+	t.Run("unknown result", func(t *testing.T) {
+		ctx := context.NewContext()
+		ctx.Block = &testBlock
+
+		err := parseProposal(ctx, map[string]string{
+			"proposal_id":     "7",
+			"proposal_result": "unknown",
+		})
+		require.Error(t, err)
+	})
+}

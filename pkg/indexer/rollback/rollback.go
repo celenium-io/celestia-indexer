@@ -245,6 +245,10 @@ func (module *Module) rollbackBlock(ctx context.Context, height types.Level) err
 		return tx.HandleError(ctx, err)
 	}
 
+	if err := rollbackProposals(ctx, tx, repos.Constants, repos.Proposals, events); err != nil {
+		return tx.HandleError(ctx, err)
+	}
+
 	newBlock, err := repos.Blocks.Last(ctx)
 	if err != nil {
 		return tx.HandleError(ctx, err)

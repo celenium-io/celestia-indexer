@@ -72,10 +72,7 @@ func (module *Module) recoverIbcClients(
 	}
 
 	substitutes := make(map[string]string)
-	for _, p := range proposals.Values() {
-		if p.Status != types.ProposalStatusApplied {
-			continue
-		}
+	for p := range appliedProposals(proposals.AllValues()) {
 		proposal, err := proposalsRepo.GetByID(ctx, p.Id)
 		if err != nil {
 			return errors.Wrapf(err, "receiving proposal %d", p.Id)

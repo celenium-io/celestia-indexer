@@ -11233,6 +11233,10 @@
                     "format": "string",
                     "example": "Some error text"
                 },
+                "expedited": {
+                    "type": "boolean",
+                    "example": true
+                },
                 "height": {
                     "type": "integer",
                     "format": "int64",
