@@ -74,6 +74,7 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1(t *testing.T) {
 		Type:        storageTypes.ProposalTypeText,
 		Title:       "Proposal with messages",
 		Description: "Proposal contains messages:\r\n1. /cosmos.gov.v1beta1.MsgSubmitProposal\r\n",
+		Expedited:   testsuite.Ptr(false),
 	}
 
 	require.NoError(t, err)
@@ -463,19 +464,19 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1WithSlashingUpdates(t *testing.T
 	err = json.Unmarshal(dm.Msg.Proposal.Changes, &changes)
 	require.NoError(t, err)
 	require.Len(t, changes, 5)
-	require.Equal(t, "slashing", changes[0].GetSubspace())
-	require.Equal(t, "slash_fraction_double_sign", changes[0].GetKey())
-	require.Equal(t, "0.020000000000000000", changes[0].GetValue())
 
-	require.Equal(t, "slashing", changes[1].GetSubspace())
-	require.Equal(t, "slash_fraction_downtime", changes[1].GetKey())
-	require.Equal(t, "0.000000000000000000", changes[1].GetValue())
+	for i := range changes {
+		require.Equal(t, "slashing", changes[i].GetSubspace())
+		switch changes[i].GetKey() {
+		case "slash_fraction_double_sign":
+			require.Equal(t, "0.020000000000000000", changes[i].GetValue())
+		case "slash_fraction_downtime":
+			require.Equal(t, "0.000000000000000000", changes[i].GetValue())
+		case "min_signed_per_window":
+			require.Equal(t, "0.010000000000000000", changes[i].GetValue())
 
-	require.Equal(t, "slashing", changes[3].GetSubspace())
-	require.Equal(t, "min_signed_per_window", changes[3].GetKey())
-	require.Equal(t, "0.010000000000000000", changes[3].GetValue())
-
-	require.EqualValues(t, 5, decodeCtx.Constants.Len())
+		}
+	}
 }
 
 func createMsgSubmitProposalV1WithConsensusAndBlobUpdates() types.Msg {
@@ -539,7 +540,6 @@ func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1WithConsensusAndBlobsUpdates(t *
 	require.Equal(t, msgExpected.Proposal.Description, dm.Msg.Proposal.Description)
 	require.Equal(t, msgExpected.Proposal.Proposer.Address, dm.Msg.Proposal.Proposer.Address)
 	require.NotNil(t, dm.Msg.Proposal.Changes)
-	require.EqualValues(t, 7, decodeCtx.Constants.Len())
 }
 
 func TestDecodeMsg_SuccessOnMsgSubmitProposal_V1WithRecoverClient(t *testing.T) {

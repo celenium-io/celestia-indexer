@@ -569,6 +569,54 @@ func (s *TransactionTestSuite) TestSaveProposals() {
 	s.Require().Len(items, 3)
 }
 
+func (s *TransactionTestSuite) TestSaveProposalsExpedited() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	save := func(proposals ...*storage.Proposal) {
+		tx, err := BeginTransaction(ctx, s.storage.Transactable)
+		s.Require().NoError(err)
+		defer tx.Close(ctx)
+
+		_, err = tx.SaveProposals(ctx, proposals...)
+		s.Require().NoError(err)
+		s.Require().NoError(tx.Flush(ctx))
+	}
+	expedited := func(id uint64) bool {
+		proposal, err := s.storage.Proposals.ById(ctx, id)
+		s.Require().NoError(err)
+		s.Require().NotNil(proposal.Expedited)
+		return *proposal.Expedited
+	}
+
+	// new rows: nil is written as the column default
+	save(&storage.Proposal{
+		Id:         3,
+		ProposerId: 2,
+		Type:       types.ProposalTypeText,
+		CreatedAt:  time.Now(),
+		Expedited:  testsuite.Ptr(true),
+	}, &storage.Proposal{
+		Id:         4,
+		ProposerId: 2,
+		Type:       types.ProposalTypeText,
+		CreatedAt:  time.Now(),
+	})
+	s.Require().True(expedited(3))
+	s.Require().False(expedited(4))
+
+	// a vote or a deposit does not know the flag and must keep it
+	save(&storage.Proposal{Id: 3, Status: types.ProposalStatusActive})
+	s.Require().True(expedited(3))
+
+	// expedited_proposal_rejected
+	save(&storage.Proposal{Id: 3, Status: types.ProposalStatusActive, Expedited: testsuite.Ptr(false)})
+	s.Require().False(expedited(3))
+
+	// fixtures have no expedited column
+	s.Require().False(expedited(1))
+}
+
 func (s *TransactionTestSuite) TestSaveEmptyProposalDuplicate() {
 	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()

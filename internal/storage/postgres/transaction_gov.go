@@ -104,7 +104,7 @@ func (tx Transaction) SaveProposals(ctx context.Context, proposals ...*models.Pr
 		query := tx.Tx().NewInsert().
 			Column("id", "proposer_id", "height", "created_at", "deposit_time", "activation_time", "status", "type", "title", "description", "deposit", "metadata", "changes", "yes", "no", "no_with_veto", "abstain").
 			Column("yes_vals", "no_vals", "no_with_veto_vals", "abstain_vals", "yes_addrs", "no_addrs", "no_with_veto_addrs", "abstain_addrs", "votes_count", "voting_power", "yes_voting_power", "no_voting_power", "no_with_veto_voting_power", "abstain_voting_power").
-			Column("total_voting_power", "quorum", "veto_quorum", "threshold", "min_deposit", "end_time", "error").
+			Column("total_voting_power", "quorum", "veto_quorum", "threshold", "min_deposit", "end_time", "error", "expedited").
 			Model(&add).
 			On("CONFLICT (id) DO UPDATE").
 			Set("votes_count = added_proposal.votes_count + EXCLUDED.votes_count").
@@ -171,6 +171,9 @@ func (tx Transaction) SaveProposals(ctx context.Context, proposals ...*models.Pr
 		}
 		if proposals[i].AbstainVotingPower.IsPositive() {
 			query.Set("abstain_voting_power = EXCLUDED.abstain_voting_power")
+		}
+		if proposals[i].Expedited != nil {
+			query.Set("expedited = EXCLUDED.expedited")
 		}
 
 		if _, err := query.Returning("xmax, id").Exec(ctx); err != nil {

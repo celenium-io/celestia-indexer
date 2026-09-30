@@ -11,7 +11,6 @@ import (
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
 	decodeContext "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/postgres"
@@ -42,11 +41,7 @@ type Module struct {
 	validatorsByAddress     map[string]uint64
 	validatorsByDelegator   map[string]uint64
 
-	slashingForDowntime   decimal.Decimal
-	slashingForDoubleSign decimal.Decimal
-	maxAgeNumBlocks       string
-	maxAgeDuration        string
-	indexerName           string
+	indexerName string
 }
 
 var _ modules.Module = (*Module)(nil)
@@ -65,10 +60,6 @@ func NewModule(
 		validatorsByConsAddress: make(map[string]uint64),
 		validatorsByAddress:     make(map[string]uint64),
 		validatorsByDelegator:   make(map[string]uint64),
-		slashingForDowntime:     decimal.Zero,
-		slashingForDoubleSign:   decimal.Zero,
-		maxAgeNumBlocks:         "",
-		maxAgeDuration:          "",
 		indexerName:             cfg.Name,
 	}
 
@@ -112,55 +103,6 @@ func (module *Module) init(ctx context.Context, repos storage.TxRepos) error {
 		module.validatorsByDelegator[validator.Delegator] = validator.Id
 	}
 
-	return module.initConstants(ctx, repos)
-}
-
-func (module *Module) isConstantsEmpty() bool {
-	return module.slashingForDoubleSign.IsZero() || module.slashingForDowntime.IsZero()
-}
-
-func (module *Module) initConstants(ctx context.Context, repos storage.TxRepos) error {
-	doubleSign, err := repos.Constants.Get(ctx, types.ModuleNameSlashing, "slash_fraction_double_sign")
-	if err != nil {
-		if repos.Validators.IsNoRows(err) {
-			return nil
-		}
-		return err
-	}
-	module.slashingForDoubleSign, err = decimal.NewFromString(doubleSign.Value)
-	if err != nil {
-		return err
-	}
-
-	downtime, err := repos.Constants.Get(ctx, types.ModuleNameSlashing, "slash_fraction_downtime")
-	if err != nil {
-		if repos.Validators.IsNoRows(err) {
-			return nil
-		}
-		return err
-	}
-	module.slashingForDowntime, err = decimal.NewFromString(downtime.Value)
-	if err != nil {
-		return err
-	}
-
-	maxAgeNumBlocks, err := repos.Constants.Get(ctx, types.ModuleNameConsensus, "evidence_max_age_num_blocks")
-	if err != nil {
-		if repos.Validators.IsNoRows(err) {
-			return nil
-		}
-		return err
-	}
-	module.maxAgeNumBlocks = maxAgeNumBlocks.Value
-
-	maxAgeDuration, err := repos.Constants.Get(ctx, types.ModuleNameConsensus, "evidence_max_age_duration")
-	if err != nil {
-		if repos.Validators.IsNoRows(err) {
-			return nil
-		}
-		return err
-	}
-	module.maxAgeDuration = maxAgeDuration.Value
 	return nil
 }
 
@@ -217,12 +159,6 @@ func (module *Module) saveBlock(ctx context.Context, dCtx *decodeContext.Context
 	defer tx.Close(ctx)
 
 	repos := module.reposFactory(tx)
-
-	if module.isConstantsEmpty() {
-		if err := module.initConstants(ctx, repos); err != nil {
-			return storage.State{}, tx.HandleError(ctx, err)
-		}
-	}
 
 	state, err := module.processBlockInTransaction(ctx, tx, repos, dCtx)
 	if err != nil {
@@ -284,7 +220,7 @@ func (module *Module) processBlockInTransaction(
 		block.ProposerId = proposer.Id
 	}
 
-	if err := module.upgrade(ctx, repos, dCtx, state.Version, block.VersionApp); err != nil {
+	if err := upgrade(ctx, repos, dCtx, state.Version, block.VersionApp); err != nil {
 		return state, errors.Wrap(err, "upgrade failed")
 	}
 
@@ -294,7 +230,7 @@ func (module *Module) processBlockInTransaction(
 		return state, errors.Wrap(err, "prepare signal round")
 	}
 
-	if err := module.saveConstantUpdates(ctx, tx, dCtx.Constants); err != nil {
+	if err := saveConstantUpdates(ctx, tx, dCtx.Constants); err != nil {
 		return state, errors.Wrap(err, "can't save constant updates")
 	}
 
@@ -425,6 +361,9 @@ func (module *Module) processBlockInTransaction(
 
 	if err := module.processSignalModule(ctx, tx, repos, dCtx, state.Version, addrToId, signalRound); err != nil {
 		return state, errors.Wrap(err, "process signal module")
+	}
+	if err := saveProposalConstantUpdates(ctx, tx, repos.Proposals, dCtx.Proposals); err != nil {
+		return state, errors.Wrap(err, "save proposals constants")
 	}
 
 	updateState(block, totalAccounts, totalNamespaces, totalProposals, ibcClientsCount, totalValidators, dCtx.Block.VersionApp, &state)

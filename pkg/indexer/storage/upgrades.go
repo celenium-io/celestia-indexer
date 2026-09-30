@@ -5,6 +5,7 @@ package storage
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
@@ -15,7 +16,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (module *Module) upgrade(
+func upgrade(
 	ctx context.Context, repos storage.TxRepos, decodeContext *decodeContext.Context, currentVersion, targetVersion uint64,
 ) error {
 	if currentVersion >= targetVersion {
@@ -24,7 +25,7 @@ func (module *Module) upgrade(
 
 	for version := currentVersion + 1; version <= targetVersion; version++ {
 		switch version {
-		case 1, 2, 3, 4, 5, 8, 9:
+		case 1, 2, 3, 5, 8, 9:
 			// No upgrade logic needed for these versions
 		case 6:
 			// CIP-037 Reduce the validator unbonding period from 21 days to 14 days and 1 hour to improve capital
@@ -36,12 +37,16 @@ func (module *Module) upgrade(
 			decodeContext.AddConstant(types.ModuleNameStaking, "min_commission_rate", "0.100000000000000000")
 
 		case 7:
-			if err := module.upgradeV7(ctx, repos, decodeContext, version); err != nil {
+			if err := upgradeV7(ctx, repos, decodeContext, version); err != nil {
 				return errors.Wrap(err, "failed to upgrade to version 7")
 			}
 		case 10:
-			if err := module.seedFibreParams(ctx, repos, decodeContext); err != nil {
+			if err := seedFibreParams(ctx, repos, decodeContext); err != nil {
 				return errors.Wrap(err, "failed to seed fibre params")
+			}
+		case 4:
+			if err := upgradeV4(ctx, decodeContext, repos.Constants); err != nil {
+				return err
 			}
 		default:
 			return errors.Errorf("unsupported upgrade version: %d", version)
@@ -55,7 +60,7 @@ func (module *Module) upgrade(
 // nothing on chain and emits no event -- the keeper just starts answering with
 // DefaultParams -- so the app defaults are the only source. A chain launched at
 // v10 already got them from genesis, so existing values are never overwritten.
-func (module *Module) seedFibreParams(
+func seedFibreParams(
 	ctx context.Context, repos storage.TxRepos, decodeContext *decodeContext.Context,
 ) error {
 	existing, err := repos.Constants.ByModule(ctx, types.ModuleNameFibre)
@@ -70,7 +75,7 @@ func (module *Module) seedFibreParams(
 	return nil
 }
 
-func (module *Module) upgradeV7(
+func upgradeV7(
 	ctx context.Context, repos storage.TxRepos, decodeContext *decodeContext.Context, targetVersion uint64,
 ) error {
 	if targetVersion != 7 {
@@ -115,4 +120,44 @@ func getMax(a, b types.Numeric) types.Numeric {
 		return a
 	}
 	return b
+}
+
+func upgradeV4(
+	ctx context.Context,
+	decodeContext *decodeContext.Context,
+	constants storage.IConstant,
+) error {
+	if err := createConstantIfNotExists(
+		ctx, decodeContext, constants, types.ModuleNameGov, "expedited_voting_period", "86400000000000",
+	); err != nil {
+		return err
+	}
+	if err := createConstantIfNotExists(
+		ctx, decodeContext, constants, types.ModuleNameGov, "expedited_threshold", "0.667000000000000000",
+	); err != nil {
+		return err
+	}
+	if err := createConstantIfNotExists(
+		ctx, decodeContext, constants, types.ModuleNameGov, "expedited_min_deposit", "50000000000utia",
+	); err != nil {
+		return err
+	}
+	return nil
+}
+
+func createConstantIfNotExists(
+	ctx context.Context,
+	decodeContext *decodeContext.Context,
+	constants storage.IConstant,
+	module types.ModuleName,
+	name, value string,
+) error {
+	if _, err := constants.Get(ctx, module, name); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			decodeContext.AddConstant(module, name, value)
+		} else {
+			return err
+		}
+	}
+	return nil
 }

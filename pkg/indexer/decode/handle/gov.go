@@ -4,19 +4,23 @@
 package handle
 
 import (
+	stdJSON "encoding/json"
 	"fmt"
+	"maps"
+	"regexp"
+	"slices"
 	"strconv"
 	"strings"
+	"time"
 
 	consensusv1 "cosmossdk.io/api/cosmos/consensus/v1"
-	slashingv1beta1 "cosmossdk.io/api/cosmos/slashing/v1beta1"
-	"cosmossdk.io/math"
 	json "github.com/bytedance/sonic"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	blobTypes "github.com/celestiaorg/celestia-app/v10/x/blob/types"
 	"github.com/cosmos/cosmos-sdk/codec"
+	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	distributionTypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	v1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	cosmosGovTypesV1Beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
@@ -25,6 +29,110 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stoewer/go-strcase"
 )
+
+func moduleFromTypeURL(typeURL string) string {
+	splitted := strings.Split(typeURL, ".")
+	if len(splitted) < 2 {
+		return typeURL
+	}
+	return splitted[1]
+}
+
+// ProtoJSON encodes google.protobuf.Duration as seconds with the "s" suffix
+var durationRe = regexp.MustCompile(`^-?\d+(\.\d+)?s$`)
+
+// UseNumber keeps big integers exact instead of float64
+var paramsJSON = json.Config{UseNumber: true}.Froze()
+
+func flatten(module, prefix string, value map[string]any, changes *[]paramsV1Beta.ParamChange) error {
+	// sorted keys: changes are stored in proposal.changes and must be stable
+	for _, key := range slices.Sorted(maps.Keys(value)) {
+		name := key
+		if prefix != "" {
+			name = prefix + "_" + key
+		}
+
+		switch typed := value[key].(type) {
+		case nil:
+			continue
+
+		case map[string]any:
+			if err := flatten(module, name, typed, changes); err != nil {
+				return err
+			}
+
+		case []any:
+			if amount, ok := firstCoinAmount(typed); ok {
+				appendChange(changes, module, name, amount)
+				continue
+			}
+			if len(typed) == 0 {
+				continue
+			}
+			raw, err := paramsJSON.MarshalToString(typed)
+			if err != nil {
+				return errors.Wrap(err, name)
+			}
+			appendChange(changes, module, name, raw)
+
+		case string:
+			if durationRe.MatchString(typed) {
+				d, err := time.ParseDuration(typed)
+				if err != nil {
+					return errors.Wrap(err, name)
+				}
+				appendChange(changes, module, name, strconv.FormatInt(d.Nanoseconds(), 10))
+				continue
+			}
+			appendChange(changes, module, name, typed)
+
+		case stdJSON.Number: // alias of json.Number
+			appendChange(changes, module, name, typed.String())
+
+		case bool:
+			appendChange(changes, module, name, strconv.FormatBool(typed))
+
+		default:
+			return errors.Errorf("unexpected param type %T: %s", typed, name)
+		}
+	}
+	return nil
+}
+
+// firstCoinAmount matches sdk.Coins: the constant keeps the amount of the first coin and its denom
+func firstCoinAmount(items []any) (string, bool) {
+	if len(items) == 0 {
+		return "", false
+	}
+	coin, ok := items[0].(map[string]any)
+	if !ok || len(coin) != 2 {
+		return "", false
+	}
+	amount, ok := coin["amount"]
+	if !ok {
+		return "", false
+	}
+	amountString, ok := amount.(string)
+	if !ok {
+		return "", false
+	}
+	denom, ok := coin["denom"]
+	if !ok {
+		return "", false
+	}
+	denomString, ok := denom.(string)
+	if !ok {
+		return "", false
+	}
+	return fmt.Sprintf("%s%s", amountString, denomString), true
+}
+
+func appendChange(changes *[]paramsV1Beta.ParamChange, module, key, value string) {
+	if changes == nil {
+		return
+	}
+	*changes = append(*changes, paramsV1Beta.NewParamChange(module, key, value))
+}
 
 // MsgSubmitProposalV1
 func MsgSubmitProposalV1(ctx *context.Context, codec codec.Codec, status storageTypes.Status, msgId uint64, msg *v1.MsgSubmitProposal) (storageTypes.MsgType, []any, *storage.Proposal, error) {
@@ -51,6 +159,7 @@ func MsgSubmitProposalV1(ctx *context.Context, codec codec.Codec, status storage
 		Title:       msg.Title,
 		Description: msg.Summary,
 		Metadata:    msg.Metadata,
+		Expedited:   &msg.Expedited,
 	}
 
 	if prpsl.Title == "" {
@@ -64,106 +173,11 @@ func MsgSubmitProposalV1(ctx *context.Context, codec codec.Codec, status storage
 		return msgType, nil, nil, errors.Wrap(err, "building proposal description from messages")
 	}
 	for i := range msg.Messages {
+		if _, err := fmt.Fprintf(&sb, "%d. %s\r\n", i+1, msg.Messages[i].TypeUrl); err != nil {
+			return msgType, nil, nil, errors.Wrap(err, "building proposal description from messages")
+		}
+
 		switch msg.Messages[i].TypeUrl {
-		case "/cosmos.slashing.v1beta1.MsgUpdateParams":
-			var params slashingv1beta1.MsgUpdateParams
-			if err := codec.Unmarshal(msg.Messages[i].Value, &params); err != nil {
-				return msgType, nil, nil, errors.Wrap(err, "unmarshalling proposal with slashing.v1beta1.MsgUpdateParams")
-			}
-			if p := params.GetParams(); p != nil {
-				prpsl.Type = storageTypes.ProposalTypeParamChanged
-
-				var slashFractionDoubleSign math.LegacyDec
-				if err := slashFractionDoubleSign.Unmarshal(p.GetSlashFractionDoubleSign()); err != nil {
-					return msgType, nil, nil, errors.Wrap(err, "slash_fraction_double_sign")
-				}
-				ctx.AddConstant(storageTypes.ModuleNameSlashing, "slash_fraction_double_sign", slashFractionDoubleSign.String())
-				changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameSlashing.String(), "slash_fraction_double_sign", slashFractionDoubleSign.String()))
-
-				var slashFractionDowntime math.LegacyDec
-				if err := slashFractionDowntime.Unmarshal(p.GetSlashFractionDowntime()); err != nil {
-					return msgType, nil, nil, errors.Wrap(err, "slash_fraction_downtime")
-				}
-				ctx.AddConstant(storageTypes.ModuleNameSlashing, "slash_fraction_downtime", slashFractionDowntime.String())
-				changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameSlashing.String(), "slash_fraction_downtime", slashFractionDowntime.String()))
-
-				downtimeJailDuration := strconv.FormatInt(int64(p.GetDowntimeJailDuration().GetNanos()), 10)
-				ctx.AddConstant(storageTypes.ModuleNameSlashing, "downtime_jail_duration", downtimeJailDuration)
-				changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameSlashing.String(), "downtime_jail_duration", downtimeJailDuration))
-
-				var minSignedPerWindow math.LegacyDec
-				if err := minSignedPerWindow.Unmarshal(p.GetMinSignedPerWindow()); err != nil {
-					return msgType, nil, nil, errors.Wrap(err, "min_signed_per_window")
-				}
-				ctx.AddConstant(storageTypes.ModuleNameSlashing, "min_signed_per_window", minSignedPerWindow.String())
-				changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameSlashing.String(), "min_signed_per_window", minSignedPerWindow.String()))
-
-				signedBlocksWindow := strconv.FormatInt(p.GetSignedBlocksWindow(), 10)
-				ctx.AddConstant(storageTypes.ModuleNameSlashing, "signed_blocks_window", signedBlocksWindow)
-				changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameSlashing.String(), "signed_blocks_window", signedBlocksWindow))
-			}
-
-		case "/cosmos.distribution.v1beta1.MsgUpdateParams":
-			var params distributionTypes.MsgUpdateParams
-			if err := codec.Unmarshal(msg.Messages[i].Value, &params); err != nil {
-				return msgType, nil, nil, errors.Wrap(err, "unmarshalling proposal with cosmos.distribution.v1beta1.MsgUpdateParams")
-			}
-
-			prpsl.Type = storageTypes.ProposalTypeParamChanged
-
-			communityTax := params.Params.CommunityTax.String()
-			ctx.AddConstant(storageTypes.ModuleNameDistribution, "community_tax", communityTax)
-			changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameDistribution.String(), "community_tax", communityTax))
-
-			baseProposerReward := params.Params.BaseProposerReward.String() //nolint:staticcheck
-			ctx.AddConstant(storageTypes.ModuleNameDistribution, "base_proposer_reward", baseProposerReward)
-			changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameDistribution.String(), "base_proposer_reward", baseProposerReward))
-
-			bonusProposerReward := params.Params.BonusProposerReward.String() //nolint:staticcheck
-			ctx.AddConstant(storageTypes.ModuleNameDistribution, "bonus_proposer_reward", bonusProposerReward)
-			changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameDistribution.String(), "bonus_proposer_reward", bonusProposerReward))
-
-			withdrawAddrEnabled := strconv.FormatBool(params.Params.WithdrawAddrEnabled)
-			ctx.AddConstant(storageTypes.ModuleNameDistribution, "withdraw_addr_enabled", withdrawAddrEnabled)
-			changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameDistribution.String(), "withdraw_addr_enabled", withdrawAddrEnabled))
-
-		case "/cosmos.gov.v1.MsgUpdateParams":
-			var params v1.MsgUpdateParams
-			if err := codec.Unmarshal(msg.Messages[i].Value, &params); err != nil {
-				return msgType, nil, nil, errors.Wrap(err, "unmarshalling proposal with cosmos.gov.v1.MsgUpdateParams")
-			}
-
-			prpsl.Type = storageTypes.ProposalTypeParamChanged
-
-			if minDeposits := params.Params.GetMinDeposit(); len(minDeposits) > 0 {
-				ctx.AddConstant(storageTypes.ModuleNameGov, "min_deposit", minDeposits[0].Amount.String())
-				changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameGov.String(), "min_deposit", minDeposits[0].Amount.String()))
-			}
-
-			if maxDepositPeriod := params.Params.GetMaxDepositPeriod(); maxDepositPeriod != nil {
-				value := strconv.FormatInt(maxDepositPeriod.Nanoseconds(), 10)
-				ctx.AddConstant(storageTypes.ModuleNameGov, "max_deposit_period", value)
-				changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameGov.String(), "max_deposit_period", value))
-			}
-
-			if votingPeriod := params.Params.GetVotingPeriod(); votingPeriod != nil {
-				value := strconv.FormatInt(votingPeriod.Nanoseconds(), 10)
-				ctx.AddConstant(storageTypes.ModuleNameGov, "voting_period", value)
-				changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameGov.String(), "voting_period", value))
-			}
-
-			quorum := params.Params.GetQuorum()
-			ctx.AddConstant(storageTypes.ModuleNameGov, "quorum", quorum)
-			changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameGov.String(), "quorum", quorum))
-
-			threshold := params.Params.GetThreshold()
-			ctx.AddConstant(storageTypes.ModuleNameGov, "threshold", threshold)
-			changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameGov.String(), "threshold", threshold))
-
-			vetoThreshold := params.Params.GetVetoThreshold()
-			ctx.AddConstant(storageTypes.ModuleNameGov, "veto_threshold", vetoThreshold)
-			changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameGov.String(), "veto_threshold", vetoThreshold))
-
 		case "/celestia.blob.v1.MsgUpdateBlobParams":
 			var params blobTypes.MsgUpdateBlobParams
 			if err := codec.Unmarshal(msg.Messages[i].Value, &params); err != nil {
@@ -172,11 +186,9 @@ func MsgSubmitProposalV1(ctx *context.Context, codec codec.Codec, status storage
 			prpsl.Type = storageTypes.ProposalTypeParamChanged
 
 			gasBlobPerByte := strconv.FormatUint(uint64(params.Params.GetGasPerBlobByte()), 10)
-			ctx.AddConstant(storageTypes.ModuleNameBlob, "gas_per_blob_byte", gasBlobPerByte)
 			changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameBlob.String(), "gas_per_blob_byte", gasBlobPerByte))
 
 			maxSquareSize := strconv.FormatUint(params.Params.GetGovMaxSquareSize(), 10)
-			ctx.AddConstant(storageTypes.ModuleNameBlob, "gov_max_square_size", maxSquareSize)
 			changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameBlob.String(), "gov_max_square_size", maxSquareSize))
 
 		case "/ibc.core.client.v1.MsgRecoverClient":
@@ -202,33 +214,49 @@ func MsgSubmitProposalV1(ctx *context.Context, codec codec.Codec, status storage
 
 			if block := params.GetBlock(); block != nil {
 				maxBytes := strconv.FormatInt(block.GetMaxBytes(), 10)
-				ctx.AddConstant(storageTypes.ModuleNameConsensus, "block_max_bytes", maxBytes)
 				changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameConsensus.String(), "block_max_bytes", maxBytes))
 
 				maxGas := strconv.FormatInt(block.GetMaxGas(), 10)
-				ctx.AddConstant(storageTypes.ModuleNameConsensus, "block_max_gas", maxGas)
 				changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameConsensus.String(), "block_max_gas", maxGas))
 			}
 
 			if evidence := params.GetEvidence(); evidence != nil {
 				maxAgeNumBlocks := strconv.FormatInt(evidence.GetMaxAgeNumBlocks(), 10)
-				ctx.AddConstant(storageTypes.ModuleNameConsensus, "evidence_max_age_num_blocks", maxAgeNumBlocks)
 				changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameConsensus.String(), "evidence_max_age_num_blocks", maxAgeNumBlocks))
 
 				maxBytes := strconv.FormatInt(evidence.GetMaxBytes(), 10)
-				ctx.AddConstant(storageTypes.ModuleNameConsensus, "evidence_max_bytes", maxBytes)
 				changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameConsensus.String(), "evidence_max_bytes", maxBytes))
 
 				if age := evidence.GetMaxAgeDuration(); age != nil {
-					value := strconv.FormatInt(int64(age.GetNanos()), 10)
-					ctx.AddConstant(storageTypes.ModuleNameConsensus, "evidence_max_age_duration", value)
+					value := strconv.FormatInt(age.AsDuration().Nanoseconds(), 10)
 					changes = append(changes, paramsV1Beta.NewParamChange(storageTypes.ModuleNameConsensus.String(), "evidence_max_age_duration", value))
 				}
 			}
-		}
-
-		if _, err := fmt.Fprintf(&sb, "%d. %s\r\n", i+1, msg.Messages[i].TypeUrl); err != nil {
-			return msgType, nil, nil, errors.Wrap(err, "building proposal description from messages")
+		default:
+			var sdkMsg cosmosTypes.Msg
+			if err := codec.UnpackAny(msg.Messages[i], &sdkMsg); err != nil {
+				continue // skip unknown message
+			}
+			module, err := storageTypes.ParseModuleName(moduleFromTypeURL(msg.Messages[i].TypeUrl))
+			if err != nil {
+				continue // not a module we keep constants for
+			}
+			raw, err := codec.MarshalJSON(sdkMsg)
+			if err != nil {
+				return msgType, nil, prpsl, err
+			}
+			var body struct {
+				Params map[string]any `json:"params"`
+			}
+			if err := paramsJSON.Unmarshal(raw, &body); err != nil {
+				return msgType, nil, prpsl, err
+			}
+			if len(body.Params) > 0 {
+				if err := flatten(module.String(), "", body.Params, &changes); err != nil {
+					return msgType, nil, prpsl, err
+				}
+				prpsl.Type = storageTypes.ProposalTypeParamChanged
+			}
 		}
 	}
 	if prpsl.Description == "" {
@@ -289,11 +317,7 @@ func MsgSubmitProposalV1Beta(ctx *context.Context, codec codec.Codec, status sto
 		prpsl.Title = proposal.Title
 		prpsl.Description = proposal.Description
 		prpsl.Type = storageTypes.ProposalTypeParamChanged
-		prpsl.Changes, err = json.Marshal(proposal.Changes)
-		if err != nil {
-			return msgType, nil, nil, errors.Wrap(err, "marshalling changes proposal for submit proposal content")
-		}
-
+		changes := make([]paramsV1Beta.ParamChange, 0, len(proposal.Changes))
 		for i := range proposal.Changes {
 			moduleName, err := storageTypes.ParseModuleName(proposal.Changes[i].GetSubspace())
 			if err != nil {
@@ -307,22 +331,22 @@ func MsgSubmitProposalV1Beta(ctx *context.Context, codec codec.Codec, status sto
 
 				switch key {
 				case "BlockParams":
-					if err := parseParamsToConstants(ctx, storageTypes.ModuleNameConsensus, "block_", value); err != nil {
+					if err := parseParamsToConstants(storageTypes.ModuleNameConsensus, "block_", value, &changes); err != nil {
 						return msgType, nil, nil, errors.Wrap(err, "parse block params")
 					}
 				case "EvidenceParams":
-					if err := parseParamsToConstants(ctx, storageTypes.ModuleNameConsensus, "evidence_", value); err != nil {
+					if err := parseParamsToConstants(storageTypes.ModuleNameConsensus, "evidence_", value, &changes); err != nil {
 						return msgType, nil, nil, errors.Wrap(err, "parse evidence params")
 					}
 				case "ValidatorParams":
-					if err := parseParamsToConstants(ctx, storageTypes.ModuleNameConsensus, "validator_", value); err != nil {
+					if err := parseParamsToConstants(storageTypes.ModuleNameConsensus, "validator_", value, &changes); err != nil {
 						return msgType, nil, nil, errors.Wrap(err, "parse validator params")
 					}
 				}
 
 			case storageTypes.ModuleNameGov:
 				if key == "votingparams" {
-					if err := parseParamsToConstants(ctx, moduleName, "", value); err != nil {
+					if err := parseParamsToConstants(moduleName, "", value, &changes); err != nil {
 						return msgType, nil, nil, errors.Wrap(err, "parse voting params")
 					}
 				}
@@ -335,13 +359,28 @@ func MsgSubmitProposalV1Beta(ctx *context.Context, codec codec.Codec, status sto
 						return msgType, nil, nil, errors.Wrap(err, value)
 					}
 				}
-				ctx.AddConstant(moduleName, strcase.SnakeCase(key), val)
+				change := paramsV1Beta.NewParamChange(
+					proposal.Changes[i].GetSubspace(),
+					strcase.SnakeCase(key),
+					val,
+				)
+				changes = append(changes, change)
 
 			default:
-				ctx.AddConstant(moduleName, strcase.SnakeCase(key), value)
+				change := paramsV1Beta.NewParamChange(
+					proposal.Changes[i].GetSubspace(),
+					strcase.SnakeCase(key),
+					value,
+				)
+				changes = append(changes, change)
 
 			}
 		}
+		data, err := paramsJSON.Marshal(changes)
+		if err != nil {
+			return msgType, nil, nil, errors.Wrap(err, "marshalling changes proposal for submit proposal content")
+		}
+		prpsl.Changes = data
 
 		return msgType, proposal, prpsl, nil
 	case "/ibc.core.client.v1.ClientUpdateProposal":
@@ -431,13 +470,18 @@ func MsgUpdateParamsGov(ctx *context.Context, msgId uint64, m *v1.MsgUpdateParam
 	return msgType, err
 }
 
-func parseParamsToConstants(ctx *context.Context, moduleName storageTypes.ModuleName, keyPrefix, value string) error {
+func parseParamsToConstants(moduleName storageTypes.ModuleName, keyPrefix, value string, changes *[]paramsV1Beta.ParamChange) error {
 	var params map[string]string
 	if err := json.Unmarshal([]byte(value), &params); err != nil {
 		return errors.Wrap(err, "unmarshal params")
 	}
-	for k, v := range params {
-		ctx.AddConstant(moduleName, keyPrefix+k, v)
+	for _, key := range slices.Sorted(maps.Keys(params)) {
+		change := paramsV1Beta.NewParamChange(
+			moduleName.String(),
+			keyPrefix+key,
+			params[key],
+		)
+		*changes = append(*changes, change)
 	}
 	return nil
 }

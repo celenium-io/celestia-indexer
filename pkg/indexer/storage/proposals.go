@@ -5,8 +5,7 @@ package storage
 
 import (
 	"context"
-	"maps"
-	"slices"
+	"iter"
 	"strconv"
 	"time"
 
@@ -16,6 +15,18 @@ import (
 	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/pkg/errors"
 )
+
+func appliedProposals(it iter.Seq[*storage.Proposal]) iter.Seq[*storage.Proposal] {
+	return func(yield func(*storage.Proposal) bool) {
+		for p := range it {
+			if p.Status == types.ProposalStatusApplied {
+				if !yield(p) {
+					return
+				}
+			}
+		}
+	}
+}
 
 func (module *Module) saveProposals(
 	ctx context.Context,
@@ -71,6 +82,10 @@ func (module *Module) saveProposals(
 			proposal.NoWithVetoValidators += vc.NoWithVetoValidators
 			proposal.YesValidators += vc.YesValidators
 		}
+	}
+
+	if err := fillExpeditedProposal(ctx, repos.Proposals, repos.Constants, proposals); err != nil {
+		return 0, errors.Wrap(err, "fill expedited proposal")
 	}
 
 	filled, err := module.fillProposalsVotingPower(ctx, repos, height, proposals)
@@ -150,8 +165,15 @@ func (module *Module) fillProposalsVotingPower(
 	}
 
 	for i := range active {
-		if _, ok := finished[active[i].Id]; !ok {
-			finished[active[i].Id] = &active[i]
+		if proposal, ok := finished[active[i].Id]; !ok {
+			if p, ok := proposals.Get(active[i].Id); ok {
+				finished[active[i].Id] = p
+			} else {
+				finished[active[i].Id] = &active[i]
+				proposals.Set(active[i].Id, finished[active[i].Id])
+			}
+		} else {
+			proposal.Expedited = active[i].Expedited
 		}
 	}
 
@@ -192,13 +214,11 @@ func (module *Module) fillProposalsVotingPower(
 			}
 			proposal.Quorum = quorum.Value
 
-			minDeposit, err := repos.Constants.Get(ctx, types.ModuleNameGov, "min_deposit")
-			if err != nil {
-				return nil, errors.Wrapf(err, "can't find min_deposit constant")
+			var thresholdConstantName = "threshold"
+			if proposal.IsExpedited() {
+				thresholdConstantName = "expedited_threshold"
 			}
-			proposal.MinDeposit = minDeposit.Value
-
-			threshold, err := repos.Constants.Get(ctx, types.ModuleNameGov, "threshold")
+			threshold, err := repos.Constants.Get(ctx, types.ModuleNameGov, thresholdConstantName)
 			if err != nil {
 				return nil, errors.Wrapf(err, "can't find threshold constant")
 			}
@@ -281,5 +301,97 @@ func (module *Module) fillProposalsVotingPower(
 		}
 	}
 
-	return slices.Collect(maps.Values(finished)), nil
+	return proposals.Values(), nil
+}
+
+func fillExpeditedProposal(
+	ctx context.Context,
+	repo storage.IProposal,
+	constants storage.IConstant,
+	proposals *sdkSync.Map[uint64, *storage.Proposal],
+) error {
+	for proposal := range proposals.AllValues() {
+		if proposal.Status != types.ProposalStatusActive {
+			continue
+		}
+		if proposal.ActivationTime == nil && !proposal.ExpeditedProposalRejected {
+			continue
+		}
+
+		stored, err := repo.GetByID(ctx, proposal.Id)
+		if err != nil && !repo.IsNoRows(err) {
+			return errors.Wrapf(err, "get proposal by id: %d", proposal.Id)
+		}
+
+		if proposal.ExpeditedProposalRejected {
+			if stored == nil {
+				return errors.Errorf("unknown expedited proposal: %d", proposal.Id)
+			}
+			if err := fillExpeditedProposalEndTime(
+				ctx, constants, "voting_period", stored.ActivationTime, proposal,
+			); err != nil {
+				return errors.Wrap(err, "can't fill expedited proposal")
+			}
+			proposal.Expedited = new(false)
+			continue
+		}
+
+		expedited := stored != nil && stored.IsExpedited()
+		if proposal.Expedited != nil {
+			expedited = *proposal.Expedited
+		}
+
+		if err := fillProposalMinDeposit(ctx, constants, proposal, expedited); err != nil {
+			return err
+		}
+
+		if expedited {
+			if err := fillExpeditedProposalEndTime(
+				ctx, constants, "expedited_voting_period", proposal.ActivationTime, proposal,
+			); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func computeEndTimeForExpeditionProposal(activationTime *time.Time, votingPeriod string) (*time.Time, error) {
+	if activationTime == nil {
+		return nil, errors.Errorf("nil activation time")
+	}
+	ns, err := strconv.ParseInt(votingPeriod, 10, 64)
+	if err != nil {
+		return nil, errors.Wrapf(err, "parse voting period: %s", votingPeriod)
+	}
+	endTime := activationTime.Add(time.Duration(ns))
+	return &endTime, nil
+}
+
+func fillExpeditedProposalEndTime(
+	ctx context.Context, constants storage.IConstant, name string, activationTime *time.Time, proposal *storage.Proposal,
+) error {
+	votingPeriod, err := constants.Get(ctx, types.ModuleNameGov, name)
+	if err != nil {
+		return errors.Wrapf(err, "get '%s'", name)
+	}
+	endTime, err := computeEndTimeForExpeditionProposal(activationTime, votingPeriod.Value)
+	if err != nil {
+		return errors.Wrapf(err, "compute end time for expedition proposal: %d", proposal.Id)
+	}
+	proposal.EndTime = endTime
+	return nil
+}
+
+func fillProposalMinDeposit(ctx context.Context, constants storage.IConstant, proposal *storage.Proposal, expedited bool) error {
+	name := "min_deposit"
+	if expedited {
+		name = "expedited_min_deposit"
+	}
+	minDeposit, err := constants.Get(ctx, types.ModuleNameGov, name)
+	if err != nil {
+		return errors.Wrapf(err, "get '%s'", name)
+	}
+	proposal.MinDeposit = minDeposit.Value
+	return nil
 }

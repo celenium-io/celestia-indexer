@@ -55,11 +55,17 @@ type Proposal struct {
 
 	Error string `example:"Some error text" format:"string" json:"error,omitempty" swaggertype:"string"`
 
+	Expedited bool `example:"true" json:"expedited" swaggertype:"boolean"`
+
 	Changes  json.RawMessage `json:"changes,omitempty"  swaggerignore:"true"`
 	Proposer *ShortAddress   `json:"proposer,omitempty"`
 }
 
 func NewProposal(proposal storage.Proposal) Proposal {
+	expedited := false
+	if proposal.Expedited != nil {
+		expedited = *proposal.Expedited
+	}
 	return Proposal{
 		Id:                    proposal.Id,
 		Height:                proposal.Height,
@@ -99,6 +105,7 @@ func NewProposal(proposal storage.Proposal) Proposal {
 		MinDeposit:            proposal.MinDeposit,
 		TotalVotingPower:      proposal.TotalVotingPower.String(),
 		Error:                 proposal.Error,
+		Expedited:             expedited,
 	}
 }
 

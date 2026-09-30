@@ -92,3 +92,19 @@ func (s *StorageTestSuite) TestProposalById() {
 	s.Require().NotNil(proposal.Proposer)
 	s.Require().Equal("celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8", proposal.Proposer.String())
 }
+
+// the tally reads expedited of a finishing proposal from Active
+func (s *StorageTestSuite) TestProposalActive() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	proposals, err := s.storage.Proposals.Active(ctx)
+	s.Require().NoError(err)
+	s.Require().NotEmpty(proposals)
+
+	for i := range proposals {
+		s.Require().Equal(types.ProposalStatusActive, proposals[i].Status)
+		s.Require().NotNil(proposals[i].Expedited, "proposal %d", proposals[i].Id)
+		s.Require().False(*proposals[i].Expedited)
+	}
+}
