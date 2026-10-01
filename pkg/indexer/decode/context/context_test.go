@@ -802,3 +802,79 @@ func Test_AddValidator_BondUpdatesCountMerge(t *testing.T) {
 	require.EqualValues(t, 1, val.BondUpdatesCount)
 	require.Nil(t, val.Power)
 }
+
+func TestContext_AddProposalStatus(t *testing.T) {
+	tests := []struct {
+		name     string
+		statuses []storageTypes.ProposalStatus
+		want     storageTypes.ProposalStatus
+	}{
+		{
+			name:     "vote then passed in end block",
+			statuses: []storageTypes.ProposalStatus{"", storageTypes.ProposalStatusApplied},
+			want:     storageTypes.ProposalStatusApplied,
+		}, {
+			name:     "deposit then canceled",
+			statuses: []storageTypes.ProposalStatus{"", storageTypes.ProposalStatusCancelled},
+			want:     storageTypes.ProposalStatusCancelled,
+		}, {
+			name:     "vote after a final status keeps it",
+			statuses: []storageTypes.ProposalStatus{storageTypes.ProposalStatusRejected, ""},
+			want:     storageTypes.ProposalStatusRejected,
+		}, {
+			name:     "submitted and activated by deposit",
+			statuses: []storageTypes.ProposalStatus{storageTypes.ProposalStatusInactive, "", storageTypes.ProposalStatusActive},
+			want:     storageTypes.ProposalStatusActive,
+		}, {
+			name:     "activated then canceled",
+			statuses: []storageTypes.ProposalStatus{storageTypes.ProposalStatusActive, storageTypes.ProposalStatusCancelled},
+			want:     storageTypes.ProposalStatusCancelled,
+		}, {
+			name:     "inactive does not downgrade active",
+			statuses: []storageTypes.ProposalStatus{storageTypes.ProposalStatusActive, storageTypes.ProposalStatusInactive},
+			want:     storageTypes.ProposalStatusActive,
+		}, {
+			name:     "only votes",
+			statuses: []storageTypes.ProposalStatus{"", ""},
+			want:     "",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := NewContext()
+			for _, status := range tt.statuses {
+				ctx.AddProposal(&storage.Proposal{Id: 1, Status: status})
+			}
+
+			proposal, ok := ctx.Proposals.Get(1)
+			require.True(t, ok)
+			require.Equal(t, tt.want, proposal.Status)
+		})
+	}
+}
+
+func TestContext_AddProposalMergesFields(t *testing.T) {
+	ctx := NewContext()
+	activation := time.Now()
+
+	ctx.AddProposal(&storage.Proposal{Id: 1, Deposit: storageTypes.NumericFromInt64(10)})
+	ctx.AddProposal(&storage.Proposal{
+		Id:             1,
+		Status:         storageTypes.ProposalStatusActive,
+		ActivationTime: &activation,
+		Deposit:        storageTypes.NumericFromInt64(5),
+	})
+	// expedited_proposal_rejected keeps the active status and only raises the flag
+	ctx.AddProposal(&storage.Proposal{
+		Id:                        1,
+		Status:                    storageTypes.ProposalStatusActive,
+		ExpeditedProposalRejected: true,
+	})
+
+	proposal, ok := ctx.Proposals.Get(1)
+	require.True(t, ok)
+	require.Equal(t, storageTypes.ProposalStatusActive, proposal.Status)
+	require.Equal(t, &activation, proposal.ActivationTime)
+	require.Equal(t, "15", proposal.Deposit.String())
+	require.True(t, proposal.ExpeditedProposalRejected)
+}

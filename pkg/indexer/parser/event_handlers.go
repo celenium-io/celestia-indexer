@@ -348,3 +348,23 @@ func parseSetIgp(ctx *context.Context, data map[string]string) error {
 
 	return nil
 }
+
+func parseCancelProposal(ctx *context.Context, data map[string]string) error {
+	cancel, err := decode.NewCancelProposal(data)
+	if err != nil {
+		return err
+	}
+
+	if cancel.ProposalId == 0 {
+		return nil
+	}
+
+	proposal := &storage.Proposal{
+		Id:      cancel.ProposalId,
+		Status:  types.ProposalStatusCancelled,
+		EndTime: &ctx.Block.Time,
+	}
+	ctx.AddProposal(proposal)
+
+	return nil
+}

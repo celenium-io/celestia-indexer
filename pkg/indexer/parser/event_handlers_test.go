@@ -670,3 +670,53 @@ func Test_parseProposal(t *testing.T) {
 		require.Error(t, err)
 	})
 }
+
+func Test_parseCancelProposal(t *testing.T) {
+	t.Run("canceled", func(t *testing.T) {
+		ctx := context.NewContext()
+		ctx.Block = &testBlock
+
+		err := parseCancelProposal(ctx, map[string]string{
+			"proposal_id": "7",
+			"sender":      testAddress,
+		})
+		require.NoError(t, err)
+
+		proposal, ok := ctx.Proposals.Get(7)
+		require.True(t, ok)
+		require.Equal(t, types.ProposalStatusCancelled, proposal.Status)
+		require.NotNil(t, proposal.EndTime)
+		require.Equal(t, testBlock.Time, *proposal.EndTime)
+	})
+
+	t.Run("after a vote in the same block", func(t *testing.T) {
+		ctx := context.NewContext()
+		ctx.Block = &testBlock
+		ctx.AddProposal(&storage.Proposal{Id: 7})
+
+		require.NoError(t, parseCancelProposal(ctx, map[string]string{"proposal_id": "7"}))
+
+		proposal, ok := ctx.Proposals.Get(7)
+		require.True(t, ok)
+		require.Equal(t, types.ProposalStatusCancelled, proposal.Status)
+		require.NotNil(t, proposal.EndTime)
+		require.Equal(t, testBlock.Time, *proposal.EndTime)
+	})
+
+	t.Run("zero proposal id is ignored", func(t *testing.T) {
+		ctx := context.NewContext()
+		ctx.Block = &testBlock
+
+		require.NoError(t, parseCancelProposal(ctx, map[string]string{"proposal_id": "0"}))
+		require.Zero(t, ctx.Proposals.Len())
+	})
+
+	t.Run("invalid proposal id", func(t *testing.T) {
+		ctx := context.NewContext()
+		ctx.Block = &testBlock
+
+		require.Error(t, parseCancelProposal(ctx, map[string]string{"proposal_id": "abc"}))
+		require.Error(t, parseCancelProposal(ctx, map[string]string{}))
+		require.Zero(t, ctx.Proposals.Len())
+	})
+}

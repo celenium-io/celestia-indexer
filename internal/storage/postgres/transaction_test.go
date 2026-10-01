@@ -617,6 +617,92 @@ func (s *TransactionTestSuite) TestSaveProposalsExpedited() {
 	s.Require().False(expedited(1))
 }
 
+func (s *TransactionTestSuite) TestSaveProposalsTallied() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	save := func(proposal *storage.Proposal) {
+		tx, err := BeginTransaction(ctx, s.storage.Transactable)
+		s.Require().NoError(err)
+		defer tx.Close(ctx)
+
+		_, err = tx.SaveProposals(ctx, proposal)
+		s.Require().NoError(err)
+		s.Require().NoError(tx.Flush(ctx))
+	}
+	type power struct {
+		total, yes, no, veto, abstain string
+	}
+	check := func(want power) {
+		s.T().Helper()
+		proposal, err := s.storage.Proposals.ById(ctx, 1)
+		s.Require().NoError(err)
+		s.Require().Equal(want, power{
+			total:   proposal.VotingPower.String(),
+			yes:     proposal.YesVotingPower.String(),
+			no:      proposal.NoVotingPower.String(),
+			veto:    proposal.NoWithVetoVotingPower.String(),
+			abstain: proposal.AbstainVotingPower.String(),
+		})
+	}
+	tallied := func(total, yes, no, veto, abstain int64) *storage.Proposal {
+		return &storage.Proposal{
+			Id:                    1,
+			Tallied:               true,
+			VotingPower:           types.NumericFromInt64(total),
+			YesVotingPower:        types.NumericFromInt64(yes),
+			NoVotingPower:         types.NumericFromInt64(no),
+			NoWithVetoVotingPower: types.NumericFromInt64(veto),
+			AbstainVotingPower:    types.NumericFromInt64(abstain),
+		}
+	}
+
+	save(tallied(1000, 500, 300, 150, 50))
+	check(power{total: "1000", yes: "500", no: "300", veto: "150", abstain: "50"})
+
+	// the voter switched from no to yes: zero options must be written too
+	save(tallied(800, 800, 0, 0, 0))
+	check(power{total: "800", yes: "800", no: "0", veto: "0", abstain: "0"})
+
+	// a vote or a deposit without a tally must keep the stored power
+	save(&storage.Proposal{Id: 1, Status: types.ProposalStatusActive})
+	check(power{total: "800", yes: "800", no: "0", veto: "0", abstain: "0"})
+
+	// every voter lost the power
+	save(tallied(0, 0, 0, 0, 0))
+	check(power{total: "0", yes: "0", no: "0", veto: "0", abstain: "0"})
+}
+
+func (s *TransactionTestSuite) TestSaveProposalsCancelled() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	canceledAt := time.Date(2024, 1, 2, 3, 4, 5, 0, time.UTC)
+	_, err = tx.SaveProposals(ctx, &storage.Proposal{
+		Id:      2,
+		Status:  types.ProposalStatusCancelled,
+		EndTime: &canceledAt,
+	})
+	s.Require().NoError(err)
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	proposal, err := s.storage.Proposals.ById(ctx, 2)
+	s.Require().NoError(err)
+	s.Require().Equal(types.ProposalStatusCancelled, proposal.Status)
+	s.Require().NotNil(proposal.EndTime)
+	s.Require().True(canceledAt.Equal(*proposal.EndTime))
+
+	active, err := s.storage.Proposals.Active(ctx)
+	s.Require().NoError(err)
+	for i := range active {
+		s.Require().NotEqualValues(2, active[i].Id)
+	}
+}
+
 func (s *TransactionTestSuite) TestSaveEmptyProposalDuplicate() {
 	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
@@ -751,7 +837,7 @@ func (s *TransactionTestSuite) TestSaveWeightedVotes() {
 	s.Require().NoError(err)
 	s.Require().EqualValues(map[uint64]*storage.VotesCount{
 		1: {
-			VotesCount:     2,
+			VotesCount:     1,
 			Abstain:        1,
 			AbstainAddress: 1,
 			Yes:            1,
@@ -778,6 +864,7 @@ func (s *TransactionTestSuite) TestSaveVotesValidatorIdDuplicate() {
 	var vote = &storage.Vote{
 		Option:      types.VoteOptionYes,
 		ProposalId:  2,
+		VoterId:     3,
 		ValidatorId: testsuite.Ptr(uint64(1)),
 		Height:      1001,
 		Time:        time.Now(),
@@ -858,6 +945,143 @@ func (s *TransactionTestSuite) TestSaveVotesAddressIdDuplicate() {
 		}
 	}
 	s.Require().EqualValues(1, count)
+}
+
+func (s *TransactionTestSuite) votesOf(ctx context.Context, proposalId, voterId uint64) []storage.Vote {
+	items, err := s.storage.Votes.List(ctx, 100, 0, sdk.SortOrderAsc)
+	s.Require().NoError(err)
+
+	var result []storage.Vote
+	for i := range items {
+		if items[i].ProposalId == proposalId && items[i].VoterId == voterId {
+			result = append(result, *items[i])
+		}
+	}
+	return result
+}
+
+func (s *TransactionTestSuite) TestSaveVotesReplaceWithWeighted() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	// voter 1 voted yes on proposal 1 in fixtures
+	votes := []*storage.Vote{
+		{Option: types.VoteOptionYes, ProposalId: 1, VoterId: 1, Height: 1001, Time: time.Now(), Weight: types.MustNumericFromString("0.5")},
+		{Option: types.VoteOptionNo, ProposalId: 1, VoterId: 1, Height: 1001, Time: time.Now(), Weight: types.MustNumericFromString("0.5")},
+	}
+	count, err := tx.SaveVotes(ctx, votes...)
+	s.Require().NoError(err)
+	s.Require().EqualValues(map[uint64]*storage.VotesCount{
+		1: {No: 1, NoAddress: 1},
+	}, count)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	stored := s.votesOf(ctx, 1, 1)
+	s.Require().Len(stored, 2)
+	for i := range stored {
+		s.Require().EqualValues(1001, stored[i].Height)
+		s.Require().Equal("0.5", stored[i].Weight.String())
+	}
+}
+
+func (s *TransactionTestSuite) TestSaveVotesReplaceWeightedWithSingle() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	weighted := []*storage.Vote{
+		{Option: types.VoteOptionYes, ProposalId: 1, VoterId: 5, Height: 1001, Time: time.Now(), Weight: types.MustNumericFromString("0.3")},
+		{Option: types.VoteOptionNoWithVeto, ProposalId: 1, VoterId: 5, Height: 1001, Time: time.Now(), Weight: types.MustNumericFromString("0.7")},
+	}
+	_, err = tx.SaveVotes(ctx, weighted...)
+	s.Require().NoError(err)
+
+	count, err := tx.SaveVotes(ctx, &storage.Vote{
+		Option: types.VoteOptionNo, ProposalId: 1, VoterId: 5, Height: 1002, Time: time.Now(), Weight: types.MustNumericFromString("1"),
+	})
+	s.Require().NoError(err)
+	s.Require().EqualValues(map[uint64]*storage.VotesCount{
+		1: {
+			Yes: -1, YesAddress: -1,
+			NoWithVeto: -1, NoWithVetoAddress: -1,
+			No: 1, NoAddress: 1,
+		},
+	}, count)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	stored := s.votesOf(ctx, 1, 5)
+	s.Require().Len(stored, 1)
+	s.Require().Equal(types.VoteOptionNo, stored[0].Option)
+}
+
+func (s *TransactionTestSuite) TestSaveVotesVoterBecameValidator() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	// voter 2 voted no on proposal 1 as a plain address in fixtures
+	count, err := tx.SaveVotes(ctx, &storage.Vote{
+		Option:      types.VoteOptionYes,
+		ProposalId:  1,
+		VoterId:     2,
+		ValidatorId: testsuite.Ptr(uint64(1)),
+		Height:      1001,
+		Time:        time.Now(),
+		Weight:      types.MustNumericFromString("1"),
+	})
+	s.Require().NoError(err)
+	s.Require().EqualValues(map[uint64]*storage.VotesCount{
+		1: {No: -1, NoAddress: -1, Yes: 1, YesValidators: 1},
+	}, count)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	stored := s.votesOf(ctx, 1, 2)
+	s.Require().Len(stored, 1)
+	s.Require().Equal(types.VoteOptionYes, stored[0].Option)
+	s.Require().NotNil(stored[0].ValidatorId)
+}
+
+func (s *TransactionTestSuite) TestSaveVotesSeveralProposals() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+
+	count, err := tx.SaveVotes(ctx,
+		// replaces voter 1's yes on proposal 1
+		&storage.Vote{Option: types.VoteOptionAbstain, ProposalId: 1, VoterId: 1, Height: 1001, Time: time.Now(), Weight: types.MustNumericFromString("1")},
+		// replaces voter 2's yes on proposal 2, voter 2's no on proposal 1 stays
+		&storage.Vote{Option: types.VoteOptionNo, ProposalId: 2, VoterId: 2, Height: 1001, Time: time.Now(), Weight: types.MustNumericFromString("1")},
+		// new voter on proposal 2
+		&storage.Vote{Option: types.VoteOptionYes, ProposalId: 2, VoterId: 4, Height: 1001, Time: time.Now(), Weight: types.MustNumericFromString("1")},
+	)
+	s.Require().NoError(err)
+	s.Require().EqualValues(map[uint64]*storage.VotesCount{
+		1: {Yes: -1, YesAddress: -1, Abstain: 1, AbstainAddress: 1},
+		2: {VotesCount: 1, No: 1, NoAddress: 1},
+	}, count)
+
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	s.Require().Len(s.votesOf(ctx, 1, 1), 1)
+	s.Require().Len(s.votesOf(ctx, 1, 2), 1)
+	s.Require().Len(s.votesOf(ctx, 2, 2), 1)
+	s.Require().Len(s.votesOf(ctx, 2, 4), 1)
 }
 
 func (s *TransactionTestSuite) TestSaveBlockSignatures() {
@@ -3214,7 +3438,7 @@ func (s *TransactionTestSuite) TestVotesListByProposal() {
 			Time:       time.Date(2023, 7, 4, 3, 11, 26, 0, time.UTC),
 			Option:     types.VoteOptionYes,
 			Weight:     types.NumericFromInt64(1),
-			VoterId:    1,
+			VoterId:    uint64(3 - i%3),
 			ProposalId: 1,
 		}
 	}
@@ -3224,8 +3448,13 @@ func (s *TransactionTestSuite) TestVotesListByProposal() {
 	all, err := repos.Votes.ListByProposal(ctx, 1, 1000, 0)
 	s.Require().NoError(err)
 	s.Require().Len(all, 152)
+	// tally needs all options of a voter in a row
 	for i := 1; i < len(all); i++ {
-		s.Require().Less(all[i-1].Id, all[i].Id)
+		if all[i-1].VoterId == all[i].VoterId {
+			s.Require().Less(all[i-1].Id, all[i].Id)
+		} else {
+			s.Require().Less(all[i-1].VoterId, all[i].VoterId)
+		}
 	}
 
 	page, err := repos.Votes.ListByProposal(ctx, 1, 50, 100)

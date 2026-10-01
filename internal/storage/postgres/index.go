@@ -793,6 +793,15 @@ func createIndices(ctx context.Context, conn *database.Bun) error {
 			Exec(ctx); err != nil {
 			return err
 		}
+		if _, err := tx.NewCreateIndex().
+			IfNotExists().
+			Model((*storage.Vote)(nil)).
+			Index("vote_proposal_and_voter_idx").
+			Column("proposal_id").
+			Column("voter_id").
+			Exec(ctx); err != nil {
+			return err
+		}
 
 		// IBC Client
 		if _, err := tx.NewCreateIndex().

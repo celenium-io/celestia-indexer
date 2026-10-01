@@ -72,6 +72,7 @@ func parseOption(ctx *context.Context, proposalId uint64, voter, option string, 
 			return errors.New("empty vote options array")
 		}
 
+		votes := make([]*storage.Vote, len(opts))
 		for i := range opts {
 			vote := storage.Vote{
 				ProposalId: proposalId,
@@ -99,61 +100,64 @@ func parseOption(ctx *context.Context, proposalId uint64, voter, option string, 
 				vote.Option = types.VoteOptionYes
 			}
 			vote.Weight = types.NewNumeric(opts[i].Weight)
-
-			ctx.AddVote(&vote)
+			votes[i] = &vote
 		}
+		ctx.AddVotes(votes...)
 		c.Skip(1)
 		return nil
 	}
 
-	vote := storage.Vote{
-		ProposalId: proposalId,
-		Time:       ctx.Block.Time,
-		Height:     ctx.Block.Height,
-		Voter: &storage.Address{
-			Height:     ctx.Block.Height,
-			LastHeight: ctx.Block.Height,
-			Address:    voter,
-			Balances:   []storage.Balance{storage.EmptyBalance()},
-		},
-	}
-
-	if err := ctx.AddAddress(vote.Voter); err != nil {
-		return err
-	}
-
-	optionParts := strings.Split(option, " ")
-	for i := range optionParts {
-		values := strings.Split(optionParts[i], ":")
-		if len(values) != 2 {
+	var votes []*storage.Vote
+	for _, field := range strings.Fields(option) {
+		key, value, ok := strings.Cut(field, ":")
+		if !ok {
 			continue
 		}
-		switch values[0] {
+		switch key {
 		case "option":
-			switch values[1] {
+			voterAddress := &storage.Address{
+				Height:     ctx.Block.Height,
+				LastHeight: ctx.Block.Height,
+				Address:    voter,
+				Balances:   []storage.Balance{storage.EmptyBalance()},
+			}
+			votes = append(votes, &storage.Vote{
+				ProposalId: proposalId,
+				Time:       ctx.Block.Time,
+				Height:     ctx.Block.Height,
+				Voter:      voterAddress,
+			})
+
+			if err := ctx.AddAddress(voterAddress); err != nil {
+				return err
+			}
+
+			switch value {
 			case "VOTE_OPTION_YES":
-				vote.Option = types.VoteOptionYes
+				votes[len(votes)-1].Option = types.VoteOptionYes
 			case "VOTE_OPTION_NO":
-				vote.Option = types.VoteOptionNo
+				votes[len(votes)-1].Option = types.VoteOptionNo
 			case "VOTE_OPTION_NO_WITH_VETO":
-				vote.Option = types.VoteOptionNoWithVeto
+				votes[len(votes)-1].Option = types.VoteOptionNoWithVeto
 			case "VOTE_OPTION_ABSTAIN":
-				vote.Option = types.VoteOptionAbstain
+				votes[len(votes)-1].Option = types.VoteOptionAbstain
 			}
 		case "weight":
-			value, err := strconv.Unquote(values[1])
-			if err != nil {
-				return errors.Errorf("unquote weight in vote option: %s", values[1])
+			if len(votes) == 0 {
+				return errors.Errorf("weight before option: %s", option)
 			}
-			w, err := types.NumericFromString(value)
+			unquoted, err := strconv.Unquote(value)
 			if err != nil {
-				return errors.Wrap(err, "parse vote weight")
+				return errors.Wrap(err, "unquote weight")
 			}
-			vote.Weight = w
+			weight, err := types.NumericFromString(unquoted)
+			if err != nil {
+				return errors.Wrap(err, "parse weight")
+			}
+			votes[len(votes)-1].Weight = weight
 		}
 	}
-
-	ctx.AddVote(&vote)
+	ctx.AddVotes(votes...)
 	c.Skip(2)
 	return nil
 }

@@ -15,6 +15,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	testsuite "github.com/celenium-io/celestia-indexer/internal/test_suite"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/config"
+	decodeContext "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/stretchr/testify/require"
@@ -81,6 +82,10 @@ func proposalsMap(items ...*storage.Proposal) *sdkSync.Map[uint64, *storage.Prop
 		m.Set(items[i].Id, items[i])
 	}
 	return m
+}
+
+func noVotes() *sdkSync.Map[decodeContext.VoteKey, []*storage.Vote] {
+	return sdkSync.NewMap[decodeContext.VoteKey, []*storage.Vote]()
 }
 
 func TestFillExpeditedProposal(t *testing.T) {
@@ -241,7 +246,6 @@ func TestSaveProposals_FinishedThreshold(t *testing.T) {
 			expectStoredProposals(repos, stored)
 			repos.Proposals.EXPECT().Active(gomock.Any()).Return([]storage.Proposal{stored}, nil).AnyTimes()
 			repos.Validators.EXPECT().BondedValidators(gomock.Any()).Return(nil, nil).AnyTimes()
-			repos.Validators.EXPECT().TotalVotingPower(gomock.Any()).Return(types.NumericFromInt64(1000), nil).AnyTimes()
 			repos.Votes.EXPECT().ListByProposal(gomock.Any(), uint64(1), gomock.Any(), gomock.Any()).Return(nil, nil).AnyTimes()
 
 			var saved []*storage.Proposal
@@ -255,7 +259,7 @@ func TestSaveProposals_FinishedThreshold(t *testing.T) {
 
 			module := NewModule(nil, nil, config.Indexer{})
 			finished := &storage.Proposal{Id: 1, Status: types.ProposalStatusApplied}
-			_, err := module.saveProposals(t.Context(), tx, repos.Repos(), pkgTypes.Level(101), proposalsMap(finished), nil, nil)
+			_, err := module.saveProposals(t.Context(), tx, repos.Repos(), pkgTypes.Level(101), proposalsMap(finished), noVotes(), nil, newGovValidators())
 			require.NoError(t, err)
 
 			require.Len(t, saved, 1)
@@ -295,7 +299,6 @@ func TestSaveProposals_ExpeditedRejectedIsSaved(t *testing.T) {
 			MinDeposit:     testExpeditedMinDeposit,
 		}}, nil).AnyTimes()
 		repos.Validators.EXPECT().BondedValidators(gomock.Any()).Return(nil, nil).AnyTimes()
-		repos.Validators.EXPECT().TotalVotingPower(gomock.Any()).Return(types.NumericFromInt64(1000), nil).AnyTimes()
 		repos.Votes.EXPECT().ListByProposal(gomock.Any(), uint64(5), gomock.Any(), gomock.Any()).Return(nil, nil).AnyTimes()
 
 		var saved []*storage.Proposal
@@ -309,7 +312,7 @@ func TestSaveProposals_ExpeditedRejectedIsSaved(t *testing.T) {
 
 		module := NewModule(nil, nil, config.Indexer{})
 		rejected := &storage.Proposal{Id: 5, Status: types.ProposalStatusActive, ExpeditedProposalRejected: true}
-		_, err := module.saveProposals(t.Context(), tx, repos.Repos(), height, proposalsMap(rejected), nil, nil)
+		_, err := module.saveProposals(t.Context(), tx, repos.Repos(), height, proposalsMap(rejected), noVotes(), nil, newGovValidators())
 		require.NoError(t, err, "height %d", height)
 
 		require.Len(t, saved, 1, "height %d", height)

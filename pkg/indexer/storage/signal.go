@@ -24,10 +24,10 @@ type powerSnapshot struct {
 	total  types.Numeric
 }
 
-func takePowerSnapshot(ctx context.Context, validators storage.IValidator) (powerSnapshot, error) {
-	bonded, err := validators.BondedValidators(ctx)
+func takePowerSnapshot(ctx context.Context, start *blockStartValidators) (powerSnapshot, error) {
+	bonded, err := start.get(ctx)
 	if err != nil {
-		return powerSnapshot{}, errors.Wrap(err, "get bonded validators")
+		return powerSnapshot{}, err
 	}
 	snapshot := powerSnapshot{
 		powers: make(map[uint64]types.Numeric, len(bonded)),
@@ -56,6 +56,7 @@ func prepareSignalRound(
 	repos storage.TxRepos,
 	decodeContext *decodeContext.Context,
 	stateVersion uint64,
+	start *blockStartValidators,
 ) (signalRound, error) {
 	currentVersion := decodeContext.Block.VersionApp
 	pending, err := repos.Upgrades.PendingVersions(ctx, currentVersion)
@@ -71,7 +72,7 @@ func prepareSignalRound(
 		return round, nil
 	}
 
-	snapshot, err := takePowerSnapshot(ctx, repos.Validators)
+	snapshot, err := takePowerSnapshot(ctx, start)
 	if err != nil {
 		return round, err
 	}

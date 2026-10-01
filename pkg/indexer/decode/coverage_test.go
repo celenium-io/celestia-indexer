@@ -28,7 +28,6 @@ var knownUnhandledMsgs = map[string]struct{}{
 	"/cosmos.distribution.v1beta1.MsgCommunityPoolSpend":          {},
 	"/cosmos.distribution.v1beta1.MsgDepositValidatorRewardsPool": {},
 	"/cosmos.feegrant.v1beta1.MsgPruneAllowances":                 {},
-	"/cosmos.gov.v1.MsgCancelProposal":                            {},
 
 	// Hyperlane routing ISM management and native synthetic tokens.
 	"/hyperlane.core.interchain_security.v1.MsgRemoveRoutingIsmDomain": {},

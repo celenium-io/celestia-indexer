@@ -29,6 +29,8 @@ const (
 	ProposalStatusRejected ProposalStatus = "rejected"
 	// ProposalStatusFailed is a ProposalStatus of type failed.
 	ProposalStatusFailed ProposalStatus = "failed"
+	// ProposalStatusCancelled is a ProposalStatus of type cancelled.
+	ProposalStatusCancelled ProposalStatus = "cancelled"
 )
 
 var ErrInvalidProposalStatus = fmt.Errorf("not a valid ProposalStatus, try [%s]", strings.Join(_ProposalStatusNames, ", "))
@@ -40,6 +42,7 @@ var _ProposalStatusNames = []string{
 	string(ProposalStatusApplied),
 	string(ProposalStatusRejected),
 	string(ProposalStatusFailed),
+	string(ProposalStatusCancelled),
 }
 
 // ProposalStatusNames returns a list of possible string values of ProposalStatus.
@@ -58,6 +61,7 @@ func ProposalStatusValues() []ProposalStatus {
 		ProposalStatusApplied,
 		ProposalStatusRejected,
 		ProposalStatusFailed,
+		ProposalStatusCancelled,
 	}
 }
 
@@ -74,12 +78,13 @@ func (x ProposalStatus) IsValid() bool {
 }
 
 var _ProposalStatusValue = map[string]ProposalStatus{
-	"inactive": ProposalStatusInactive,
-	"active":   ProposalStatusActive,
-	"removed":  ProposalStatusRemoved,
-	"applied":  ProposalStatusApplied,
-	"rejected": ProposalStatusRejected,
-	"failed":   ProposalStatusFailed,
+	"inactive":  ProposalStatusInactive,
+	"active":    ProposalStatusActive,
+	"removed":   ProposalStatusRemoved,
+	"applied":   ProposalStatusApplied,
+	"rejected":  ProposalStatusRejected,
+	"failed":    ProposalStatusFailed,
+	"cancelled": ProposalStatusCancelled,
 }
 
 // ParseProposalStatus attempts to convert a string to a ProposalStatus.

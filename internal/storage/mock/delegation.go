@@ -46,18 +46,23 @@ func (m *MockIDelegation) EXPECT() *MockIDelegationMockRecorder {
 }
 
 // AddressDelegations mocks base method.
-func (m *MockIDelegation) AddressDelegations(ctx context.Context, addressId uint64) ([]storage.Delegation, error) {
+func (m *MockIDelegation) AddressDelegations(ctx context.Context, addressId ...uint64) ([]storage.Delegation, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AddressDelegations", ctx, addressId)
+	varargs := []any{ctx}
+	for _, a := range addressId {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "AddressDelegations", varargs...)
 	ret0, _ := ret[0].([]storage.Delegation)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // AddressDelegations indicates an expected call of AddressDelegations.
-func (mr *MockIDelegationMockRecorder) AddressDelegations(ctx, addressId any) *MockIDelegationAddressDelegationsCall {
+func (mr *MockIDelegationMockRecorder) AddressDelegations(ctx any, addressId ...any) *MockIDelegationAddressDelegationsCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddressDelegations", reflect.TypeOf((*MockIDelegation)(nil).AddressDelegations), ctx, addressId)
+	varargs := append([]any{ctx}, addressId...)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddressDelegations", reflect.TypeOf((*MockIDelegation)(nil).AddressDelegations), varargs...)
 	return &MockIDelegationAddressDelegationsCall{Call: call}
 }
 
@@ -73,13 +78,13 @@ func (c *MockIDelegationAddressDelegationsCall) Return(arg0 []storage.Delegation
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIDelegationAddressDelegationsCall) Do(f func(context.Context, uint64) ([]storage.Delegation, error)) *MockIDelegationAddressDelegationsCall {
+func (c *MockIDelegationAddressDelegationsCall) Do(f func(context.Context, ...uint64) ([]storage.Delegation, error)) *MockIDelegationAddressDelegationsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIDelegationAddressDelegationsCall) DoAndReturn(f func(context.Context, uint64) ([]storage.Delegation, error)) *MockIDelegationAddressDelegationsCall {
+func (c *MockIDelegationAddressDelegationsCall) DoAndReturn(f func(context.Context, ...uint64) ([]storage.Delegation, error)) *MockIDelegationAddressDelegationsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

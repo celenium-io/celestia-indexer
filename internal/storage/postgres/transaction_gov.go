@@ -12,6 +12,7 @@ import (
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
 	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/schema"
 )
 
 func (tx Transaction) SaveUpgrades(ctx context.Context, upgrades ...*models.Upgrade) error {
@@ -137,9 +138,6 @@ func (tx Transaction) SaveProposals(ctx context.Context, proposals ...*models.Pr
 			query.Set("end_time = EXCLUDED.end_time")
 		}
 
-		if proposals[i].VotingPower.IsPositive() {
-			query.Set("voting_power = EXCLUDED.voting_power")
-		}
 		if proposals[i].TotalVotingPower.IsPositive() {
 			query.Set("total_voting_power = EXCLUDED.total_voting_power")
 		}
@@ -160,18 +158,14 @@ func (tx Transaction) SaveProposals(ctx context.Context, proposals ...*models.Pr
 			query.Set("error = EXCLUDED.error")
 		}
 
-		if proposals[i].YesVotingPower.IsPositive() {
+		if proposals[i].Tallied {
 			query.Set("yes_voting_power = EXCLUDED.yes_voting_power")
-		}
-		if proposals[i].NoVotingPower.IsPositive() {
 			query.Set("no_voting_power = EXCLUDED.no_voting_power")
-		}
-		if proposals[i].NoWithVetoVotingPower.IsPositive() {
 			query.Set("no_with_veto_voting_power = EXCLUDED.no_with_veto_voting_power")
-		}
-		if proposals[i].AbstainVotingPower.IsPositive() {
 			query.Set("abstain_voting_power = EXCLUDED.abstain_voting_power")
+			query.Set("voting_power = EXCLUDED.voting_power")
 		}
+
 		if proposals[i].Expedited != nil {
 			query.Set("expedited = EXCLUDED.expedited")
 		}
@@ -188,65 +182,76 @@ func (tx Transaction) SaveProposals(ctx context.Context, proposals ...*models.Pr
 	return count, nil
 }
 
-var one = storageTypes.NumericFromInt64(1)
+type voteKey struct {
+	proposalId uint64
+	voterId    uint64
+}
 
+// SaveVotes expects each (proposal, voter) pair to carry the rows of a single vote:
+// as in x/gov, a new vote replaces all previous rows of the voter.
 func (tx Transaction) SaveVotes(ctx context.Context, votes ...*models.Vote) (map[uint64]*models.VotesCount, error) {
 	if len(votes) == 0 {
 		return nil, nil
 	}
 
-	var votesCount = make(map[uint64]*models.VotesCount)
-	for i := range votes {
-		var existsVotes []models.Vote
-		query := tx.Tx().NewSelect().
-			Model(&existsVotes).
-			Where("proposal_id = ?", votes[i].ProposalId)
+	var (
+		votesCount = make(map[uint64]*models.VotesCount)
+		keys       = make(map[voteKey]struct{})
+		pairs      = make([]schema.QueryAppender, 0, len(votes))
+	)
+	counter := func(proposalId uint64) *models.VotesCount {
+		vc, ok := votesCount[proposalId]
+		if !ok {
+			vc = new(models.VotesCount)
+			votesCount[proposalId] = vc
+		}
+		return vc
+	}
 
-		if votes[i].VoterId > 0 {
-			query.Where("voter_id = ?", votes[i].VoterId)
+	for _, vote := range votes {
+		key := voteKey{proposalId: vote.ProposalId, voterId: vote.VoterId}
+		if _, ok := keys[key]; !ok {
+			keys[key] = struct{}{}
+			pairs = append(pairs, bun.Tuple([]uint64{vote.ProposalId, vote.VoterId}))
+			counter(vote.ProposalId).AddVoter(1)
 		}
-		if votes[i].ValidatorId != nil {
-			query.Where("validator_id = ?", *votes[i].ValidatorId)
-		}
-		if err := query.Scan(ctx); err != nil {
-			return nil, errors.Wrap(err, "receive existing votes")
-		}
+		counter(vote.ProposalId).AddOption(1, *vote)
+	}
 
-		if len(existsVotes) > 0 {
-			ids := make([]uint64, len(existsVotes))
-			totalWeight := votes[i].Weight.Copy()
-			for j := range existsVotes {
-				totalWeight = totalWeight.Add(existsVotes[j].Weight)
-				ids[j] = existsVotes[j].Id
+	var existing []models.Vote
+	if err := tx.Tx().NewSelect().
+		Model(&existing).
+		Column("id", "time", "option", "voter_id", "proposal_id", "validator_id").
+		Where("(proposal_id, voter_id) IN (?)", bun.List(pairs)).
+		Scan(ctx); err != nil {
+		return nil, errors.Wrap(err, "receive existing votes")
+	}
+
+	if len(existing) > 0 {
+		ids := make([]uint64, len(existing))
+		replaced := make(map[voteKey]struct{})
+		for i := range existing {
+			ids[i] = existing[i].Id
+			key := voteKey{proposalId: existing[i].ProposalId, voterId: existing[i].VoterId}
+			if _, ok := replaced[key]; !ok {
+				replaced[key] = struct{}{}
+				counter(key.proposalId).AddVoter(-1)
 			}
-			if totalWeight.GreaterThan(one) {
-				if _, err := tx.Tx().NewDelete().Model((*models.Vote)(nil)).Where("id IN ?", bun.Tuple(ids)).Exec(ctx); err != nil {
-					return nil, errors.Wrap(err, "remove existing votes")
-				}
-
-				for _, vote := range existsVotes {
-					if vc, ok := votesCount[vote.ProposalId]; ok {
-						vc.Update(-1, vote)
-					} else {
-						var vc models.VotesCount
-						vc.Update(-1, vote)
-						votesCount[vote.ProposalId] = &vc
-					}
-				}
-			}
+			counter(key.proposalId).AddOption(-1, existing[i])
 		}
 
-		if vc, ok := votesCount[votes[i].ProposalId]; ok {
-			vc.Update(1, *votes[i])
-		} else {
-			var vc models.VotesCount
-			vc.Update(1, *votes[i])
-			votesCount[votes[i].ProposalId] = &vc
+		if _, err := tx.Tx().NewDelete().
+			Model((*models.Vote)(nil)).
+			Where("id IN (?)", bun.List(ids)).
+			Exec(ctx); err != nil {
+			return nil, errors.Wrap(err, "remove existing votes")
 		}
 	}
 
-	_, err := tx.Tx().NewInsert().Model(&votes).Exec(ctx)
-	return votesCount, err
+	if _, err := tx.Tx().NewInsert().Model(&votes).Exec(ctx); err != nil {
+		return nil, errors.Wrap(err, "insert votes")
+	}
+	return votesCount, nil
 }
 
 func (tx Transaction) Proposal(ctx context.Context, id uint64) (proposal models.Proposal, err error) {

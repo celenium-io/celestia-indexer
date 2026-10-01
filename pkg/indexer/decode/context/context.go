@@ -26,6 +26,7 @@ type Context struct {
 	Delegations       *sdkSync.Map[string, *storage.Delegation]
 	Jails             *sdkSync.Map[string, *storage.Jail]
 	Proposals         *sdkSync.Map[uint64, *storage.Proposal]
+	Votes             *sdkSync.Map[VoteKey, []*storage.Vote]
 	Constants         *sdkSync.Map[string, *storage.Constant]
 	Igps              *sdkSync.Map[string, *storage.HLIGP]
 	IgpConfigs        *sdkSync.Map[string, *storage.HLIGPConfig]
@@ -49,7 +50,6 @@ type Context struct {
 	Redelegations []storage.Redelegation
 
 	StakingLogs         []storage.StakingLog
-	Votes               []*storage.Vote
 	VestingAccounts     []*storage.VestingAccount
 	Forwardings         []*storage.Forwarding
 	ZkIsmUpdates        []*storage.ZkISMUpdate
@@ -93,12 +93,12 @@ func NewContext() *Context {
 		Undelegations:     sdkSync.NewMap[unbondingKey, *storage.Undelegation](),
 		CancelUnbonding:   sdkSync.NewMap[unbondingKey, *storage.Undelegation](),
 		ValidatorUpdates:  sdkSync.NewMap[string, *storage.ValidatorBondUpdate](),
+		Votes:             sdkSync.NewMap[VoteKey, []*storage.Vote](),
 
 		Messages:            make([]*storage.Message, 0, 100),
 		Events:              make([]storage.Event, 0, 1000),
 		Redelegations:       make([]storage.Redelegation, 0),
 		StakingLogs:         make([]storage.StakingLog, 0),
-		Votes:               make([]*storage.Vote, 0),
 		VestingAccounts:     make([]*storage.VestingAccount, 0),
 		Forwardings:         make([]*storage.Forwarding, 0),
 		ZkIsmUpdates:        make([]*storage.ZkISMUpdate, 0),
@@ -346,13 +346,28 @@ func (ctx *Context) AddProposal(proposal *storage.Proposal) {
 		if proposal.ExpeditedProposalRejected {
 			p.ExpeditedProposalRejected = proposal.ExpeditedProposalRejected
 		}
+		if proposal.EndTime != nil {
+			p.EndTime = proposal.EndTime
+		}
 	} else {
 		ctx.Proposals.Set(proposal.Id, proposal)
 	}
 }
 
-func (ctx *Context) AddVote(vote *storage.Vote) {
-	ctx.Votes = append(ctx.Votes, vote)
+type VoteKey struct {
+	proposalId uint64
+	voter      string
+}
+
+func (ctx *Context) AddVotes(votes ...*storage.Vote) {
+	if len(votes) == 0 {
+		return
+	}
+	key := VoteKey{
+		proposalId: votes[0].ProposalId,
+		voter:      votes[0].Voter.Address,
+	}
+	ctx.Votes.Set(key, votes)
 }
 
 func (ctx *Context) AddConstant(module types.ModuleName, name, value string) {

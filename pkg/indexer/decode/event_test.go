@@ -989,3 +989,18 @@ func TestNewZkISMSubmitMessagesEvent(t *testing.T) {
 		})
 	}
 }
+
+func TestNewCancelProposal(t *testing.T) {
+	body, err := NewCancelProposal(map[string]string{
+		"sender":      "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
+		"proposal_id": "42",
+	})
+	require.NoError(t, err)
+	require.EqualValues(t, 42, body.ProposalId)
+
+	_, err = NewCancelProposal(map[string]string{"proposal_id": "-1"})
+	require.Error(t, err)
+
+	_, err = NewCancelProposal(map[string]string{})
+	require.Error(t, err)
+}

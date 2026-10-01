@@ -11,28 +11,32 @@ package types
 		removed,
 		applied,
 		rejected,
-		failed
+		failed,
+		cancelled
 	)
 */
 //go:generate go-enum --marshal --sql --values --names
 type ProposalStatus string
 
-func (p ProposalStatus) GreaterThan(status ProposalStatus) bool {
-	switch status {
+// rank orders statuses by lifecycle: an empty status (vote or deposit) never wins,
+// and every final status outranks inactive and active.
+func (p ProposalStatus) rank() int {
+	switch p {
 	case ProposalStatusInactive:
-		return false
-	case ProposalStatusFailed:
-		return true
-	case ProposalStatusRemoved:
-		return true
-	case ProposalStatusRejected:
-		return true
+		return 1
 	case ProposalStatusActive:
-		return p == ProposalStatusInactive
-	case ProposalStatusApplied:
-		return true
+		return 2
+	case ProposalStatusRemoved, ProposalStatusApplied, ProposalStatusRejected,
+		ProposalStatusFailed, ProposalStatusCancelled:
+		return 3
+	default:
+		return 0
 	}
-	return false
+}
+
+// GreaterThan reports whether p is a later lifecycle stage than status.
+func (p ProposalStatus) GreaterThan(status ProposalStatus) bool {
+	return p.rank() > status.rank()
 }
 
 // swagger:enum ProposalType

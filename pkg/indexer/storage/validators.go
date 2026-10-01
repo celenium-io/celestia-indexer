@@ -12,6 +12,31 @@ import (
 	"github.com/pkg/errors"
 )
 
+// blockStartValidators reads the bonded validators before the block's validator writes
+// at most once, so x/signal and x/gov share the query.
+type blockStartValidators struct {
+	repo   storage.IValidator
+	bonded []storage.Validator
+	loaded bool
+}
+
+func newBlockStartValidators(repo storage.IValidator) *blockStartValidators {
+	return &blockStartValidators{repo: repo}
+}
+
+func (v *blockStartValidators) get(ctx context.Context) ([]storage.Validator, error) {
+	if v.loaded {
+		return v.bonded, nil
+	}
+	bonded, err := v.repo.BondedValidators(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "get bonded validators")
+	}
+	v.bonded = bonded
+	v.loaded = true
+	return bonded, nil
+}
+
 func (module *Module) saveValidators(
 	ctx context.Context,
 	tx storage.Transaction,

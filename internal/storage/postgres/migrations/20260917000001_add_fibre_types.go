@@ -9,8 +9,12 @@ import (
 	"strings"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
+	"github.com/pkg/errors"
 	"github.com/uptrace/bun"
 )
+
+// Mask width after this migration. Hardcoded: MsgTypeBitsCount grows with later migrations.
+const fibreWidth = 121
 
 func init() {
 	Migrations.MustRegister(upAddFibreTypes, downAddFibreTypes)
@@ -61,26 +65,15 @@ func upAddFibreTypes(ctx context.Context, db *bun.DB) error {
 
 	// New types take the high bits, so old masks are left-padded to keep every
 	// existing bit in place. Padding must be a literal: there is no text -> bit cast.
-	//
-	// This step is not naturally idempotent like the ones above: on a fresh
-	// deployment the table is created with message_types already at
-	// MsgTypeBitsCount (the table doesn't exist yet, so initDatabaseWithMigrations
-	// skips migrateDatabase entirely and no migration gets recorded as applied).
-	// A later restart then replays every migration against that already-current
-	// schema, and re-padding an already MsgTypeBitsCount-wide column would push
-	// it past MsgTypeBitsCount and silently truncate the low bits on cast back
-	// down, corrupting every existing mask. Guard on the column's current width.
+	// A fresh database is created at the current width and replays all migrations
+	// on a later start, so skip columns that are already widened.
 	padding := strings.Repeat("0", len(fibreMsgTypes))
-	for _, table := range []string{"block", "tx"} {
-		var width int
-		if err := db.QueryRowContext(ctx, `SELECT COALESCE(character_maximum_length, 0)
-			FROM information_schema.columns
-			WHERE table_schema = 'public' AND table_name = ? AND column_name = 'message_types'`,
-			table,
-		).Scan(&width); err != nil {
+	for _, table := range messageTypesTables {
+		width, err := messageTypesWidth(ctx, db, table)
+		if err != nil {
 			return err
 		}
-		if width == types.MsgTypeBitsCount {
+		if width >= fibreWidth {
 			continue
 		}
 
@@ -88,7 +81,7 @@ func upAddFibreTypes(ctx context.Context, db *bun.DB) error {
 			ALTER COLUMN message_types
 			TYPE bit(%d)
 			USING (B'%s' || message_types)::bit(%d)`,
-			table, types.MsgTypeBitsCount, padding, types.MsgTypeBitsCount,
+			table, fibreWidth, padding, fibreWidth,
 		)); err != nil {
 			return err
 		}
@@ -101,8 +94,18 @@ func downAddFibreTypes(ctx context.Context, db *bun.DB) error {
 	// Drop the padding first, then the rows using the new types: an enum value
 	// can only be deleted from pg_enum while nothing references it.
 	padding := len(fibreMsgTypes)
-	width := types.MsgTypeBitsCount - padding
-	for _, table := range []string{"block", "tx"} {
+	width := fibreWidth - padding
+	for _, table := range messageTypesTables {
+		current, err := messageTypesWidth(ctx, db, table)
+		if err != nil {
+			return err
+		}
+		if current == width {
+			continue
+		}
+		if current != fibreWidth {
+			return errors.Errorf("%s.message_types is bit(%d), expected bit(%d)", table, current, fibreWidth)
+		}
 		if _, err := db.ExecContext(ctx, fmt.Sprintf(`ALTER TABLE %s
 			ALTER COLUMN message_types
 			TYPE bit(%d)

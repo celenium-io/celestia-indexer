@@ -72,9 +72,11 @@ type VotesCount struct {
 	AbstainAddress    int64
 }
 
-func (vc *VotesCount) Update(count int64, vote Vote) {
+func (vc *VotesCount) AddVoter(count int64) {
 	vc.VotesCount += count
+}
 
+func (vc *VotesCount) AddOption(count int64, vote Vote) {
 	switch vote.Option {
 	case types.VoteOptionAbstain:
 		vc.Abstain += count

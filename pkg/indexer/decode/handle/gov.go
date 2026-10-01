@@ -470,6 +470,14 @@ func MsgUpdateParamsGov(ctx *context.Context, msgId uint64, m *v1.MsgUpdateParam
 	return msgType, err
 }
 
+func MsgCancelProposal(ctx *context.Context, msgId uint64, m *v1.MsgCancelProposal) (storageTypes.MsgType, error) {
+	msgType := storageTypes.MsgCancelProposal
+	err := createAddresses(ctx, addressesData{
+		{t: storageTypes.MsgAddressTypeProposer, address: m.Proposer},
+	}, ctx.Block.Height, msgId)
+	return msgType, err
+}
+
 func parseParamsToConstants(moduleName storageTypes.ModuleName, keyPrefix, value string, changes *[]paramsV1Beta.ParamChange) error {
 	var params map[string]string
 	if err := json.Unmarshal([]byte(value), &params); err != nil {
