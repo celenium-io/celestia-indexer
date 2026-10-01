@@ -19,34 +19,49 @@ func saveIgps(
 	dCtx *decodeContext.Context,
 	addrToId map[string]uint64,
 ) error {
-	igps := dCtx.Igps.Values()
-	for i := range igps {
-		addressId, ok := addrToId[igps[i].Owner.Address]
-		if !ok {
-			return errors.Wrapf(errCantFindAddress, "owner address %s", igps[i].Owner.Address)
+	var (
+		igps = make([]*storage.HLIGP, 0, dCtx.Igps.Len())
+		ids  = make(map[string]uint64, dCtx.Igps.Len())
+	)
+	for igp := range dCtx.Igps.AllValues() {
+		if igp.Owner == nil {
+			igp.OwnerId = 0
+		} else {
+			addressId, ok := addrToId[igp.Owner.Address]
+			if !ok {
+				return errors.Wrapf(errCantFindAddress, "owner address %s", igp.Owner.Address)
+			}
+			igp.OwnerId = addressId
 		}
-		igps[i].OwnerId = addressId
+		igps = append(igps, igp)
 	}
 
 	if err := tx.SaveHyperlaneIgps(ctx, igps...); err != nil {
 		return err
 	}
 
+	for igpId, igp := range dCtx.Igps.All() {
+		ids[igpId] = igp.Id
+	}
+
 	if dCtx.IgpConfigs.Len() > 0 {
 		configs := make([]storage.HLIGPConfig, 0, dCtx.IgpConfigs.Len())
 
-		for igpAddress, value := range dCtx.IgpConfigs.All() {
-			hexAddress, err := util.DecodeHexAddress(igpAddress)
-			if err != nil {
-				return errors.Wrap(err, "decode igp address")
+		for key, value := range dCtx.IgpConfigs.All() {
+			id, ok := ids[key.IgpId]
+			if !ok {
+				hexAddress, err := util.DecodeHexAddress(key.IgpId)
+				if err != nil {
+					return errors.Wrapf(err, "decode igp id: %s", key.IgpId)
+				}
+				id, err = repo.IdByHash(ctx, hexAddress.Bytes())
+				if err != nil {
+					return errors.Wrapf(err, "can't find igp with this address %s", hexAddress)
+				}
+				ids[key.IgpId] = id
 			}
 
-			igpId, err := repo.IdByHash(ctx, hexAddress.Bytes())
-			if err != nil {
-				return errors.Wrapf(err, "can't find igp with this address %s", hexAddress)
-			}
-			value.Id = igpId
-
+			value.Id = id
 			configs = append(configs, *value)
 		}
 

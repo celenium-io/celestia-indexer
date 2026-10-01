@@ -29,7 +29,7 @@ type Context struct {
 	Votes             *sdkSync.Map[VoteKey, []*storage.Vote]
 	Constants         *sdkSync.Map[string, *storage.Constant]
 	Igps              *sdkSync.Map[string, *storage.HLIGP]
-	IgpConfigs        *sdkSync.Map[string, *storage.HLIGPConfig]
+	IgpConfigs        *sdkSync.Map[IgpConfigKey, *storage.HLIGPConfig]
 	ZkISMs            *sdkSync.Map[string, *storage.ZkISM]
 	Upgrades          *sdkSync.Map[uint64, *storage.Upgrade]
 	Grants            *sdkSync.Map[string, *storage.Grant]
@@ -78,7 +78,7 @@ func NewContext() *Context {
 		Proposals:         sdkSync.NewMap[uint64, *storage.Proposal](),
 		Constants:         sdkSync.NewMap[string, *storage.Constant](),
 		Igps:              sdkSync.NewMap[string, *storage.HLIGP](),
-		IgpConfigs:        sdkSync.NewMap[string, *storage.HLIGPConfig](),
+		IgpConfigs:        sdkSync.NewMap[IgpConfigKey, *storage.HLIGPConfig](),
 		Upgrades:          sdkSync.NewMap[uint64, *storage.Upgrade](),
 		ZkISMs:            sdkSync.NewMap[string, *storage.ZkISM](),
 		Grants:            sdkSync.NewMap[string, *storage.Grant](),
@@ -397,12 +397,17 @@ func (ctx *Context) AddIgp(igpId string, igp *storage.HLIGP) {
 	}
 }
 
+type IgpConfigKey struct {
+	IgpId        string
+	RemoteDomain uint64
+}
+
 func (ctx *Context) AddIgpConfig(igpId string, config *storage.HLIGPConfig) {
-	if val, ok := ctx.Igps.Get(igpId); ok {
-		val.Configs = append(val.Configs, config)
-	} else {
-		ctx.IgpConfigs.Set(igpId, config)
+	key := IgpConfigKey{
+		IgpId:        igpId,
+		RemoteDomain: config.RemoteDomain,
 	}
+	ctx.IgpConfigs.Set(key, config)
 }
 
 func (ctx *Context) AddUpgrade(upgrade storage.Upgrade) {
@@ -565,6 +570,11 @@ func (ctx *Context) AddHlMailbox(mailbox *storage.HLMailbox) {
 		}
 		if mailbox.Owner != nil {
 			item.Owner = mailbox.Owner
+			item.OwnerRenounced = false
+		}
+		if mailbox.OwnerRenounced {
+			item.Owner = nil
+			item.OwnerRenounced = true
 		}
 	} else {
 		ctx.HlMailboxes.Set(mailbox.InternalId, mailbox)
@@ -581,6 +591,14 @@ func (ctx *Context) AddHlToken(token *storage.HLToken) {
 		}
 		if !token.Received.IsZero() {
 			item.Received = item.Received.Add(token.Received)
+		}
+		if token.Owner != nil {
+			item.Owner = token.Owner
+			item.OwnerRenounced = false
+		}
+		if token.OwnerRenounced {
+			item.Owner = nil
+			item.OwnerRenounced = true
 		}
 	} else {
 		ctx.HlTokens.Set(key, token)

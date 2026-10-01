@@ -52,7 +52,7 @@ func (tx Transaction) SaveHyperlaneMailbox(ctx context.Context, mailbox ...*mode
 			Column("height", "time", "tx_id", "mailbox", "internal_id", "owner_id", "default_ism", "default_hook", "required_hook", "domain", "sent_messages", "received_messages").
 			On("CONFLICT (internal_id) DO UPDATE")
 
-		if mailbox[i].Owner != nil {
+		if mailbox[i].Owner != nil || mailbox[i].OwnerRenounced {
 			query.Set("owner_id = EXCLUDED.owner_id")
 		}
 		if mailbox[i].SentMessages > 0 {
@@ -60,6 +60,15 @@ func (tx Transaction) SaveHyperlaneMailbox(ctx context.Context, mailbox ...*mode
 		}
 		if mailbox[i].ReceivedMessages > 0 {
 			query.Set("received_messages = hl_mailbox.received_messages + EXCLUDED.received_messages")
+		}
+		if mailbox[i].DefaultIsm != nil {
+			query.Set("default_ism = EXCLUDED.default_ism")
+		}
+		if mailbox[i].DefaultHook != nil {
+			query.Set("default_hook = EXCLUDED.default_hook")
+		}
+		if mailbox[i].RequiredHook != nil {
+			query.Set("required_hook = EXCLUDED.required_hook")
 		}
 
 		if _, err := query.Exec(ctx); err != nil {
@@ -81,7 +90,7 @@ func (tx Transaction) SaveHyperlaneTokens(ctx context.Context, tokens ...*models
 			Column("height", "time", "tx_id", "mailbox_id", "owner_id", "type", "denom", "token_id", "sent_transfers", "received_transfers", "sent", "received").
 			On("CONFLICT (token_id) DO UPDATE")
 
-		if tokens[i].Owner != nil {
+		if tokens[i].Owner != nil || tokens[i].OwnerRenounced {
 			query.Set("owner_id = EXCLUDED.owner_id")
 		}
 		if tokens[i].SentTransfers > 0 {

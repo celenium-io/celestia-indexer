@@ -4,6 +4,7 @@
 package events
 
 import (
+	"encoding/hex"
 	"testing"
 	"time"
 
@@ -118,7 +119,52 @@ func Test_handleHyperlaneProcessMessage(t *testing.T) {
 
 				require.NotNil(t, tt.ctx.HlTransfers[0])
 				require.NotNil(t, tt.ctx.HlTransfers[0].Address)
+				// message_id emitted by the chain in EventProcess
+				require.Equal(t, "d3aa80e8a5f8082cba208900a4ad3aec15516f423a89ef7803a9da35e2e58369", hex.EncodeToString(tt.ctx.HlTransfers[0].MessageId))
+				require.Equal(t, "7b4bf9feccff207ef2cb7101ceb15b8516021acd", tt.ctx.HlTransfers[0].CounterpartyAddress)
 			}
+		})
+	}
+}
+
+func Test_hyperlaneCounterpartyAddress(t *testing.T) {
+	tests := []struct {
+		name    string
+		address string
+		want    string
+		wantErr bool
+	}{
+		{
+			name:    "evm",
+			address: "0x0000000000000000000000007b4bf9feccff207ef2cb7101ceb15b8516021acd",
+			want:    "7b4bf9feccff207ef2cb7101ceb15b8516021acd",
+		}, {
+			name:    "evm with leading zero nibble",
+			address: "0x0000000000000000000000000b4bf9feccff207ef2cb7101ceb15b8516021acd",
+			want:    "0b4bf9feccff207ef2cb7101ceb15b8516021acd",
+		}, {
+			name:    "evm with leading zero bytes",
+			address: "0x0000000000000000000000000000f9feccff207ef2cb7101ceb15b8516021acd",
+			want:    "0000f9feccff207ef2cb7101ceb15b8516021acd",
+		}, {
+			name:    "32-byte address",
+			address: "0x00a1b2c3d4e5f60718293a4b5c6d7e8f9011223344556677889900aabbccddee",
+			want:    "00a1b2c3d4e5f60718293a4b5c6d7e8f9011223344556677889900aabbccddee",
+		}, {
+			name:    "invalid",
+			address: "0x1234",
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := hyperlaneCounterpartyAddress(tt.address)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			require.Equal(t, tt.want, got)
 		})
 	}
 }

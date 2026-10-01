@@ -103,3 +103,41 @@ func Test_handleCreateMailbox(t *testing.T) {
 		})
 	}
 }
+
+func Test_handleCreateMailbox_hooks(t *testing.T) {
+	ctx := context.NewContext()
+	ctx.Block = &storage.Block{
+		Height: 1036866,
+		Time:   time.Now(),
+	}
+	events := []storage.Event{
+		{
+			Height: 1036866,
+			Type:   "message",
+			Data: map[string]string{
+				"action": "/hyperlane.core.v1.MsgCreateMailbox",
+			},
+		}, {
+			Height: 1036866,
+			Type:   "hyperlane.core.v1.EventCreateMailbox",
+			Data: map[string]string{
+				"owner":         "\"celestia1lg0e9n4pt29lpq2k4ptue4ckw09dx0aujlpe4j\"",
+				"mailbox_id":    "\"0x68797065726c616e650000000000000000000000000000000000000000000003\"",
+				"default_ism":   "\"0x726f757465725f69736d00000000000000000000000000000000000000000004\"",
+				"default_hook":  "\"0x726f757465725f706f73745f6469737061746368000000000000000000000004\"",
+				"local_domain":  "1297040200",
+				"required_hook": "\"0x726f757465725f706f73745f6469737061746368000000000000000000000005\"",
+			},
+		},
+	}
+
+	err := handleCreateMailbox(ctx, NewCursor(events), &storage.Message{Type: types.MsgCreateMailbox, Height: 1036866})
+	require.NoError(t, err)
+
+	mailbox, ok := ctx.HlMailboxes.Get(3)
+	require.True(t, ok)
+	require.Len(t, mailbox.DefaultHook, 32)
+	require.Len(t, mailbox.RequiredHook, 32)
+	require.EqualValues(t, 4, mailbox.DefaultHook[31])
+	require.EqualValues(t, 5, mailbox.RequiredHook[31])
+}

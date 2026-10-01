@@ -403,6 +403,12 @@ func NestedMessage(
 		d.Msg.Type, err = handle.MsgCreateNoopIsm(ctx, d.Msg.Id, typedMsg)
 	case *hyperlaneICS.MsgCreateRoutingIsm:
 		d.Msg.Type, err = handle.MsgCreateRoutingIsm(ctx, d.Msg.Id, typedMsg)
+	case *hyperlaneICS.MsgSetRoutingIsmDomain:
+		d.Msg.Type, err = handle.MsgSetRoutingIsmDomain(ctx, d.Msg.Id, typedMsg)
+	case *hyperlaneICS.MsgRemoveRoutingIsmDomain:
+		d.Msg.Type, err = handle.MsgRemoveRoutingIsmDomain(ctx, d.Msg.Id, typedMsg)
+	case *hyperlaneICS.MsgUpdateRoutingIsmOwner:
+		d.Msg.Type, err = handle.MsgUpdateRoutingIsmOwner(ctx, d.Msg.Id, typedMsg)
 
 	case *minfeeTypes.MsgUpdateMinfeeParams:
 		d.Msg.Type, err = handle.MsgUpdateMinfeeParams(ctx, d.Msg.Id, typedMsg)

@@ -29,11 +29,8 @@ var knownUnhandledMsgs = map[string]struct{}{
 	"/cosmos.distribution.v1beta1.MsgDepositValidatorRewardsPool": {},
 	"/cosmos.feegrant.v1beta1.MsgPruneAllowances":                 {},
 
-	// Hyperlane routing ISM management and native synthetic tokens.
-	"/hyperlane.core.interchain_security.v1.MsgRemoveRoutingIsmDomain": {},
-	"/hyperlane.core.interchain_security.v1.MsgSetRoutingIsmDomain":    {},
-	"/hyperlane.core.interchain_security.v1.MsgUpdateRoutingIsmOwner":  {},
-	"/hyperlane.warp.v1.MsgCreateNativeSyntheticToken":                 {},
+	// Hyperlane native synthetic tokens are created only through governance.
+	"/hyperlane.warp.v1.MsgCreateNativeSyntheticToken": {},
 	// Registered as a Msg implementation upstream although it is a response.
 	"/hyperlane.warp.v1.MsgSetTokenResponse": {},
 

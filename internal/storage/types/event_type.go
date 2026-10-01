@@ -146,8 +146,28 @@ package types
 		denomination_trace,
 		ibccallbackerror-denomination_trace,
 
-		cancel_proposal
+		cancel_proposal,
+		hyperlane.core.ism.v1.EventRemoveRoutingIsmDomain,
+		hyperlane.core.ism.v1.EventAnnounceStorageLocation,
+		hyperlane.core.ism.v1.EventCreateMessageIdMultisigIsm,
+		hyperlane.core.ism.v1.EventCreateMerkleRootMultisigIsm
 	)
 */
 //go:generate go-enum --marshal --sql --values --names
 type EventType string
+
+// Postgres caps enum labels at 63 bytes, so events with longer chain names are stored under short labels.
+var eventTypeByChainName = map[string]EventType{
+	"hyperlane.core.interchain_security.v1.EventRemoveRoutingIsmDomain":      EventTypeHyperlanecoreismv1EventRemoveRoutingIsmDomain,
+	"hyperlane.core.interchain_security.v1.EventAnnounceStorageLocation":     EventTypeHyperlanecoreismv1EventAnnounceStorageLocation,
+	"hyperlane.core.interchain_security.v1.EventCreateMessageIdMultisigIsm":  EventTypeHyperlanecoreismv1EventCreateMessageIdMultisigIsm,
+	"hyperlane.core.interchain_security.v1.EventCreateMerkleRootMultisigIsm": EventTypeHyperlanecoreismv1EventCreateMerkleRootMultisigIsm,
+}
+
+// ParseChainEventType parses an event type as the chain emits it.
+func ParseChainEventType(name string) (EventType, error) {
+	if typ, ok := eventTypeByChainName[name]; ok {
+		return typ, nil
+	}
+	return ParseEventType(name)
+}

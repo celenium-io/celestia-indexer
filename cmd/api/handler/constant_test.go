@@ -64,7 +64,7 @@ func (s *ConstantTestSuite) TestEnums() {
 	var enums responses.Enums
 	err := json.NewDecoder(rec.Body).Decode(&enums)
 	s.Require().NoError(err)
-	s.Require().Len(enums.EventType, 119)
+	s.Require().Len(enums.EventType, 123)
 	s.Require().Len(enums.MessageType, 122)
 	s.Require().Len(enums.Status, 2)
 	s.Require().Len(enums.Categories, 5)

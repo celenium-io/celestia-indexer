@@ -4,7 +4,8 @@
 package events
 
 import (
-	"strings"
+	"bytes"
+	"encoding/hex"
 
 	"github.com/bcp-innovations/hyperlane-cosmos/util"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -57,7 +58,12 @@ func processHyperlaneProcessMessage(ctx *context.Context, c *Cursor, msg *storag
 				ReceivedMessages: 1,
 			}
 
+			if processEvent.Message == nil {
+				return errors.New("empty message in hyperlane process event")
+			}
+
 			transfer.Counterparty = processEvent.Origin
+			transfer.MessageId = processEvent.Message.Id().Bytes()
 			transfer.Version = processEvent.Message.Version
 			transfer.Nonce = processEvent.Message.Nonce
 			transfer.Body = processEvent.Message.Body
@@ -140,8 +146,24 @@ func makeHyperlaneTransferAddress(ctx *context.Context, str string, transfer *st
 		}
 		return ctx.AddAddress(transfer.Address)
 	}
-	str = strings.TrimPrefix(str, "0x")
-	str = strings.TrimLeft(str, "0")
-	transfer.CounterpartyAddress = str
+	address, err := hyperlaneCounterpartyAddress(str)
+	if err != nil {
+		return errors.Wrapf(err, "decode counterparty address: %s", str)
+	}
+	transfer.CounterpartyAddress = address
 	return nil
+}
+
+// hyperlaneCounterpartyAddress unpads a bytes32 Hyperlane address: EVM addresses are
+// left-padded with 12 zero bytes, other chains (e.g. Solana) use all 32 bytes.
+func hyperlaneCounterpartyAddress(str string) (string, error) {
+	address, err := util.DecodeHexAddress(str)
+	if err != nil {
+		return "", err
+	}
+	b := address.Bytes()
+	if bytes.Equal(b[:12], make([]byte, 12)) {
+		return hex.EncodeToString(b[12:]), nil
+	}
+	return hex.EncodeToString(b), nil
 }

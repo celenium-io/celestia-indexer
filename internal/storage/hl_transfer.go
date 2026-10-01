@@ -44,23 +44,24 @@ type IHLTransfer interface {
 type HLTransfer struct {
 	bun.BaseModel `bun:"hl_transfer" comment:"Table with hyperlane transfers"`
 
-	Id                  uint64               `bun:"id,pk,autoincrement"           comment:"Internal identity"`
-	Height              pkgTypes.Level       `bun:"height,notnull"                comment:"The number (height) of this block"`
-	Time                time.Time            `bun:"time,pk,notnull"               comment:"The time of block"`
-	TxId                uint64               `bun:"tx_id"                         comment:"Transaction identity"`
-	MailboxId           uint64               `bun:"mailbox_id"                    comment:"Mailbox address"`
-	RelayerId           uint64               `bun:"relayer_id"                    comment:"Relayer address"`
-	TokenId             uint64               `bun:"token_id"                      comment:"Token id"`
-	Counterparty        uint64               `bun:"counterparty"                  comment:"Counterparty domain"`
-	AddressId           uint64               `bun:"address_id"                    comment:"Internal celestia address identity"`
-	CounterpartyAddress string               `bun:"counterparty_address"          comment:"Counterparty address"`
-	Version             byte                 `bun:"version"                       comment:"Version"`
-	Nonce               uint32               `bun:"nonce"                         comment:"Nonce"`
-	Body                []byte               `bun:"body,type:bytea,nullzero"      comment:"Body"`
-	Metadata            []byte               `bun:"metadata,type:bytea,nullzero"  comment:"Metadata"`
-	Type                types.HLTransferType `bun:",type:hyperlane_transfer_type" comment:"Transfer type"`
-	Amount              types.Numeric        `bun:"amount,type:numeric"           comment:"Amount"`
-	Denom               string               `bun:"denom"                         comment:"Denom"`
+	Id                  uint64               `bun:"id,pk,autoincrement"            comment:"Internal identity"`
+	Height              pkgTypes.Level       `bun:"height,notnull"                 comment:"The number (height) of this block"`
+	Time                time.Time            `bun:"time,pk,notnull"                comment:"The time of block"`
+	TxId                uint64               `bun:"tx_id"                          comment:"Transaction identity"`
+	MailboxId           uint64               `bun:"mailbox_id"                     comment:"Mailbox address"`
+	RelayerId           uint64               `bun:"relayer_id"                     comment:"Relayer address"`
+	TokenId             uint64               `bun:"token_id"                       comment:"Token id"`
+	Counterparty        uint64               `bun:"counterparty"                   comment:"Counterparty domain"`
+	AddressId           uint64               `bun:"address_id"                     comment:"Internal celestia address identity"`
+	CounterpartyAddress string               `bun:"counterparty_address"           comment:"Counterparty address"`
+	Version             byte                 `bun:"version"                        comment:"Version"`
+	Nonce               uint32               `bun:"nonce"                          comment:"Nonce"`
+	MessageId           []byte               `bun:"message_id,type:bytea,nullzero" comment:"Hyperlane message id (keccak256 of the message)"`
+	Body                []byte               `bun:"body,type:bytea,nullzero"       comment:"Body"`
+	Metadata            []byte               `bun:"metadata,type:bytea,nullzero"   comment:"Metadata"`
+	Type                types.HLTransferType `bun:",type:hyperlane_transfer_type"  comment:"Transfer type"`
+	Amount              types.Numeric        `bun:"amount,type:numeric"            comment:"Amount"`
+	Denom               string               `bun:"denom"                          comment:"Denom"`
 
 	Mailbox    *HLMailbox    `bun:"rel:belongs-to,join:mailbox_id=id"`
 	Relayer    *Address      `bun:"rel:belongs-to,join:relayer_id=id"`

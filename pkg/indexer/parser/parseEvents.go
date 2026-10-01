@@ -47,7 +47,7 @@ func parseBlockEvents(ctx *context.Context, b *types.BlockData, events []types.E
 }
 
 func parseEvent(ctx *context.Context, b *types.BlockData, eN types.Event, index int, resultEvent *storage.Event, txId *uint64, isDuplicated bool) error {
-	eventType, err := storageTypes.ParseEventType(eN.Type)
+	eventType, err := storageTypes.ParseChainEventType(eN.Type)
 	if err != nil {
 		log.Err(err).Msgf("got type %v", eN.Type)
 		eventType = storageTypes.EventTypeUnknown

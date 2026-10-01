@@ -75,7 +75,7 @@ func processCreateMailbox(ctx *context.Context, c *Cursor, msg *storage.Message)
 			if err != nil {
 				return errors.Wrapf(err, "decode required hook: %s", createMailbox.RequiredHook)
 			}
-			mailbox.DefaultHook = requiredHook.Bytes()
+			mailbox.RequiredHook = requiredHook.Bytes()
 		}
 
 		ctx.AddHlMailbox(mailbox)

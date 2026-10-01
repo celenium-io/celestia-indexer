@@ -878,3 +878,98 @@ func TestContext_AddProposalMergesFields(t *testing.T) {
 	require.Equal(t, "15", proposal.Deposit.String())
 	require.True(t, proposal.ExpeditedProposalRejected)
 }
+
+func igpConfigOf(domain uint64, gasPrice int64) *storage.HLIGPConfig {
+	return &storage.HLIGPConfig{
+		RemoteDomain: domain,
+		GasPrice:     storageTypes.NumericFromInt64(gasPrice),
+	}
+}
+
+func Test_AddIgpConfig_DomainsOfOneIgp(t *testing.T) {
+	ctx := NewContext()
+	ctx.AddIgpConfig("0x01", igpConfigOf(1, 100))
+	ctx.AddIgpConfig("0x01", igpConfigOf(42161, 5))
+	ctx.AddIgpConfig("0x01", igpConfigOf(8453, 3))
+
+	require.Equal(t, 3, ctx.IgpConfigs.Len())
+	for _, domain := range []uint64{1, 42161, 8453} {
+		_, ok := ctx.IgpConfigs.Get(IgpConfigKey{IgpId: "0x01", RemoteDomain: domain})
+		require.True(t, ok, domain)
+	}
+}
+
+func Test_AddIgpConfig_SameDomainLastWins(t *testing.T) {
+	ctx := NewContext()
+	ctx.AddIgpConfig("0x01", igpConfigOf(1, 100))
+	ctx.AddIgpConfig("0x01", igpConfigOf(1, 200))
+	ctx.AddIgpConfig("0x02", igpConfigOf(1, 300))
+
+	require.Equal(t, 2, ctx.IgpConfigs.Len())
+	config, ok := ctx.IgpConfigs.Get(IgpConfigKey{IgpId: "0x01", RemoteDomain: 1})
+	require.True(t, ok)
+	require.Equal(t, "200", config.GasPrice.String())
+}
+
+func Test_AddIgpConfig_IgpInBlock(t *testing.T) {
+	ctx := NewContext()
+	ctx.AddIgp("0x01", &storage.HLIGP{Denom: "utia"})
+	ctx.AddIgpConfig("0x01", igpConfigOf(1, 100))
+
+	igp, ok := ctx.Igps.Get("0x01")
+	require.True(t, ok)
+	require.Empty(t, igp.Configs)
+	require.Equal(t, 1, ctx.IgpConfigs.Len())
+}
+
+func Test_AddIgp_RenounceResetsOwner(t *testing.T) {
+	ctx := NewContext()
+	ctx.AddIgp("0x01", &storage.HLIGP{Denom: "utia", Owner: &storage.Address{Address: "owner"}})
+	ctx.AddIgp("0x01", &storage.HLIGP{Owner: nil})
+
+	igp, ok := ctx.Igps.Get("0x01")
+	require.True(t, ok)
+	require.Nil(t, igp.Owner)
+	require.Equal(t, "utia", igp.Denom)
+}
+
+func Test_AddHlMailbox_RenounceAfterCreate(t *testing.T) {
+	ctx := NewContext()
+	ctx.AddHlMailbox(&storage.HLMailbox{InternalId: 1, Owner: &storage.Address{Address: "owner"}})
+	ctx.AddHlMailbox(&storage.HLMailbox{InternalId: 1, SentMessages: 1})
+	ctx.AddHlMailbox(&storage.HLMailbox{InternalId: 1, OwnerRenounced: true})
+
+	mailbox, ok := ctx.HlMailboxes.Get(1)
+	require.True(t, ok)
+	require.Nil(t, mailbox.Owner)
+	require.True(t, mailbox.OwnerRenounced)
+	require.EqualValues(t, 1, mailbox.SentMessages)
+}
+
+func Test_AddHlToken_OwnerMerge(t *testing.T) {
+	tokenId := []byte{1, 2, 3}
+
+	t.Run("new owner after transfer", func(t *testing.T) {
+		ctx := NewContext()
+		ctx.AddHlToken(&storage.HLToken{TokenId: tokenId, SentTransfers: 1, Sent: storageTypes.NumericFromInt64(10)})
+		ctx.AddHlToken(&storage.HLToken{TokenId: tokenId, Owner: &storage.Address{Address: "new_owner"}})
+
+		require.Equal(t, 1, ctx.HlTokens.Len())
+		for _, token := range ctx.HlTokens.All() {
+			require.NotNil(t, token.Owner)
+			require.Equal(t, "new_owner", token.Owner.Address)
+			require.EqualValues(t, 1, token.SentTransfers)
+		}
+	})
+
+	t.Run("renounce after create", func(t *testing.T) {
+		ctx := NewContext()
+		ctx.AddHlToken(&storage.HLToken{TokenId: tokenId, Owner: &storage.Address{Address: "owner"}})
+		ctx.AddHlToken(&storage.HLToken{TokenId: tokenId, OwnerRenounced: true})
+
+		for _, token := range ctx.HlTokens.All() {
+			require.Nil(t, token.Owner)
+			require.True(t, token.OwnerRenounced)
+		}
+	})
+}

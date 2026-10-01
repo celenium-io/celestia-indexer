@@ -39,7 +39,8 @@ func processSetToken(ctx *context.Context, c *Cursor, msg *storage.Message) erro
 			return err
 		}
 
-		if setToken.NewOwner == "" {
+		// ISM-only update: ism_id is not stored and the owner is unchanged
+		if setToken.NewOwner == "" && !setToken.RenounceOwnership {
 			continue
 		}
 
@@ -56,9 +57,16 @@ func processSetToken(ctx *context.Context, c *Cursor, msg *storage.Message) erro
 				LastHeight: msg.Height,
 				Balances:   []storage.Balance{storage.EmptyBalance()},
 			},
-			Type: types.HLTokenTypeCollateral,
+			Type:           types.HLTokenTypeCollateral,
+			OwnerRenounced: setToken.RenounceOwnership,
 		}
+
+		if token.OwnerRenounced {
+			token.Owner = nil
+		}
+
 		ctx.AddHlToken(token)
+
 		if err := ctx.AddAddress(token.Owner); err != nil {
 			return errors.Wrap(err, "add address")
 		}
