@@ -787,7 +787,8 @@
                             "MsgPayForFibre",
                             "MsgPaymentPromiseTimeout",
                             "MsgUpdateFibreParams",
-                            "MsgSetFibreProviderInfo"
+                            "MsgSetFibreProviderInfo",
+                            "MsgCancelProposal"
                         ],
                         "type": "string",
                         "example": "MsgSend",
@@ -1160,7 +1161,8 @@
                             "MsgPayForFibre",
                             "MsgPaymentPromiseTimeout",
                             "MsgUpdateFibreParams",
-                            "MsgSetFibreProviderInfo"
+                            "MsgSetFibreProviderInfo",
+                            "MsgCancelProposal"
                         ],
                         "type": "string",
                         "example": "MsgSend",
@@ -2190,7 +2192,8 @@
                             "MsgPayForFibre",
                             "MsgPaymentPromiseTimeout",
                             "MsgUpdateFibreParams",
-                            "MsgSetFibreProviderInfo"
+                            "MsgSetFibreProviderInfo",
+                            "MsgCancelProposal"
                         ],
                         "type": "string",
                         "example": "MsgSend",
@@ -2320,7 +2323,8 @@
                             "MsgPayForFibre",
                             "MsgPaymentPromiseTimeout",
                             "MsgUpdateFibreParams",
-                            "MsgSetFibreProviderInfo"
+                            "MsgSetFibreProviderInfo",
+                            "MsgCancelProposal"
                         ],
                         "type": "string",
                         "example": "MsgSend",
@@ -7637,7 +7641,8 @@
                             "MsgPayForFibre",
                             "MsgPaymentPromiseTimeout",
                             "MsgUpdateFibreParams",
-                            "MsgSetFibreProviderInfo"
+                            "MsgSetFibreProviderInfo",
+                            "MsgCancelProposal"
                         ],
                         "type": "string",
                         "example": "MsgSend",
@@ -7767,7 +7772,8 @@
                             "MsgPayForFibre",
                             "MsgPaymentPromiseTimeout",
                             "MsgUpdateFibreParams",
-                            "MsgSetFibreProviderInfo"
+                            "MsgSetFibreProviderInfo",
+                            "MsgCancelProposal"
                         ],
                         "type": "string",
                         "example": "MsgSend",
@@ -13141,7 +13147,8 @@
                 "channel_flush_complete",
                 "channel_closed",
                 "denomination_trace",
-                "ibccallbackerror-denomination_trace"
+                "ibccallbackerror-denomination_trace",
+                "cancel_proposal"
             ],
             "x-enum-varnames": [
                 "EventTypeUnknown",
@@ -13261,7 +13268,8 @@
                 "EventTypeChannelFlushComplete",
                 "EventTypeChannelClosed",
                 "EventTypeDenominationTrace",
-                "EventTypeIbccallbackerrorDenominationTrace"
+                "EventTypeIbccallbackerrorDenominationTrace",
+                "EventTypeCancelProposal"
             ]
         },
         "types.MsgAddressType": {
@@ -13448,7 +13456,8 @@
                 "MsgPayForFibre",
                 "MsgPaymentPromiseTimeout",
                 "MsgUpdateFibreParams",
-                "MsgSetFibreProviderInfo"
+                "MsgSetFibreProviderInfo",
+                "MsgCancelProposal"
             ],
             "x-enum-varnames": [
                 "MsgUnknown",
@@ -13571,7 +13580,8 @@
                 "MsgPayForFibre",
                 "MsgPaymentPromiseTimeout",
                 "MsgUpdateFibreParams",
-                "MsgSetFibreProviderInfo"
+                "MsgSetFibreProviderInfo",
+                "MsgCancelProposal"
             ]
         },
         "types.Status": {

@@ -147,3 +147,21 @@ func TestProcessEvent_RecoveredIbcClients(t *testing.T) {
 	}
 	require.Equal(t, []string{"07-tendermint-1", "07-tendermint-2", "07-tendermint-3"}, ctx.RecoveredIbcClients)
 }
+
+func TestProcessEvent_CancelProposal(t *testing.T) {
+	ctx := context.NewContext()
+	ctx.Block = &storage.Block{Height: 100, Time: time.Now()}
+
+	event := storage.Event{
+		Type: storageTypes.EventTypeCancelProposal,
+		Data: map[string]string{
+			"sender":      "celestia10d07y265gmmuvt4z0w9aw880jnsr700jtgz4v7",
+			"proposal_id": "12",
+		},
+	}
+	require.NoError(t, processEvent(ctx, &event))
+
+	proposal, ok := ctx.Proposals.Get(12)
+	require.True(t, ok)
+	require.Equal(t, storageTypes.ProposalStatusCancelled, proposal.Status)
+}

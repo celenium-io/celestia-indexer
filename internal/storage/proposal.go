@@ -74,6 +74,7 @@ type Proposal struct {
 	Proposer *Address `bun:"rel:belongs-to,join:proposer_id=id"`
 
 	ExpeditedProposalRejected bool `bun:"-"`
+	Tallied                   bool `bun:"-"`
 }
 
 // TableName -
@@ -86,7 +87,10 @@ func (p Proposal) EmptyStatus() bool {
 }
 
 func (p Proposal) Finished() bool {
-	return p.Status == types.ProposalStatusApplied || p.Status == types.ProposalStatusRejected || p.Status == types.ProposalStatusFailed
+	return p.Status == types.ProposalStatusApplied ||
+		p.Status == types.ProposalStatusRejected ||
+		p.Status == types.ProposalStatusFailed ||
+		p.Status == types.ProposalStatusCancelled
 }
 
 func (p Proposal) IsExpedited() bool {

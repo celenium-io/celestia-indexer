@@ -225,6 +225,8 @@ func NestedMessage(
 		d.Msg.Type, err = handle.MsgDeposit(ctx, d.Msg.Id, typedMsg.Depositor)
 	case *cosmosGovTypesV1.MsgUpdateParams:
 		d.Msg.Type, err = handle.MsgUpdateParamsGov(ctx, d.Msg.Id, typedMsg)
+	case *cosmosGovTypesV1.MsgCancelProposal:
+		d.Msg.Type, err = handle.MsgCancelProposal(ctx, d.Msg.Id, typedMsg)
 
 	// ibc module
 	case *ibcTypes.MsgTransfer:

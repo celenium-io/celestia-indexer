@@ -71,9 +71,9 @@ func (d *Delegation) ByValidator(ctx context.Context, validatorId uint64, limit,
 	return
 }
 
-func (d *Delegation) AddressDelegations(ctx context.Context, addressId uint64) (val []storage.Delegation, err error) {
+func (d *Delegation) AddressDelegations(ctx context.Context, addressIds ...uint64) (val []storage.Delegation, err error) {
 	err = d.DB().NewSelect().Model(&val).
-		Where("address_id = ?", addressId).
+		Where("address_id IN (?)", bun.List(addressIds)).
 		Where("amount > 0").
 		Scan(ctx)
 	return

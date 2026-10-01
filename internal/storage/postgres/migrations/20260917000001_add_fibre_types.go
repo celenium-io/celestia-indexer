@@ -71,7 +71,7 @@ func upAddFibreTypes(ctx context.Context, db *bun.DB) error {
 	// it past MsgTypeBitsCount and silently truncate the low bits on cast back
 	// down, corrupting every existing mask. Guard on the column's current width.
 	padding := strings.Repeat("0", len(fibreMsgTypes))
-	for _, table := range []string{"block", "tx"} {
+	for _, table := range messageTypesTables {
 		var width int
 		if err := db.QueryRowContext(ctx, `SELECT COALESCE(character_maximum_length, 0)
 			FROM information_schema.columns
@@ -102,7 +102,7 @@ func downAddFibreTypes(ctx context.Context, db *bun.DB) error {
 	// can only be deleted from pg_enum while nothing references it.
 	padding := len(fibreMsgTypes)
 	width := types.MsgTypeBitsCount - padding
-	for _, table := range []string{"block", "tx"} {
+	for _, table := range messageTypesTables {
 		if _, err := db.ExecContext(ctx, fmt.Sprintf(`ALTER TABLE %s
 			ALTER COLUMN message_types
 			TYPE bit(%d)

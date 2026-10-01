@@ -126,7 +126,7 @@ func (v *Vote) ByValidatorId(ctx context.Context, validatorId uint64, fltrs stor
 func (v *Vote) ListByProposal(ctx context.Context, proposalId uint64, limit, offset int) (votes []storage.Vote, err error) {
 	query := v.DB().NewSelect().Model(&votes).
 		Where("proposal_id = ?", proposalId).
-		OrderExpr("id asc")
+		OrderExpr("voter_id asc, id asc")
 
 	if limit < 1 {
 		limit = 10

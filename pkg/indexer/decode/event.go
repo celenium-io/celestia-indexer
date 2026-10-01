@@ -1007,3 +1007,12 @@ func NewZkISMSubmitMessagesEvent(m map[string]string) (e ZkISMSubmitMessagesEven
 	}
 	return
 }
+
+type CancelProposal struct {
+	ProposalId uint64
+}
+
+func NewCancelProposal(m map[string]string) (body CancelProposal, err error) {
+	body.ProposalId, err = decoder.Uint64FromMap(m, "proposal_id")
+	return
+}

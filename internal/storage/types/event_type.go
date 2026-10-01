@@ -144,7 +144,9 @@ package types
 		channel_flush_complete,
 		channel_closed,
 		denomination_trace,
-		ibccallbackerror-denomination_trace
+		ibccallbackerror-denomination_trace,
+
+		cancel_proposal
 	)
 */
 //go:generate go-enum --marshal --sql --values --names

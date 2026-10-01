@@ -113,6 +113,8 @@ func processEvent(ctx *context.Context, event *storage.Event) error {
 		return parseSetIgp(ctx, event.Data)
 	case storageTypes.EventTypeHyperlanecorepostDispatchv1EventSetDestinationGasConfig:
 		return parseSetDestinationGasConfig(ctx, event.Data)
+	case storageTypes.EventTypeCancelProposal:
+		return parseCancelProposal(ctx, event.Data)
 	}
 
 	return nil

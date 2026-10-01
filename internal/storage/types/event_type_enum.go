@@ -253,6 +253,8 @@ const (
 	EventTypeDenominationTrace EventType = "denomination_trace"
 	// EventTypeIbccallbackerrorDenominationTrace is a EventType of type ibccallbackerror-denomination_trace.
 	EventTypeIbccallbackerrorDenominationTrace EventType = "ibccallbackerror-denomination_trace"
+	// EventTypeCancelProposal is a EventType of type cancel_proposal.
+	EventTypeCancelProposal EventType = "cancel_proposal"
 )
 
 var ErrInvalidEventType = fmt.Errorf("not a valid EventType, try [%s]", strings.Join(_EventTypeNames, ", "))
@@ -376,6 +378,7 @@ var _EventTypeNames = []string{
 	string(EventTypeChannelClosed),
 	string(EventTypeDenominationTrace),
 	string(EventTypeIbccallbackerrorDenominationTrace),
+	string(EventTypeCancelProposal),
 }
 
 // EventTypeNames returns a list of possible string values of EventType.
@@ -506,6 +509,7 @@ func EventTypeValues() []EventType {
 		EventTypeChannelClosed,
 		EventTypeDenominationTrace,
 		EventTypeIbccallbackerrorDenominationTrace,
+		EventTypeCancelProposal,
 	}
 }
 
@@ -640,6 +644,7 @@ var _EventTypeValue = map[string]EventType{
 	"channel_closed":                                        EventTypeChannelClosed,
 	"denomination_trace":                                    EventTypeDenominationTrace,
 	"ibccallbackerror-denomination_trace":                   EventTypeIbccallbackerrorDenominationTrace,
+	"cancel_proposal":                                       EventTypeCancelProposal,
 }
 
 // ParseEventType attempts to convert a string to a EventType.

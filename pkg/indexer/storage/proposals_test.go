@@ -34,9 +34,10 @@ func TestFillProposalVotingPower(t *testing.T) {
 			Status: types.ProposalStatusActive,
 		})
 
-		filled, err := module.fillProposalsVotingPower(t.Context(), repos, 1, proposals)
+		filled, err := module.fillProposalsVotingPower(t.Context(), repos, 1, proposals, nil)
 		require.NoError(t, err)
 		require.Len(t, filled, 1)
+		require.False(t, filled[0].Tallied, "no tally outside the recount height")
 	})
 
 	t.Run("no active and finished", func(t *testing.T) {
@@ -58,7 +59,7 @@ func TestFillProposalVotingPower(t *testing.T) {
 			NoWithVeto: 1,
 		})
 
-		filled, err := module.fillProposalsVotingPower(t.Context(), repos.Repos(), 600, proposals)
+		filled, err := module.fillProposalsVotingPower(t.Context(), repos.Repos(), 600, proposals, newGovValidators())
 		require.NoError(t, err)
 		require.Len(t, filled, 1)
 	})
@@ -75,11 +76,6 @@ func TestFillProposalVotingPower(t *testing.T) {
 				Type:   types.ProposalTypeParamChanged,
 			}}, nil).
 			Times(1)
-		repos.Validators.EXPECT().
-			TotalVotingPower(gomock.Any()).
-			Return(types.NumericFromInt64(10000), nil).
-			Times(1)
-
 		repos.Validators.
 			EXPECT().
 			BondedValidators(t.Context()).
@@ -96,44 +92,35 @@ func TestFillProposalVotingPower(t *testing.T) {
 			EXPECT().
 			ListByProposal(t.Context(), uint64(1), 1000, 0).
 			Return([]storage.Vote{{
-				ValidatorId: testsuite.Ptr(uint64(1)),
-				VoterId:     3,
-				Option:      types.VoteOptionAbstain,
-			}, {
 				VoterId: 1,
 				Option:  types.VoteOptionNo,
+				Weight:  types.NumericFromInt64(1),
 			}, {
 				VoterId: 2,
 				Option:  types.VoteOptionYes,
+				Weight:  types.NumericFromInt64(1),
+			}, {
+				ValidatorId: testsuite.Ptr(uint64(1)),
+				VoterId:     3,
+				Option:      types.VoteOptionAbstain,
+				Weight:      types.NumericFromInt64(1),
 			}}, nil).
 			Times(1)
 
 		repos.Delegation.
 			EXPECT().
-			AddressDelegations(t.Context(), uint64(1)).
+			AddressDelegations(t.Context(), uint64(1), uint64(2), uint64(3)).
 			Return([]storage.Delegation{{
 				ValidatorId: 1,
 				AddressId:   1,
 				Amount:      types.NumericFromInt64(50000000),
-			}}, nil).
-			Times(1)
-
-		repos.Delegation.
-			EXPECT().
-			AddressDelegations(t.Context(), uint64(2)).
-			Return([]storage.Delegation{{
+			}, {
 				ValidatorId: 1,
-				AddressId:   1,
+				AddressId:   2,
 				Amount:      types.NumericFromInt64(10000000),
-			}}, nil).
-			Times(1)
-
-		repos.Delegation.
-			EXPECT().
-			AddressDelegations(t.Context(), uint64(3)).
-			Return([]storage.Delegation{{
+			}, {
 				ValidatorId: 1,
-				AddressId:   1,
+				AddressId:   3,
 				Amount:      types.NumericFromInt64(10000000),
 			}}, nil).
 			Times(1)
@@ -149,9 +136,10 @@ func TestFillProposalVotingPower(t *testing.T) {
 			NoWithVeto: 1,
 		})
 
-		filled, err := module.fillProposalsVotingPower(t.Context(), repos.Repos(), 600, proposals)
+		filled, err := module.fillProposalsVotingPower(t.Context(), repos.Repos(), 600, proposals, newGovValidators(1, 2))
 		require.NoError(t, err)
 		require.Len(t, filled, 1)
+		require.True(t, filled[0].Tallied)
 
 		require.Equal(t, "100000000", filled[0].VotingPower.String())
 		require.Equal(t, "40000000", filled[0].AbstainVotingPower.String())

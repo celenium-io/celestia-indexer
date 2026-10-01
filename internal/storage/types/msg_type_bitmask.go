@@ -176,10 +176,11 @@ const (
 	MsgTypeBitsUpdateFibreParams
 
 	MsgTypeBitsSetFibreProviderInfo
+	MsgTypeBitsCancelProposal
 )
 
 // MsgTypeBitsCount is the mask width: the number of bits declared above.
-const MsgTypeBitsCount = 121
+const MsgTypeBitsCount = 122
 
 func NewMsgTypeBitMask(values ...MsgType) MsgTypeBits {
 	mask := NewMsgTypeBits()
@@ -253,6 +254,8 @@ func (mask *MsgTypeBits) SetByMsgType(value MsgType) {
 
 	case MsgSubmitProposal:
 		mask.SetBit(MsgTypeBitsSubmitProposal)
+	case MsgCancelProposal:
+		mask.SetBit(MsgTypeBitsCancelProposal)
 	case MsgExecLegacyContent:
 		mask.SetBit(MsgTypeBitsExecLegacyContent)
 	case MsgVote:
@@ -984,6 +987,11 @@ func (mask MsgTypeBits) Names() []MsgType {
 
 	if mask.HasBit(MsgTypeBitsSetFibreProviderInfo) {
 		names[i] = MsgSetFibreProviderInfo
+		i++
+	}
+
+	if mask.HasBit(MsgTypeBitsCancelProposal) {
+		names[i] = MsgCancelProposal
 		// i++
 	}
 

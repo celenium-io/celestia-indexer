@@ -57,7 +57,7 @@ func TestTakePowerSnapshot(t *testing.T) {
 		{Id: 3, Power: &zero},
 	}, nil)
 
-	snapshot, err := takePowerSnapshot(t.Context(), repos.Validators)
+	snapshot, err := takePowerSnapshot(t.Context(), newBlockStartValidators(repos.Validators))
 	require.NoError(t, err)
 	require.Equal(t, "3", snapshot.total.String())
 	require.Len(t, snapshot.powers, 1)
@@ -99,7 +99,7 @@ func TestPrepareSignalRound(t *testing.T) {
 				dCtx.AddUpgrade(*upgrade)
 			}
 
-			round, err := prepareSignalRound(t.Context(), repos.Repos(), dCtx, tt.stateVersion)
+			round, err := prepareSignalRound(t.Context(), repos.Repos(), dCtx, tt.stateVersion, newBlockStartValidators(repos.Validators))
 			require.NoError(t, err)
 			require.Equal(t, tt.pending, round.pending)
 			require.Equal(t, tt.wantSnapshot, round.snapshot != nil)

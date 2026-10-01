@@ -158,7 +158,8 @@ package types
 		MsgPaymentPromiseTimeout,
 		MsgUpdateFibreParams,
 
-		MsgSetFibreProviderInfo
+		MsgSetFibreProviderInfo,
+		MsgCancelProposal
 	)
 */
 //go:generate go-enum --marshal --sql --values --noprefix --names

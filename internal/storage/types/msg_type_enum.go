@@ -259,6 +259,8 @@ const (
 	MsgUpdateFibreParams MsgType = "MsgUpdateFibreParams"
 	// MsgSetFibreProviderInfo is a MsgType of type MsgSetFibreProviderInfo.
 	MsgSetFibreProviderInfo MsgType = "MsgSetFibreProviderInfo"
+	// MsgCancelProposal is a MsgType of type MsgCancelProposal.
+	MsgCancelProposal MsgType = "MsgCancelProposal"
 )
 
 var ErrInvalidMsgType = fmt.Errorf("not a valid MsgType, try [%s]", strings.Join(_MsgTypeNames, ", "))
@@ -385,6 +387,7 @@ var _MsgTypeNames = []string{
 	string(MsgPaymentPromiseTimeout),
 	string(MsgUpdateFibreParams),
 	string(MsgSetFibreProviderInfo),
+	string(MsgCancelProposal),
 }
 
 // MsgTypeNames returns a list of possible string values of MsgType.
@@ -518,6 +521,7 @@ func MsgTypeValues() []MsgType {
 		MsgPaymentPromiseTimeout,
 		MsgUpdateFibreParams,
 		MsgSetFibreProviderInfo,
+		MsgCancelProposal,
 	}
 }
 
@@ -655,6 +659,7 @@ var _MsgTypeValue = map[string]MsgType{
 	"MsgPaymentPromiseTimeout":           MsgPaymentPromiseTimeout,
 	"MsgUpdateFibreParams":               MsgUpdateFibreParams,
 	"MsgSetFibreProviderInfo":            MsgSetFibreProviderInfo,
+	"MsgCancelProposal":                  MsgCancelProposal,
 }
 
 // ParseMsgType attempts to convert a string to a MsgType.

@@ -4,6 +4,7 @@
 package events
 
 import (
+	"slices"
 	"testing"
 	"time"
 
@@ -237,8 +238,76 @@ func Test_handleVote(t *testing.T) {
 			c.Skip(tt.idx)
 			err := handleVote(tt.ctx, c, tt.msg)
 			require.NoError(t, err)
-			require.Len(t, tt.ctx.Votes, len(tt.votes))
-			require.Equal(t, tt.votes, tt.ctx.Votes)
+			got := slices.Concat(slices.Collect(tt.ctx.Votes.AllValues())...)
+			require.Equal(t, tt.votes, got)
 		})
+	}
+}
+
+func Test_handleVote_StringWeighted(t *testing.T) {
+	ctx := context.NewContext()
+	ctx.Block = &storage.Block{Time: time.Now(), Height: 100}
+
+	c := NewCursor([]storage.Event{
+		{
+			Type: "message",
+			Data: map[string]string{"action": "/cosmos.gov.v1.MsgVoteWeighted"},
+		}, {
+			Type: "proposal_vote",
+			Data: map[string]string{
+				"option":      "option:VOTE_OPTION_YES weight:\"0.300000000000000000\" \noption:VOTE_OPTION_NO weight:\"0.700000000000000000\"",
+				"proposal_id": "7",
+				"voter":       "celestia12zs7e3n8pjd8y8ex0cyv67ethv30mekgqu665r",
+			},
+		},
+	})
+	require.NoError(t, handleVote(ctx, c, &storage.Message{Type: types.MsgVoteWeighted, Height: 100}))
+
+	got := slices.Concat(slices.Collect(ctx.Votes.AllValues())...)
+	require.Len(t, got, 2)
+	require.Equal(t, types.VoteOptionYes, got[0].Option)
+	require.Equal(t, "0.3", got[0].Weight.String())
+	require.Equal(t, types.VoteOptionNo, got[1].Option)
+	require.Equal(t, "0.7", got[1].Weight.String())
+}
+
+func Test_handleVote_ReplacedInSameBlock(t *testing.T) {
+	ctx := context.NewContext()
+	ctx.Block = &storage.Block{Time: time.Now(), Height: 100}
+
+	voteEvents := func(proposalId, option string) []storage.Event {
+		return []storage.Event{
+			{
+				Type: "message",
+				Data: map[string]string{"action": "/cosmos.gov.v1.MsgVoteWeighted"},
+			}, {
+				Type: "proposal_vote",
+				Data: map[string]string{
+					"option":      option,
+					"proposal_id": proposalId,
+					"voter":       "celestia12zs7e3n8pjd8y8ex0cyv67ethv30mekgqu665r",
+				},
+			},
+		}
+	}
+	for _, events := range [][]storage.Event{
+		voteEvents("7", `[{"option":1,"weight":"0.500000000000000000"},{"option":3,"weight":"0.500000000000000000"}]`),
+		voteEvents("8", `[{"option":2,"weight":"1.000000000000000000"}]`),
+		voteEvents("7", `[{"option":4,"weight":"1.000000000000000000"}]`),
+	} {
+		require.NoError(t, handleVote(ctx, NewCursor(events), &storage.Message{Type: types.MsgVoteWeighted, Height: 100}))
+	}
+
+	require.Equal(t, 2, ctx.Votes.Len())
+	for votes := range ctx.Votes.AllValues() {
+		require.Len(t, votes, 1)
+		switch votes[0].ProposalId {
+		case 7:
+			require.Equal(t, types.VoteOptionNoWithVeto, votes[0].Option)
+		case 8:
+			require.Equal(t, types.VoteOptionAbstain, votes[0].Option)
+		default:
+			t.Fatalf("unexpected proposal %d", votes[0].ProposalId)
+		}
 	}
 }

@@ -224,10 +224,15 @@ func (module *Module) processBlockInTransaction(
 		return state, errors.Wrap(err, "upgrade failed")
 	}
 
-	// before any validator write: x/signal weighs this block's messages with the previous block's power
-	signalRound, err := prepareSignalRound(ctx, repos, dCtx, state.Version)
+	// before any validator write: x/signal and x/gov see the set left by the previous block's EndBlock
+	startValidators := newBlockStartValidators(repos.Validators)
+	signalRound, err := prepareSignalRound(ctx, repos, dCtx, state.Version, startValidators)
 	if err != nil {
 		return state, errors.Wrap(err, "prepare signal round")
+	}
+	govSet, err := takeGovValidators(ctx, startValidators, dCtx.Block.Height, dCtx.Proposals)
+	if err != nil {
+		return state, errors.Wrap(err, "take gov validator set")
 	}
 
 	if err := saveConstantUpdates(ctx, tx, dCtx.Constants); err != nil {
@@ -300,7 +305,8 @@ func (module *Module) processBlockInTransaction(
 		return state, err
 	}
 
-	totalProposals, err := module.saveProposals(ctx, tx, repos, dCtx.Block.Height, dCtx.Proposals, dCtx.Votes, addrToId)
+	govSet.markJailed(dCtx.Jails)
+	totalProposals, err := module.saveProposals(ctx, tx, repos, dCtx.Block.Height, dCtx.Proposals, dCtx.Votes, addrToId, govSet)
 	if err != nil {
 		return state, err
 	}
