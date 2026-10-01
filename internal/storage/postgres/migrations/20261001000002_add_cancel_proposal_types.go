@@ -18,6 +18,9 @@ func init() {
 
 var messageTypesTables = []string{"block", "tx"}
 
+// Mask width after this migration. Hardcoded: MsgTypeBitsCount grows with later migrations.
+const cancelProposalWidth = 122
+
 func upAddCancelProposalTypes(ctx context.Context, db *bun.DB) error {
 	// ALTER TYPE ... ADD VALUE cannot run inside a transaction block, so every
 	// statement goes on its own and is idempotent. msg_type keeps the bit-mask order.
@@ -44,14 +47,14 @@ func upAddCancelProposalTypes(ctx context.Context, db *bun.DB) error {
 		if err != nil {
 			return err
 		}
-		if width == types.MsgTypeBitsCount {
+		if width >= cancelProposalWidth {
 			continue
 		}
 		if _, err := db.ExecContext(ctx, fmt.Sprintf(`ALTER TABLE %s
 			ALTER COLUMN message_types
 			TYPE bit(%d)
 			USING (B'0' || message_types)::bit(%d)`,
-			table, types.MsgTypeBitsCount, types.MsgTypeBitsCount,
+			table, cancelProposalWidth, cancelProposalWidth,
 		)); err != nil {
 			return errors.Wrapf(err, "widen %s.message_types", table)
 		}
@@ -60,7 +63,7 @@ func upAddCancelProposalTypes(ctx context.Context, db *bun.DB) error {
 }
 
 func downAddCancelProposalTypes(ctx context.Context, db *bun.DB) error {
-	width := types.MsgTypeBitsCount - 1
+	width := cancelProposalWidth - 1
 	for _, table := range messageTypesTables {
 		current, err := messageTypesWidth(ctx, db, table)
 		if err != nil {
@@ -68,6 +71,9 @@ func downAddCancelProposalTypes(ctx context.Context, db *bun.DB) error {
 		}
 		if current == width {
 			continue
+		}
+		if current != cancelProposalWidth {
+			return errors.Errorf("%s.message_types is bit(%d), expected bit(%d)", table, current, cancelProposalWidth)
 		}
 		if _, err := db.ExecContext(ctx, fmt.Sprintf(`ALTER TABLE %s
 			ALTER COLUMN message_types
