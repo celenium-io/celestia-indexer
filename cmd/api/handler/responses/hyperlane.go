@@ -103,19 +103,20 @@ func NewHyperlaneToken(token storage.HLToken) HyperlaneToken {
 }
 
 type HyperlaneTransfer struct {
-	Id       uint64         `example:"321"                                                              format:"int64"     json:"id"                 swaggertype:"integer"`
-	Height   pkgTypes.Level `example:"100"                                                              format:"int64"     json:"height"             swaggertype:"integer"`
-	Time     time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"               swaggertype:"string"`
-	TxHash   string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash,omitempty"  swaggertype:"string"`
-	Mailbox  string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"mailbox"            swaggertype:"string"`
-	TokenId  string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"token_id"           swaggertype:"string"`
-	Type     string         `example:"collateral"                                                       format:"string"    json:"type"               swaggertype:"string"`
-	Version  byte           `example:"1"                                                                format:"int64"     json:"version"            swaggertype:"integer"`
-	Nonce    uint32         `example:"10"                                                               format:"int64"     json:"nonce"              swaggertype:"integer"`
-	Body     []byte         `example:"AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0="                         format:"string"    json:"body,omitempty"     swaggertype:"string"`
-	Metadata []byte         `example:"AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0="                         format:"string"    json:"metadata,omitempty" swaggertype:"string"`
-	Amount   string         `example:"123445"                                                           format:"string"    json:"received"           swaggertype:"string"`
-	Denom    string         `example:"utia"                                                             format:"string"    json:"denom"              swaggertype:"string"`
+	Id        uint64         `example:"321"                                                              format:"int64"     json:"id"                   swaggertype:"integer"`
+	Height    pkgTypes.Level `example:"100"                                                              format:"int64"     json:"height"               swaggertype:"integer"`
+	Time      time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"                 swaggertype:"string"`
+	TxHash    string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash,omitempty"    swaggertype:"string"`
+	Mailbox   string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"mailbox"              swaggertype:"string"`
+	TokenId   string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"token_id"             swaggertype:"string"`
+	Type      string         `example:"collateral"                                                       format:"string"    json:"type"                 swaggertype:"string"`
+	Version   byte           `example:"1"                                                                format:"int64"     json:"version"              swaggertype:"integer"`
+	Nonce     uint32         `example:"10"                                                               format:"int64"     json:"nonce"                swaggertype:"integer"`
+	MessageId string         `example:"652452a670018d629cc116e510ba88c1cabe061336661b1f3d206d248bd558af" format:"binary"    json:"message_id,omitempty" swaggertype:"string"`
+	Body      []byte         `example:"AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0="                         format:"string"    json:"body,omitempty"       swaggertype:"string"`
+	Metadata  []byte         `example:"AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0="                         format:"string"    json:"metadata,omitempty"   swaggertype:"string"`
+	Amount    string         `example:"123445"                                                           format:"string"    json:"received"             swaggertype:"string"`
+	Denom     string         `example:"utia"                                                             format:"string"    json:"denom"                swaggertype:"string"`
 
 	Address      *ShortAddress         `json:"address,omitempty"`
 	Relayer      *ShortAddress         `json:"relayer,omitempty"`
@@ -140,6 +141,7 @@ func NewHyperlaneTransfer(transfer storage.HLTransfer, store hyperlane.IChainSto
 		Type:         transfer.Type.String(),
 		Version:      transfer.Version,
 		Nonce:        transfer.Nonce,
+		MessageId:    hex.EncodeToString(transfer.MessageId),
 		Body:         transfer.Body,
 		Metadata:     transfer.Metadata,
 		Denom:        transfer.Denom,

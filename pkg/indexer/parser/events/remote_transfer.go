@@ -48,7 +48,12 @@ func processHyperlaneRemoteTransfer(ctx *context.Context, c *Cursor, msg *storag
 				return errors.Wrap(err, "decode mailbox id")
 			}
 
+			if dispatchEvent.Message == nil {
+				return errors.New("empty message in hyperlane dispatch event")
+			}
+
 			transfer.Counterparty = dispatchEvent.Destination
+			transfer.MessageId = dispatchEvent.Message.Id().Bytes()
 			transfer.Version = dispatchEvent.Message.Version
 			transfer.Nonce = dispatchEvent.Message.Nonce
 			transfer.Body = dispatchEvent.Message.Body

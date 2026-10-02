@@ -108,3 +108,34 @@ func Test_handleSetToken(t *testing.T) {
 		})
 	}
 }
+
+func Test_handleSetToken_renounce(t *testing.T) {
+	ctx := context.NewContext()
+	ctx.Block = &storage.Block{Height: 1036866, Time: time.Now()}
+	events := []storage.Event{
+		{
+			Height: 1036866,
+			Type:   "message",
+			Data:   map[string]string{"action": "/hyperlane.warp.v1.MsgSetToken"},
+		}, {
+			Height: 1036866,
+			Type:   "hyperlane.warp.v1.EventSetToken",
+			Data: map[string]string{ //nolint:gosec
+				"owner":              "celestia1lg0e9n4pt29lpq2k4ptue4ckw09dx0aujlpe4j",
+				"token_id":           "0x726f757465725f61707000000000000000000000000000020000000000000001",
+				"new_owner":          "",
+				"renounce_ownership": "true",
+			},
+		},
+	}
+
+	err := handleSetToken(ctx, NewCursor(events), &storage.Message{Type: types.MsgSetToken, Height: 1036866})
+	require.NoError(t, err)
+	require.Equal(t, 1, ctx.HlTokens.Len())
+
+	for _, token := range ctx.HlTokens.All() {
+		require.Nil(t, token.Owner)
+		require.True(t, token.OwnerRenounced)
+	}
+	require.Zero(t, ctx.Addresses.Len())
+}

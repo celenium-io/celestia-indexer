@@ -357,11 +357,10 @@ func (module *Module) processBlockInTransaction(
 	if err := saveHlTokens(ctx, tx, repos.HyperlaneMailbox, dCtx.HlTokens.Values(), addrToId); err != nil {
 		return state, err
 	}
-	if err := saveHlTransfers(ctx, tx, repos.HyperlaneMailbox, repos.HyperlaneToken, repos.HyperlaneIgp, dCtx.HlTransfers, addrToId); err != nil {
+	if err := saveIgps(ctx, tx, repos.HyperlaneIgp, dCtx, addrToId); err != nil {
 		return state, err
 	}
-
-	if err := saveIgps(ctx, tx, repos.HyperlaneIgp, dCtx, addrToId); err != nil {
+	if err := saveHlTransfers(ctx, tx, repos.HyperlaneMailbox, repos.HyperlaneToken, repos.HyperlaneIgp, dCtx.HlTransfers, addrToId); err != nil {
 		return state, err
 	}
 

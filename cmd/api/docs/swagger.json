@@ -10296,6 +10296,11 @@
                     "format": "binary",
                     "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
                 },
+                "message_id": {
+                    "type": "string",
+                    "format": "binary",
+                    "example": "652452a670018d629cc116e510ba88c1cabe061336661b1f3d206d248bd558af"
+                },
                 "metadata": {
                     "type": "string",
                     "format": "string",
@@ -13148,7 +13153,11 @@
                 "channel_closed",
                 "denomination_trace",
                 "ibccallbackerror-denomination_trace",
-                "cancel_proposal"
+                "cancel_proposal",
+                "hyperlane.core.ism.v1.EventRemoveRoutingIsmDomain",
+                "hyperlane.core.ism.v1.EventAnnounceStorageLocation",
+                "hyperlane.core.ism.v1.EventCreateMessageIdMultisigIsm",
+                "hyperlane.core.ism.v1.EventCreateMerkleRootMultisigIsm"
             ],
             "x-enum-varnames": [
                 "EventTypeUnknown",
@@ -13269,7 +13278,11 @@
                 "EventTypeChannelClosed",
                 "EventTypeDenominationTrace",
                 "EventTypeIbccallbackerrorDenominationTrace",
-                "EventTypeCancelProposal"
+                "EventTypeCancelProposal",
+                "EventTypeHyperlanecoreismv1EventRemoveRoutingIsmDomain",
+                "EventTypeHyperlanecoreismv1EventAnnounceStorageLocation",
+                "EventTypeHyperlanecoreismv1EventCreateMessageIdMultisigIsm",
+                "EventTypeHyperlanecoreismv1EventCreateMerkleRootMultisigIsm"
             ]
         },
         "types.MsgAddressType": {

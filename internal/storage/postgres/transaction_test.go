@@ -3261,6 +3261,105 @@ func (s *TransactionTestSuite) TestHyperlaneMailbox() {
 	s.Require().NoError(tx2.Close(ctx))
 }
 
+func (s *TransactionTestSuite) TestHyperlaneMailboxUpdateHooks() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, rollback := s.beginRolledBack(ctx)
+	defer rollback()
+
+	s.Require().NoError(tx.SaveHyperlaneMailbox(ctx, &storage.HLMailbox{
+		Height:       10000,
+		Time:         time.Now().UTC(),
+		Mailbox:      []byte("mailbox_update_hooks"),
+		InternalId:   777,
+		OwnerId:      1,
+		DefaultIsm:   []byte("ism"),
+		DefaultHook:  []byte("default_hook"),
+		RequiredHook: []byte("required_hook"),
+	}))
+
+	// MsgSetMailbox changes only the default ISM; owner and hooks stay
+	s.Require().NoError(tx.SaveHyperlaneMailbox(ctx, &storage.HLMailbox{
+		Height:     10001,
+		Time:       time.Now().UTC(),
+		Mailbox:    []byte("mailbox_update_hooks"),
+		InternalId: 777,
+		DefaultIsm: []byte("new_ism"),
+	}))
+
+	var mailbox storage.HLMailbox
+	s.Require().NoError(tx.Tx().NewSelect().Model(&mailbox).Where("internal_id = ?", 777).Scan(ctx))
+	s.Require().Equal([]byte("new_ism"), mailbox.DefaultIsm)
+	s.Require().Equal([]byte("default_hook"), mailbox.DefaultHook)
+	s.Require().Equal([]byte("required_hook"), mailbox.RequiredHook)
+	s.Require().EqualValues(1, mailbox.OwnerId)
+}
+
+func (s *TransactionTestSuite) TestSaveHyperlaneIgpsReturnsIdOnConflict() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, rollback := s.beginRolledBack(ctx)
+	defer rollback()
+
+	igpId := []byte("igp_returning_id_on_conflict_000")
+	created := &storage.HLIGP{Height: 10000, Time: time.Now().UTC(), IgpId: igpId, OwnerId: 1, Denom: "utia"}
+	s.Require().NoError(tx.SaveHyperlaneIgps(ctx, created))
+	s.Require().NotZero(created.Id)
+
+	// owner renounced: saveIgps relies on the id coming back from the upsert
+	renounced := &storage.HLIGP{Height: 10001, Time: time.Now().UTC(), IgpId: igpId}
+	s.Require().NoError(tx.SaveHyperlaneIgps(ctx, renounced))
+	s.Require().Equal(created.Id, renounced.Id)
+
+	var igp storage.HLIGP
+	s.Require().NoError(tx.Tx().NewSelect().Model(&igp).Where("igp_id = ?", igpId).Scan(ctx))
+	s.Require().Zero(igp.OwnerId)
+	s.Require().Equal("utia", igp.Denom)
+}
+
+func (s *TransactionTestSuite) TestHyperlaneOwnerRenounced() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, rollback := s.beginRolledBack(ctx)
+	defer rollback()
+
+	s.Require().NoError(tx.SaveHyperlaneMailbox(ctx, &storage.HLMailbox{
+		Height: 10000, Time: time.Now().UTC(), Mailbox: []byte("mailbox_owner_renounced"), InternalId: 778, OwnerId: 1,
+	}))
+	s.Require().NoError(tx.SaveHyperlaneTokens(ctx, &storage.HLToken{
+		Height: 10000, Time: time.Now().UTC(), TokenId: []byte("token_owner_renounced"), OwnerId: 1,
+		Type: types.HLTokenTypeCollateral, Sent: types.NumericZero(), Received: types.NumericZero(),
+	}))
+
+	// a counter update without owner keeps owner_id
+	s.Require().NoError(tx.SaveHyperlaneMailbox(ctx, &storage.HLMailbox{
+		Height: 10001, Time: time.Now().UTC(), Mailbox: []byte("mailbox_owner_renounced"), InternalId: 778, SentMessages: 1,
+	}))
+	var mailbox storage.HLMailbox
+	s.Require().NoError(tx.Tx().NewSelect().Model(&mailbox).Where("internal_id = ?", 778).Scan(ctx))
+	s.Require().EqualValues(1, mailbox.OwnerId)
+
+	s.Require().NoError(tx.SaveHyperlaneMailbox(ctx, &storage.HLMailbox{
+		Height: 10002, Time: time.Now().UTC(), Mailbox: []byte("mailbox_owner_renounced"), InternalId: 778, OwnerRenounced: true,
+	}))
+	s.Require().NoError(tx.SaveHyperlaneTokens(ctx, &storage.HLToken{
+		Height: 10002, Time: time.Now().UTC(), TokenId: []byte("token_owner_renounced"), OwnerRenounced: true,
+		Type: types.HLTokenTypeCollateral, Sent: types.NumericZero(), Received: types.NumericZero(),
+	}))
+
+	mailbox = storage.HLMailbox{}
+	s.Require().NoError(tx.Tx().NewSelect().Model(&mailbox).Where("internal_id = ?", 778).Scan(ctx))
+	s.Require().Zero(mailbox.OwnerId)
+	s.Require().EqualValues(1, mailbox.SentMessages)
+
+	var token storage.HLToken
+	s.Require().NoError(tx.Tx().NewSelect().Model(&token).Where("token_id = ?", []byte("token_owner_renounced")).Scan(ctx))
+	s.Require().Zero(token.OwnerId)
+}
+
 func (s *TransactionTestSuite) TestRollbackUpgrade() {
 	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()

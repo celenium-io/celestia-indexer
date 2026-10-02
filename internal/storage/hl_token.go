@@ -50,6 +50,8 @@ type HLToken struct {
 	Owner   *Address   `bun:"rel:belongs-to,join:owner_id=id"`
 	Mailbox *HLMailbox `bun:"rel:belongs-to,join:mailbox_id=id"`
 	Tx      *Tx        `bun:"rel:belongs-to,join:tx_id=id"`
+
+	OwnerRenounced bool `bun:"-" comment:"Owner renounced"`
 }
 
 func (HLToken) TableName() string {

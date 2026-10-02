@@ -344,6 +344,9 @@ func parseSetIgp(ctx *context.Context, data map[string]string) error {
 			Address: igp.NewOwner,
 		},
 	}
+	if igp.RenounceOwnership || igp.NewOwner == "" {
+		newIgp.Owner = nil
+	}
 	ctx.AddIgp(igp.IgpId, &newIgp)
 
 	return nil

@@ -55,7 +55,14 @@ func processSetMailbox(ctx *context.Context, c *Cursor, msg *storage.Message) er
 				LastHeight: msg.Height,
 				Balances:   []storage.Balance{storage.EmptyBalance()},
 			},
+			OwnerRenounced: setMailbox.RenounceOwnership,
 		}
+
+		// empty new_owner without renounce keeps the owner: nil leaves owner_id untouched
+		if setMailbox.RenounceOwnership || setMailbox.NewOwner == "" {
+			mailbox.Owner = nil
+		}
+
 		if err := ctx.AddAddress(mailbox.Owner); err != nil {
 			return errors.Wrap(err, "add address")
 		}
@@ -74,6 +81,18 @@ func processSetMailbox(ctx *context.Context, c *Cursor, msg *storage.Message) er
 				return errors.Wrapf(err, "decode default hook: %s", setMailbox.DefaultHook)
 			}
 			mailbox.DefaultHook = defaultHook.Bytes()
+		}
+
+		if value, ok := msg.Data["RequiredHook"]; ok && value != nil {
+			requiredHookStr, ok := value.(string)
+			if !ok {
+				return errors.Errorf("invalid type for RequiredHook: %T", value)
+			}
+			requiredHook, err := util.DecodeHexAddress(requiredHookStr)
+			if err != nil {
+				return errors.Wrapf(err, "decode required hook: %s", requiredHookStr)
+			}
+			mailbox.RequiredHook = requiredHook.Bytes()
 		}
 
 		if len(setMailbox.NewOwner) > 0 && setMailbox.NewOwner != setMailbox.Owner {

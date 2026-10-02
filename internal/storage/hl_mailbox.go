@@ -38,6 +38,8 @@ type HLMailbox struct {
 
 	Owner *Address `bun:"rel:belongs-to,join:owner_id=id"`
 	Tx    *Tx      `bun:"rel:belongs-to,join:tx_id=id"`
+
+	OwnerRenounced bool `bun:"-" comment:"Owner renounced"`
 }
 
 func (m *HLMailbox) TableName() string {

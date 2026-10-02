@@ -4,6 +4,7 @@
 package events
 
 import (
+	"encoding/hex"
 	"testing"
 	"time"
 
@@ -155,6 +156,9 @@ func Test_handleHyperlaneRemoteTransfer(t *testing.T) {
 
 				require.NotNil(t, tt.ctx.HlTransfers[0])
 				require.NotNil(t, tt.ctx.HlTransfers[0].Address)
+				// message_id emitted by the merkle tree hook in EventInsertedIntoTree
+				require.Equal(t, "dcdb3f985ecd20c313c58c0f6b2a0d7ea980349134ee4813f6bd53cfe5bf0a1e", hex.EncodeToString(tt.ctx.HlTransfers[0].MessageId))
+				require.Equal(t, "e0f9f661f106d6da1974fdc12a904e936834b3f8", tt.ctx.HlTransfers[0].CounterpartyAddress)
 			}
 		})
 	}

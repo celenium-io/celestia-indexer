@@ -19,12 +19,8 @@ import (
 // cover yet; parseEvent stores them as EventTypeUnknown. Listed explicitly so a
 // version bump surfaces new events instead of quietly losing their type.
 var knownUnhandledEvents = map[string]struct{}{
-	"celestia.blob.v1.EventUpdateBlobParams":                                 {},
-	"celestia.minfee.v1.EventUpdateMinfeeParams":                             {},
-	"hyperlane.core.interchain_security.v1.EventAnnounceStorageLocation":     {},
-	"hyperlane.core.interchain_security.v1.EventCreateMerkleRootMultisigIsm": {},
-	"hyperlane.core.interchain_security.v1.EventCreateMessageIdMultisigIsm":  {},
-	"hyperlane.core.interchain_security.v1.EventRemoveRoutingIsmDomain":      {},
+	"celestia.blob.v1.EventUpdateBlobParams":     {},
+	"celestia.minfee.v1.EventUpdateMinfeeParams": {},
 	// Registered but never emitted: the valaddr handler emits the legacy string
 	// event set_fibre_provider_info instead, which EventType does cover.
 	"celestia.valaddr.v1.EventSetFibreProviderInfo": {},
@@ -55,7 +51,7 @@ func TestEventCoverage(t *testing.T) {
 
 	var missing, listedButKnown []string
 	for _, name := range registered {
-		_, parseErr := storageTypes.ParseEventType(name)
+		_, parseErr := storageTypes.ParseChainEventType(name)
 		_, listed := knownUnhandledEvents[name]
 		switch {
 		case parseErr != nil && !listed:

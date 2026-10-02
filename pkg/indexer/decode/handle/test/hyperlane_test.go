@@ -8,6 +8,8 @@ import (
 
 	"cosmossdk.io/math"
 	"github.com/bcp-innovations/hyperlane-cosmos/util"
+	hyperlaneICS "github.com/bcp-innovations/hyperlane-cosmos/x/core/01_interchain_security/types"
+	hyperlanePostDispatch "github.com/bcp-innovations/hyperlane-cosmos/x/core/02_post_dispatch/types"
 	hyperlaneCore "github.com/bcp-innovations/hyperlane-cosmos/x/core/types"
 	hyperlaneWarp "github.com/bcp-innovations/hyperlane-cosmos/x/warp/types"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -399,4 +401,137 @@ func TestDecodeMsg_SuccessOnMsgRemoteTransfer(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, int64(0), dm.BlobsSize)
 	require.Equal(t, msgExpected, dm.Msg)
+}
+
+func TestDecodeMsg_MsgSetIgpOwner(t *testing.T) {
+	const (
+		owner    = "celestia1j33593mn9urzydakw06jdun8f37shlucmhr8p6"
+		newOwner = "celestia1lg0e9n4pt29lpq2k4ptue4ckw09dx0aujlpe4j"
+	)
+
+	tests := []struct {
+		name      string
+		msg       *hyperlanePostDispatch.MsgSetIgpOwner
+		addresses []string
+	}{
+		{
+			name: "new owner",
+			msg: &hyperlanePostDispatch.MsgSetIgpOwner{
+				Owner:    owner,
+				IgpId:    util.CreateMockHexAddress("test", 123),
+				NewOwner: newOwner,
+			},
+			addresses: []string{owner, newOwner},
+		}, {
+			name: "renounce ownership",
+			msg: &hyperlanePostDispatch.MsgSetIgpOwner{
+				Owner:             owner,
+				IgpId:             util.CreateMockHexAddress("test", 123),
+				RenounceOwnership: true,
+			},
+			addresses: []string{owner},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			block, _ := testsuite.EmptyBlock()
+			decodeCtx := context.NewContext()
+			decodeCtx.Block = &storage.Block{
+				Height: block.Height,
+				Time:   block.Block.Time,
+			}
+
+			dm, err := decode.Message(decodeCtx, tt.msg, 0, storageTypes.StatusSuccess, 0)
+			require.NoError(t, err)
+			require.Equal(t, storageTypes.MsgSetIgpOwner, dm.Msg.Type)
+
+			require.Equal(t, len(tt.addresses), decodeCtx.Addresses.Len())
+			for _, address := range tt.addresses {
+				_, ok := decodeCtx.Addresses.Get(address)
+				require.True(t, ok, address)
+			}
+		})
+	}
+}
+
+// Data from mainnet txs 4ac88ab7…, 2b5c4ce9… and 08692113… (routing ISM 0x…01c1).
+func TestDecodeMsg_RoutingIsm(t *testing.T) {
+	const (
+		owner    = "celestia1d3ap0qjx08250ltl7cwd0eal4jtvamp3ujtmru"
+		newOwner = "celestia194ccu58pftjpqta62m0yap80gstzmug4f2jekj"
+	)
+	ismId, err := util.DecodeHexAddress("0x726f757465725f69736d000000000000000000000000000100000000000001c1")
+	require.NoError(t, err)
+	routeIsm, err := util.DecodeHexAddress("0x726f757465725f69736d000000000000000000000000000400000000000001ca")
+	require.NoError(t, err)
+
+	tests := []struct {
+		name      string
+		msg       types.Msg
+		msgType   storageTypes.MsgType
+		addresses []string
+	}{
+		{
+			name: "set domain",
+			msg: &hyperlaneICS.MsgSetRoutingIsmDomain{
+				IsmId: ismId,
+				Route: hyperlaneICS.Route{Ism: routeIsm, Domain: 714},
+				Owner: owner,
+			},
+			msgType:   storageTypes.MsgSetRoutingIsmDomain,
+			addresses: []string{owner},
+		}, {
+			name: "remove domain",
+			msg: &hyperlaneICS.MsgRemoveRoutingIsmDomain{
+				IsmId:  ismId,
+				Domain: 714,
+				Owner:  owner,
+			},
+			msgType:   storageTypes.MsgRemoveRoutingIsmDomain,
+			addresses: []string{owner},
+		}, {
+			name: "update owner",
+			msg: &hyperlaneICS.MsgUpdateRoutingIsmOwner{
+				IsmId:    ismId,
+				Owner:    owner,
+				NewOwner: newOwner,
+			},
+			msgType:   storageTypes.MsgUpdateRoutingIsmOwner,
+			addresses: []string{owner, newOwner},
+		}, {
+			name: "renounce ownership",
+			msg: &hyperlaneICS.MsgUpdateRoutingIsmOwner{
+				IsmId:             ismId,
+				Owner:             owner,
+				RenounceOwnership: true,
+			},
+			msgType:   storageTypes.MsgUpdateRoutingIsmOwner,
+			addresses: []string{owner},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			block, _ := testsuite.EmptyBlock()
+			decodeCtx := context.NewContext()
+			decodeCtx.Block = &storage.Block{
+				Height: block.Height,
+				Time:   block.Block.Time,
+			}
+
+			dm, err := decode.Message(decodeCtx, tt.msg, 0, storageTypes.StatusSuccess, 0)
+			require.NoError(t, err)
+			require.Equal(t, tt.msgType, dm.Msg.Type)
+			require.NotZero(t, dm.Msg.Size)
+			require.Equal(t, mustMsgToMap(t, tt.msg), dm.Msg.Data)
+
+			require.Equal(t, len(tt.addresses), decodeCtx.Addresses.Len())
+			require.Equal(t, len(tt.addresses), decodeCtx.AddressMessages.Len())
+			for _, address := range tt.addresses {
+				_, ok := decodeCtx.Addresses.Get(address)
+				require.True(t, ok, address)
+			}
+		})
+	}
 }

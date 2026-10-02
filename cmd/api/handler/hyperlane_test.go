@@ -116,6 +116,7 @@ var (
 		Counterparty:        1,
 		CounterpartyAddress: testsuite.RandomText(20),
 		Nonce:               12,
+		MessageId:           testsuite.RandomBytes(32),
 		Version:             1,
 		Body:                testsuite.RandomBytes(32),
 		Metadata:            testsuite.RandomBytes(32),
@@ -406,6 +407,7 @@ func (s *HyperlaneTestSuite) TestGetTransfer() {
 	s.Require().EqualValues(testTransfer.CounterpartyAddress, response.Counterparty.Hash)
 	s.Require().EqualValues(testTransfer.Version, response.Version)
 	s.Require().EqualValues(testTransfer.Nonce, response.Nonce)
+	s.Require().EqualValues(hex.EncodeToString(testTransfer.MessageId), response.MessageId)
 	s.Require().EqualValues(testTransfer.Amount.String(), response.Amount)
 	s.Require().EqualValues(hex.EncodeToString(testTransfer.Token.TokenId), response.TokenId)
 	s.Require().EqualValues(strings.ToLower(testTxHash), response.TxHash)
@@ -479,6 +481,7 @@ func (s *HyperlaneTestSuite) TestListTransferWithHash() {
 	s.Require().EqualValues(testTransfer.CounterpartyAddress, response.Counterparty.Hash)
 	s.Require().EqualValues(testTransfer.Version, response.Version)
 	s.Require().EqualValues(testTransfer.Nonce, response.Nonce)
+	s.Require().EqualValues(hex.EncodeToString(testTransfer.MessageId), response.MessageId)
 	s.Require().EqualValues(testTransfer.Amount.String(), response.Amount)
 	s.Require().EqualValues(hex.EncodeToString(testTransfer.Token.TokenId), response.TokenId)
 	s.Require().EqualValues(strings.ToLower(testTxHash), response.TxHash)
@@ -575,6 +578,7 @@ func (s *HyperlaneTestSuite) TestListTransfer() {
 	s.Require().EqualValues(testTransfer.CounterpartyAddress, response.Counterparty.Hash)
 	s.Require().EqualValues(testTransfer.Version, response.Version)
 	s.Require().EqualValues(testTransfer.Nonce, response.Nonce)
+	s.Require().EqualValues(hex.EncodeToString(testTransfer.MessageId), response.MessageId)
 	s.Require().EqualValues(testTransfer.Amount.String(), response.Amount)
 	s.Require().EqualValues(hex.EncodeToString(testTransfer.Token.TokenId), response.TokenId)
 	s.Require().EqualValues(strings.ToLower(testTxHash), response.TxHash)
@@ -634,6 +638,7 @@ func (s *HyperlaneTestSuite) TestListTransferWithoutChainStore() {
 	s.Require().EqualValues(testTransfer.CounterpartyAddress, response.Counterparty.Hash)
 	s.Require().EqualValues(testTransfer.Version, response.Version)
 	s.Require().EqualValues(testTransfer.Nonce, response.Nonce)
+	s.Require().EqualValues(hex.EncodeToString(testTransfer.MessageId), response.MessageId)
 	s.Require().EqualValues(testTransfer.Amount.String(), response.Amount)
 	s.Require().EqualValues(hex.EncodeToString(testTransfer.Token.TokenId), response.TokenId)
 	s.Require().EqualValues(strings.ToLower(testTxHash), response.TxHash)

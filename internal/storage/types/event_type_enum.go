@@ -255,6 +255,14 @@ const (
 	EventTypeIbccallbackerrorDenominationTrace EventType = "ibccallbackerror-denomination_trace"
 	// EventTypeCancelProposal is a EventType of type cancel_proposal.
 	EventTypeCancelProposal EventType = "cancel_proposal"
+	// EventTypeHyperlanecoreismv1EventRemoveRoutingIsmDomain is a EventType of type hyperlane.core.ism.v1.EventRemoveRoutingIsmDomain.
+	EventTypeHyperlanecoreismv1EventRemoveRoutingIsmDomain EventType = "hyperlane.core.ism.v1.EventRemoveRoutingIsmDomain"
+	// EventTypeHyperlanecoreismv1EventAnnounceStorageLocation is a EventType of type hyperlane.core.ism.v1.EventAnnounceStorageLocation.
+	EventTypeHyperlanecoreismv1EventAnnounceStorageLocation EventType = "hyperlane.core.ism.v1.EventAnnounceStorageLocation"
+	// EventTypeHyperlanecoreismv1EventCreateMessageIdMultisigIsm is a EventType of type hyperlane.core.ism.v1.EventCreateMessageIdMultisigIsm.
+	EventTypeHyperlanecoreismv1EventCreateMessageIdMultisigIsm EventType = "hyperlane.core.ism.v1.EventCreateMessageIdMultisigIsm"
+	// EventTypeHyperlanecoreismv1EventCreateMerkleRootMultisigIsm is a EventType of type hyperlane.core.ism.v1.EventCreateMerkleRootMultisigIsm.
+	EventTypeHyperlanecoreismv1EventCreateMerkleRootMultisigIsm EventType = "hyperlane.core.ism.v1.EventCreateMerkleRootMultisigIsm"
 )
 
 var ErrInvalidEventType = fmt.Errorf("not a valid EventType, try [%s]", strings.Join(_EventTypeNames, ", "))
@@ -379,6 +387,10 @@ var _EventTypeNames = []string{
 	string(EventTypeDenominationTrace),
 	string(EventTypeIbccallbackerrorDenominationTrace),
 	string(EventTypeCancelProposal),
+	string(EventTypeHyperlanecoreismv1EventRemoveRoutingIsmDomain),
+	string(EventTypeHyperlanecoreismv1EventAnnounceStorageLocation),
+	string(EventTypeHyperlanecoreismv1EventCreateMessageIdMultisigIsm),
+	string(EventTypeHyperlanecoreismv1EventCreateMerkleRootMultisigIsm),
 }
 
 // EventTypeNames returns a list of possible string values of EventType.
@@ -510,6 +522,10 @@ func EventTypeValues() []EventType {
 		EventTypeDenominationTrace,
 		EventTypeIbccallbackerrorDenominationTrace,
 		EventTypeCancelProposal,
+		EventTypeHyperlanecoreismv1EventRemoveRoutingIsmDomain,
+		EventTypeHyperlanecoreismv1EventAnnounceStorageLocation,
+		EventTypeHyperlanecoreismv1EventCreateMessageIdMultisigIsm,
+		EventTypeHyperlanecoreismv1EventCreateMerkleRootMultisigIsm,
 	}
 }
 
@@ -609,42 +625,46 @@ var _EventTypeValue = map[string]EventType{
 	"hyperlane.core.interchain_security.v1.EventSetRoutingIsmDomain": EventTypeHyperlanecoreinterchainSecurityv1EventSetRoutingIsmDomain,
 	"hyperlane.core.interchain_security.v1.EventSetRoutingIsm":       EventTypeHyperlanecoreinterchainSecurityv1EventSetRoutingIsm,
 	"hyperlane.core.interchain_security.v1.EventCreateRoutingIsm":    EventTypeHyperlanecoreinterchainSecurityv1EventCreateRoutingIsm,
-	"signal_version":                                        EventTypeSignalVersion,
-	"ibccallbackerror-ics27_packet":                         EventTypeIbccallbackerrorIcs27Packet,
-	"ibccallbackerror-fungible_token_packet":                EventTypeIbccallbackerrorFungibleTokenPacket,
-	"celestia.forwarding.v1.EventTokenForwarded":            EventTypeCelestiaforwardingv1EventTokenForwarded,
-	"celestia.forwarding.v1.EventForwardingComplete":        EventTypeCelestiaforwardingv1EventForwardingComplete,
-	"celestia.zkism.v1.EventCreateInterchainSecurityModule": EventTypeCelestiazkismv1EventCreateInterchainSecurityModule,
-	"celestia.zkism.v1.EventUpdateInterchainSecurityModule": EventTypeCelestiazkismv1EventUpdateInterchainSecurityModule,
-	"celestia.zkism.v1.EventSubmitMessages":                 EventTypeCelestiazkismv1EventSubmitMessages,
-	"celestia.fibre.v1.EventDepositToEscrow":                EventTypeCelestiafibrev1EventDepositToEscrow,
-	"celestia.fibre.v1.EventWithdrawFromEscrowRequest":      EventTypeCelestiafibrev1EventWithdrawFromEscrowRequest,
-	"celestia.fibre.v1.EventWithdrawFromEscrowExecuted":     EventTypeCelestiafibrev1EventWithdrawFromEscrowExecuted,
-	"celestia.fibre.v1.EventPayForFibre":                    EventTypeCelestiafibrev1EventPayForFibre,
-	"celestia.fibre.v1.EventPaymentPromiseTimeout":          EventTypeCelestiafibrev1EventPaymentPromiseTimeout,
-	"celestia.fibre.v1.EventUpdateFibreParams":              EventTypeCelestiafibrev1EventUpdateFibreParams,
-	"celestia.fibre.v1.EventProcessedPaymentPruned":         EventTypeCelestiafibrev1EventProcessedPaymentPruned,
-	"set_fibre_provider_info":                               EventTypeSetFibreProviderInfo,
-	"client_misbehaviour":                                   EventTypeClientMisbehaviour,
-	"upgrade_client":                                        EventTypeUpgradeClient,
-	"recover_client":                                        EventTypeRecoverClient,
-	"schedule_ibc_software_upgrade":                         EventTypeScheduleIbcSoftwareUpgrade,
-	"upgrade_chain":                                         EventTypeUpgradeChain,
-	"channel_close_init":                                    EventTypeChannelCloseInit,
-	"channel_close":                                         EventTypeChannelClose,
-	"channel_upgrade_init":                                  EventTypeChannelUpgradeInit,
-	"channel_upgrade_try":                                   EventTypeChannelUpgradeTry,
-	"channel_upgrade_ack":                                   EventTypeChannelUpgradeAck,
-	"channel_upgrade_confirm":                               EventTypeChannelUpgradeConfirm,
-	"channel_upgrade_open":                                  EventTypeChannelUpgradeOpen,
-	"channel_upgrade_timeout":                               EventTypeChannelUpgradeTimeout,
-	"channel_upgrade_cancelled":                             EventTypeChannelUpgradeCancelled,
-	"channel_upgrade_error":                                 EventTypeChannelUpgradeError,
-	"channel_flush_complete":                                EventTypeChannelFlushComplete,
-	"channel_closed":                                        EventTypeChannelClosed,
-	"denomination_trace":                                    EventTypeDenominationTrace,
-	"ibccallbackerror-denomination_trace":                   EventTypeIbccallbackerrorDenominationTrace,
-	"cancel_proposal":                                       EventTypeCancelProposal,
+	"signal_version":                                         EventTypeSignalVersion,
+	"ibccallbackerror-ics27_packet":                          EventTypeIbccallbackerrorIcs27Packet,
+	"ibccallbackerror-fungible_token_packet":                 EventTypeIbccallbackerrorFungibleTokenPacket,
+	"celestia.forwarding.v1.EventTokenForwarded":             EventTypeCelestiaforwardingv1EventTokenForwarded,
+	"celestia.forwarding.v1.EventForwardingComplete":         EventTypeCelestiaforwardingv1EventForwardingComplete,
+	"celestia.zkism.v1.EventCreateInterchainSecurityModule":  EventTypeCelestiazkismv1EventCreateInterchainSecurityModule,
+	"celestia.zkism.v1.EventUpdateInterchainSecurityModule":  EventTypeCelestiazkismv1EventUpdateInterchainSecurityModule,
+	"celestia.zkism.v1.EventSubmitMessages":                  EventTypeCelestiazkismv1EventSubmitMessages,
+	"celestia.fibre.v1.EventDepositToEscrow":                 EventTypeCelestiafibrev1EventDepositToEscrow,
+	"celestia.fibre.v1.EventWithdrawFromEscrowRequest":       EventTypeCelestiafibrev1EventWithdrawFromEscrowRequest,
+	"celestia.fibre.v1.EventWithdrawFromEscrowExecuted":      EventTypeCelestiafibrev1EventWithdrawFromEscrowExecuted,
+	"celestia.fibre.v1.EventPayForFibre":                     EventTypeCelestiafibrev1EventPayForFibre,
+	"celestia.fibre.v1.EventPaymentPromiseTimeout":           EventTypeCelestiafibrev1EventPaymentPromiseTimeout,
+	"celestia.fibre.v1.EventUpdateFibreParams":               EventTypeCelestiafibrev1EventUpdateFibreParams,
+	"celestia.fibre.v1.EventProcessedPaymentPruned":          EventTypeCelestiafibrev1EventProcessedPaymentPruned,
+	"set_fibre_provider_info":                                EventTypeSetFibreProviderInfo,
+	"client_misbehaviour":                                    EventTypeClientMisbehaviour,
+	"upgrade_client":                                         EventTypeUpgradeClient,
+	"recover_client":                                         EventTypeRecoverClient,
+	"schedule_ibc_software_upgrade":                          EventTypeScheduleIbcSoftwareUpgrade,
+	"upgrade_chain":                                          EventTypeUpgradeChain,
+	"channel_close_init":                                     EventTypeChannelCloseInit,
+	"channel_close":                                          EventTypeChannelClose,
+	"channel_upgrade_init":                                   EventTypeChannelUpgradeInit,
+	"channel_upgrade_try":                                    EventTypeChannelUpgradeTry,
+	"channel_upgrade_ack":                                    EventTypeChannelUpgradeAck,
+	"channel_upgrade_confirm":                                EventTypeChannelUpgradeConfirm,
+	"channel_upgrade_open":                                   EventTypeChannelUpgradeOpen,
+	"channel_upgrade_timeout":                                EventTypeChannelUpgradeTimeout,
+	"channel_upgrade_cancelled":                              EventTypeChannelUpgradeCancelled,
+	"channel_upgrade_error":                                  EventTypeChannelUpgradeError,
+	"channel_flush_complete":                                 EventTypeChannelFlushComplete,
+	"channel_closed":                                         EventTypeChannelClosed,
+	"denomination_trace":                                     EventTypeDenominationTrace,
+	"ibccallbackerror-denomination_trace":                    EventTypeIbccallbackerrorDenominationTrace,
+	"cancel_proposal":                                        EventTypeCancelProposal,
+	"hyperlane.core.ism.v1.EventRemoveRoutingIsmDomain":      EventTypeHyperlanecoreismv1EventRemoveRoutingIsmDomain,
+	"hyperlane.core.ism.v1.EventAnnounceStorageLocation":     EventTypeHyperlanecoreismv1EventAnnounceStorageLocation,
+	"hyperlane.core.ism.v1.EventCreateMessageIdMultisigIsm":  EventTypeHyperlanecoreismv1EventCreateMessageIdMultisigIsm,
+	"hyperlane.core.ism.v1.EventCreateMerkleRootMultisigIsm": EventTypeHyperlanecoreismv1EventCreateMerkleRootMultisigIsm,
 }
 
 // ParseEventType attempts to convert a string to a EventType.

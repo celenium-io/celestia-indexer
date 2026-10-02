@@ -361,6 +361,76 @@ func Test_parseSetIgp(t *testing.T) {
 	}
 }
 
+func Test_parseSetIgp_renounce(t *testing.T) {
+	const igpId = "\"0x726f757465725f706f73745f6469737061746368000000040000000000000001\""
+
+	t.Run("existing igp", func(t *testing.T) {
+		ctx := context.NewContext()
+		ctx.Block = &testBlock
+
+		err := parseSetIgp(ctx, map[string]string{
+			"igp_id":             igpId,
+			"owner":              testAddress,
+			"new_owner":          "\"\"",
+			"renounce_ownership": "true",
+		})
+		require.NoError(t, err)
+
+		require.EqualValues(t, 1, ctx.Igps.Len())
+		for _, value := range ctx.Igps.All() {
+			require.Nil(t, value.Owner)
+			require.Equal(t, testIgpId, value.IgpId)
+		}
+	})
+
+	t.Run("created in the same block", func(t *testing.T) {
+		ctx := context.NewContext()
+		ctx.Block = &testBlock
+
+		require.NoError(t, parseCreateIgp(ctx, map[string]string{
+			"denom":  "\"utia\"",
+			"igp_id": igpId,
+			"owner":  testAddress,
+		}))
+		require.NoError(t, parseSetIgp(ctx, map[string]string{
+			"igp_id":             igpId,
+			"owner":              testAddress,
+			"new_owner":          "\"\"",
+			"renounce_ownership": "true",
+		}))
+
+		require.EqualValues(t, 1, ctx.Igps.Len())
+		for _, value := range ctx.Igps.All() {
+			require.Nil(t, value.Owner)
+			require.Equal(t, "utia", value.Denom)
+		}
+	})
+}
+
+func Test_parseSetDestinationGasConfig_severalDomains(t *testing.T) {
+	ctx := context.NewContext()
+	ctx.Block = &testBlock
+
+	const igpId = "\"0x726f757465725f706f73745f6469737061746368000000040000000000000001\""
+	require.NoError(t, parseCreateIgp(ctx, map[string]string{
+		"denom":  "\"utia\"",
+		"igp_id": igpId,
+		"owner":  testAddress,
+	}))
+	for _, domain := range []string{"1", "42161", "8453"} {
+		require.NoError(t, parseSetDestinationGasConfig(ctx, map[string]string{
+			"gas_overhead":        "\"200000\"",
+			"gas_price":           "\"1\"",
+			"igp_id":              igpId,
+			"owner":               testAddress,
+			"remote_domain":       domain,
+			"token_exchange_rate": "\"10000000000\"",
+		}))
+	}
+
+	require.EqualValues(t, 3, ctx.IgpConfigs.Len())
+}
+
 func Test_parseCompleteUnbonding(t *testing.T) {
 	ctx := context.NewContext()
 	ctx.Block = &testBlock

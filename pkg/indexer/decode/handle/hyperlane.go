@@ -125,9 +125,13 @@ func MsgCreateIgp(ctx *context.Context, msgId uint64, m *hyperlanePostDispatch.M
 // MsgSetIgpOwner
 func MsgSetIgpOwner(ctx *context.Context, msgId uint64, m *hyperlanePostDispatch.MsgSetIgpOwner) (storageTypes.MsgType, error) {
 	msgType := storageTypes.MsgSetIgpOwner
-	err := createAddresses(ctx, addressesData{
+	data := addressesData{
 		{t: storageTypes.MsgAddressTypeOwner, address: m.GetOwner()},
-	}, ctx.Block.Height, msgId)
+	}
+	if m.GetNewOwner() != "" {
+		data = append(data, addressData{t: storageTypes.MsgAddressTypeOwner, address: m.GetNewOwner()})
+	}
+	err := createAddresses(ctx, data, ctx.Block.Height, msgId)
 	return msgType, err
 }
 
@@ -209,5 +213,37 @@ func MsgCreateRoutingIsm(ctx *context.Context, msgId uint64, m *hyperlaneICS.Msg
 	err := createAddresses(ctx, addressesData{
 		{t: storageTypes.MsgAddressTypeSender, address: m.GetCreator()},
 	}, ctx.Block.Height, msgId)
+	return msgType, err
+}
+
+// MsgSetRoutingIsmDomain
+func MsgSetRoutingIsmDomain(ctx *context.Context, msgId uint64, m *hyperlaneICS.MsgSetRoutingIsmDomain) (storageTypes.MsgType, error) {
+	msgType := storageTypes.MsgSetRoutingIsmDomain
+	err := createAddresses(ctx, addressesData{
+		{t: storageTypes.MsgAddressTypeOwner, address: m.GetOwner()},
+	}, ctx.Block.Height, msgId)
+	return msgType, err
+}
+
+// MsgRemoveRoutingIsmDomain
+func MsgRemoveRoutingIsmDomain(ctx *context.Context, msgId uint64, m *hyperlaneICS.MsgRemoveRoutingIsmDomain) (storageTypes.MsgType, error) {
+	msgType := storageTypes.MsgRemoveRoutingIsmDomain
+	err := createAddresses(ctx, addressesData{
+		{t: storageTypes.MsgAddressTypeOwner, address: m.GetOwner()},
+	}, ctx.Block.Height, msgId)
+	return msgType, err
+}
+
+// MsgUpdateRoutingIsmOwner
+func MsgUpdateRoutingIsmOwner(ctx *context.Context, msgId uint64, m *hyperlaneICS.MsgUpdateRoutingIsmOwner) (storageTypes.MsgType, error) {
+	msgType := storageTypes.MsgUpdateRoutingIsmOwner
+	data := addressesData{
+		{t: storageTypes.MsgAddressTypeOwner, address: m.GetOwner()},
+	}
+	// empty when ownership is renounced
+	if m.GetNewOwner() != "" {
+		data = append(data, addressData{t: storageTypes.MsgAddressTypeOwner, address: m.GetNewOwner()})
+	}
+	err := createAddresses(ctx, data, ctx.Block.Height, msgId)
 	return msgType, err
 }
