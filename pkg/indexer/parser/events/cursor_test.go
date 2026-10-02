@@ -342,3 +342,52 @@ func TestCursor_Sub_AtBoundaryIsEmpty(t *testing.T) {
 	require.True(t, ok)
 	require.Equal(t, "boundary", next.Data["label"])
 }
+
+func TestCursor_SubAuthz(t *testing.T) {
+	ev := func(data map[string]string) storage.Event { return storage.Event{Data: data} }
+	events := []storage.Event{
+		ev(map[string]string{"authz_msg_index": "0"}),
+		ev(map[string]string{"authz_msg_index": "0"}),
+		ev(map[string]string{"authz_msg_index": "2"}),
+		ev(map[string]string{"action": "/cosmos.bank.v1beta1.MsgSend"}),
+	}
+
+	c := NewCursor(events)
+	sub, err := c.SubAuthz(0)
+	require.NoError(t, err)
+	require.Len(t, sub.Remaining(), 2)
+
+	// inner message 1 has no events
+	sub, err = c.SubAuthz(1)
+	require.NoError(t, err)
+	require.Empty(t, sub.Remaining())
+
+	sub, err = c.SubAuthz(2)
+	require.NoError(t, err)
+	require.Len(t, sub.Remaining(), 1)
+
+	next, ok := c.Peek()
+	require.True(t, ok)
+	require.Equal(t, "/cosmos.bank.v1beta1.MsgSend", next.Data["action"])
+
+	_, err = NewCursor([]storage.Event{ev(map[string]string{"authz_msg_index": "x"})}).SubAuthz(0)
+	require.Error(t, err)
+
+	// EventRevoke of MsgExec itself precedes the inner message events
+	c = NewCursor([]storage.Event{
+		ev(map[string]string{"grantee": "a"}),
+		ev(map[string]string{"authz_msg_index": "0"}),
+		ev(map[string]string{"grantee": "a"}),
+		ev(map[string]string{"action": "/cosmos.bank.v1beta1.MsgSend"}),
+	})
+	sub, err = c.SubAuthz(0)
+	require.NoError(t, err)
+	require.Len(t, sub.Remaining(), 1)
+	// the skip stops at the next tx message
+	sub, err = c.SubAuthz(1)
+	require.NoError(t, err)
+	require.Empty(t, sub.Remaining())
+	next, ok = c.Peek()
+	require.True(t, ok)
+	require.Equal(t, "/cosmos.bank.v1beta1.MsgSend", next.Data["action"])
+}

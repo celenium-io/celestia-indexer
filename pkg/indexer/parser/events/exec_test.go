@@ -1451,3 +1451,423 @@ func Test_handleExec_TryUpgrade(t *testing.T) {
 	require.True(t, ok)
 	require.Equal(t, "1", next.Data["msg_index"])
 }
+
+// Inner messages have no rows of their own, so the forwarding points at the MsgExec.
+func Test_handleExec_Forward(t *testing.T) {
+	ctx := context.NewContext()
+	ctx.Block = &storage.Block{Time: time.Now(), Height: 45631}
+
+	events := []storage.Event{
+		{
+			Height: 45631,
+			Type:   "message",
+			Data: map[string]string{
+				"action":    "/cosmos.authz.v1beta1.MsgExec",
+				"module":    "authz",
+				"msg_index": "0",
+				"sender":    "celestia10vj4f36sd4nr27c9meta7elxt87t9ww9vw8euw",
+			},
+		}, {
+			Height: 45631,
+			Type:   types.EventTypeHyperlanewarpv1EventSendRemoteTransfer,
+			Data: map[string]string{ //nolint:gosec
+				"authz_msg_index":    "0",
+				"msg_index":          "0",
+				"destination_domain": "11155111",
+				"recipient":          "\"0x000000000000000000000000d5e85e86fc692cedad6d6992f1f0ccf273e39913\"",
+				"sender":             "\"celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60\"",
+				"token_id":           "\"0x726f757465725f61707000000000000000000000000000020000000000000024\"",
+			},
+		}, {
+			Height: 45631,
+			Type:   types.EventTypeCelestiaforwardingv1EventTokenForwarded,
+			Data: map[string]string{ //nolint:gosec
+				"authz_msg_index": "0",
+				"msg_index":       "0",
+				"forward_addr":    "\"celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60\"",
+				"denom":           "\"utia\"",
+				"amount":          "\"1000\"",
+				"message_id":      "\"0xac8852bd411c0c88cdadfe9b2386b2bcd702f35479c25a4b2d2cc3fb49d095d4\"",
+				"token_id":        "\"0x726f757465725f61707000000000000000000000000000020000000000000024\"",
+			},
+		}, {
+			Height: 45631,
+			Type:   "message",
+			Data: map[string]string{
+				"action":    "/cosmos.bank.v1beta1.MsgSend",
+				"msg_index": "1",
+			},
+		},
+	}
+	msg := &storage.Message{
+		Id:     10,
+		TxId:   5,
+		Type:   types.MsgExec,
+		Height: 45631,
+		Time:   ctx.Block.Time,
+		Data: map[string]any{
+			"Grantee": "celestia10vj4f36sd4nr27c9meta7elxt87t9ww9vw8euw",
+			"Msgs": []any{
+				map[string]any{"ForwardAddr": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"},
+			},
+		},
+		InternalMsgs: []string{"/celestia.forwarding.v1.MsgForward"},
+	}
+
+	c := NewCursor(events)
+	require.NoError(t, handleExec(ctx, c, msg))
+
+	require.Len(t, ctx.Forwardings, 1)
+	fwd := ctx.Forwardings[0]
+	require.EqualValues(t, 5, fwd.TxId)
+	require.EqualValues(t, 10, fwd.MsgId)
+	require.EqualValues(t, 11155111, fwd.DestDomain)
+	require.Equal(t, "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", fwd.Address.Address)
+
+	// the event of the next message is left for its handler
+	next, ok := c.Peek()
+	require.True(t, ok)
+	require.Equal(t, "1", next.Data["msg_index"])
+}
+
+func forwardExecEvents(authzIdx, domain, addr, amount string) []storage.Event {
+	return []storage.Event{
+		{
+			Height: 45631,
+			Type:   types.EventTypeHyperlanewarpv1EventSendRemoteTransfer,
+			Data: map[string]string{ //nolint:gosec
+				"authz_msg_index":    authzIdx,
+				"msg_index":          "0",
+				"destination_domain": domain,
+				"recipient":          "\"0x000000000000000000000000d5e85e86fc692cedad6d6992f1f0ccf273e39913\"",
+				"sender":             "\"" + addr + "\"",
+				"token_id":           "\"0x726f757465725f61707000000000000000000000000000020000000000000024\"",
+			},
+		}, {
+			Height: 45631,
+			Type:   types.EventTypeCelestiaforwardingv1EventTokenForwarded,
+			Data: map[string]string{ //nolint:gosec
+				"authz_msg_index": authzIdx,
+				"msg_index":       "0",
+				"forward_addr":    "\"" + addr + "\"",
+				"denom":           "\"utia\"",
+				"amount":          "\"" + amount + "\"",
+				"message_id":      "\"0xac8852bd411c0c88cdadfe9b2386b2bcd702f35479c25a4b2d2cc3fb49d095d4\"",
+				"token_id":        "\"0x726f757465725f61707000000000000000000000000000020000000000000024\"",
+			},
+		},
+	}
+}
+
+func Test_handleExec_ForwardBoundary(t *testing.T) {
+	execEvent := storage.Event{
+		Height: 45631,
+		Type:   "message",
+		Data: map[string]string{
+			"action":    "/cosmos.authz.v1beta1.MsgExec",
+			"msg_index": "0",
+		},
+	}
+	newMsg := func(t time.Time, inner ...string) *storage.Message {
+		msgs := make([]any, len(inner))
+		for i := range msgs {
+			msgs[i] = map[string]any{}
+		}
+		return &storage.Message{
+			Id:           10,
+			TxId:         5,
+			Type:         types.MsgExec,
+			Height:       45631,
+			Time:         t,
+			Data:         map[string]any{"Msgs": msgs},
+			InternalMsgs: inner,
+		}
+	}
+
+	t.Run("two forwards", func(t *testing.T) {
+		ctx := context.NewContext()
+		ctx.Block = &storage.Block{Time: time.Now(), Height: 45631}
+
+		events := make([]storage.Event, 0, 5)
+		events = append(events, execEvent)
+		events = append(events, forwardExecEvents("0", "1", "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", "100")...)
+		events = append(events, forwardExecEvents("1", "2", "celestia10vj4f36sd4nr27c9meta7elxt87t9ww9vw8euw", "200")...)
+
+		msg := newMsg(ctx.Block.Time, "/celestia.forwarding.v1.MsgForward", "/celestia.forwarding.v1.MsgForward")
+		c := NewCursor(events)
+		require.NoError(t, handleExec(ctx, c, msg))
+
+		require.Len(t, ctx.Forwardings, 2)
+		require.EqualValues(t, 1, ctx.Forwardings[0].DestDomain)
+		require.Equal(t, "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", ctx.Forwardings[0].Address.Address)
+		require.Equal(t, "100", ctx.Forwardings[0].Amount.String())
+		require.EqualValues(t, 2, ctx.Forwardings[1].DestDomain)
+		require.Equal(t, "celestia10vj4f36sd4nr27c9meta7elxt87t9ww9vw8euw", ctx.Forwardings[1].Address.Address)
+		require.Equal(t, "200", ctx.Forwardings[1].Amount.String())
+
+		_, ok := c.Peek()
+		require.False(t, ok)
+	})
+
+	t.Run("forward then delegate", func(t *testing.T) {
+		ctx := context.NewContext()
+		ctx.Block = &storage.Block{Time: time.Now(), Height: 45631}
+
+		events := make([]storage.Event, 0, 5)
+		events = append(events, execEvent)
+		events = append(events, forwardExecEvents("0", "1", "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", "100")...)
+		events = append(events, storage.Event{
+			Height: 45631,
+			Type:   "delegate",
+			Data: map[string]string{
+				"amount":          "101774utia",
+				"authz_msg_index": "1",
+				"new_shares":      "101774.000000000000000000",
+				"validator":       "celestiavaloper1j2jq259d3rrc24876gwxg0ksp0lhd8gy49k6st",
+			},
+		}, storage.Event{
+			Height: 45631,
+			Type:   "message",
+			Data: map[string]string{
+				"authz_msg_index": "1",
+				"module":          "staking",
+				"sender":          "celestia1xu5fsc3jgcfwmr3a7uefcfs4r0u42q4c64grjp",
+			},
+		})
+
+		msg := newMsg(ctx.Block.Time, "/celestia.forwarding.v1.MsgForward", "/cosmos.staking.v1beta1.MsgDelegate")
+		c := NewCursor(events)
+		require.NoError(t, handleExec(ctx, c, msg))
+
+		require.Len(t, ctx.Forwardings, 1)
+		require.Equal(t, 1, ctx.Delegations.Len())
+	})
+}
+
+func Test_handleExec_InnerBoundary(t *testing.T) {
+	const (
+		valA = "celestiavaloper15urq2dtp9qce4fyc85m6upwm9xul3049gwdz0x"
+		valB = "celestiavaloper1gl0rg3g0pkcpr8umj2hvlhha06ecjd65yt96z5"
+	)
+	execEvent := storage.Event{
+		Height: 45631,
+		Type:   "message",
+		Data: map[string]string{
+			"action":    "/cosmos.authz.v1beta1.MsgExec",
+			"msg_index": "0",
+		},
+	}
+	nextTxMsg := storage.Event{
+		Height: 45631,
+		Type:   "message",
+		Data: map[string]string{
+			"action":    "/cosmos.bank.v1beta1.MsgSend",
+			"module":    "bank",
+			"msg_index": "1",
+		},
+	}
+	newExec := func(ts time.Time, inner []string, data []any) *storage.Message {
+		return &storage.Message{
+			Id:           10,
+			TxId:         5,
+			Type:         types.MsgExec,
+			Height:       45631,
+			Time:         ts,
+			Data:         map[string]any{"Msgs": data},
+			InternalMsgs: inner,
+		}
+	}
+	newCtx := func() *context.Context {
+		ctx := context.NewContext()
+		ctx.Block = &storage.Block{Time: time.Now(), Height: 45631}
+		return ctx
+	}
+
+	// the first commission has no amount, so the old scan took the second validator's withdrawal
+	t.Run("commission does not take next message withdrawal", func(t *testing.T) {
+		ctx := newCtx()
+		events := []storage.Event{
+			execEvent,
+			{
+				Height: 45631,
+				Type:   "withdraw_commission",
+				Data: map[string]string{
+					"amount":          "",
+					"authz_msg_index": "0",
+					"msg_index":       "0",
+				},
+			}, {
+				Height: 45631,
+				Type:   "withdraw_commission",
+				Data: map[string]string{
+					"amount":          "100utia",
+					"authz_msg_index": "1",
+					"msg_index":       "0",
+				},
+			},
+			nextTxMsg,
+		}
+		msg := newExec(ctx.Block.Time,
+			[]string{msgWithdrawValidatorCommission, msgWithdrawValidatorCommission},
+			[]any{
+				map[string]any{"ValidatorAddress": valA},
+				map[string]any{"ValidatorAddress": valB},
+			},
+		)
+		c := NewCursor(events)
+		require.NoError(t, handleExec(ctx, c, msg))
+
+		require.Equal(t, 1, ctx.Validators.Len())
+		_, ok := ctx.Validators.Get(valA)
+		require.False(t, ok)
+		val, ok := ctx.Validators.Get(valB)
+		require.True(t, ok)
+		require.Equal(t, "-100", val.Commissions.String())
+
+		next, ok := c.Peek()
+		require.True(t, ok)
+		require.Equal(t, "1", next.Data["msg_index"])
+	})
+
+	// since SDK 0.50 an unjail inside MsgExec emits no events
+	t.Run("unjail without events", func(t *testing.T) {
+		ctx := newCtx()
+		events := []storage.Event{execEvent, nextTxMsg}
+		msg := newExec(ctx.Block.Time,
+			[]string{"/cosmos.slashing.v1beta1.MsgUnjail"},
+			[]any{map[string]any{"ValidatorAddr": valA}},
+		)
+		c := NewCursor(events)
+		require.NoError(t, handleExec(ctx, c, msg))
+
+		val, ok := ctx.Validators.Get(valA)
+		require.True(t, ok)
+		require.NotNil(t, val.Jailed)
+		require.False(t, *val.Jailed)
+
+		next, ok := c.Peek()
+		require.True(t, ok)
+		require.Equal(t, "1", next.Data["msg_index"])
+	})
+
+	t.Run("unjail between delegations", func(t *testing.T) {
+		ctx := newCtx()
+		delegate := func(idx, amount, validator string) storage.Event {
+			return storage.Event{
+				Height: 45631,
+				Type:   "delegate",
+				Data: map[string]string{
+					"amount":          amount + "utia",
+					"authz_msg_index": idx,
+					"msg_index":       "0",
+					"delegator":       "celestia1xu5fsc3jgcfwmr3a7uefcfs4r0u42q4c64grjp",
+					"new_shares":      amount + ".000000000000000000",
+					"validator":       validator,
+				},
+			}
+		}
+		events := []storage.Event{execEvent, delegate("0", "100", valA), delegate("2", "200", valB), nextTxMsg}
+		msg := newExec(ctx.Block.Time,
+			[]string{
+				"/cosmos.staking.v1beta1.MsgDelegate",
+				"/cosmos.slashing.v1beta1.MsgUnjail",
+				"/cosmos.staking.v1beta1.MsgDelegate",
+			},
+			[]any{
+				map[string]any{},
+				map[string]any{"ValidatorAddr": valA},
+				map[string]any{},
+			},
+		)
+		c := NewCursor(events)
+		require.NoError(t, handleExec(ctx, c, msg))
+
+		require.Equal(t, 2, ctx.Delegations.Len())
+		val, ok := ctx.Validators.Get(valA)
+		require.True(t, ok)
+		require.False(t, *val.Jailed)
+
+		next, ok := c.Peek()
+		require.True(t, ok)
+		require.Equal(t, "1", next.Data["msg_index"])
+	})
+
+	// a used-up grant emits EventRevoke without authz_msg_index before the inner message events
+	t.Run("revoke before inner message", func(t *testing.T) {
+		ctx := newCtx()
+		delegate := func(idx, validator string) storage.Event {
+			return storage.Event{
+				Height: 45631,
+				Type:   "delegate",
+				Data: map[string]string{
+					"amount":          "100utia",
+					"authz_msg_index": idx,
+					"msg_index":       "0",
+					"delegator":       "celestia1xu5fsc3jgcfwmr3a7uefcfs4r0u42q4c64grjp",
+					"new_shares":      "100.000000000000000000",
+					"validator":       validator,
+				},
+			}
+		}
+		revoke := storage.Event{
+			Height: 45631,
+			Type:   types.EventTypeCosmosauthzv1beta1EventRevoke,
+			Data: map[string]string{
+				"granter":      "\"celestia1xu5fsc3jgcfwmr3a7uefcfs4r0u42q4c64grjp\"",
+				"grantee":      "\"celestia10vj4f36sd4nr27c9meta7elxt87t9ww9vw8euw\"",
+				"msg_type_url": "\"/cosmos.staking.v1beta1.MsgDelegate\"",
+				"msg_index":    "0",
+			},
+		}
+		events := []storage.Event{execEvent, delegate("0", valA), revoke, delegate("1", valB), nextTxMsg}
+		msg := newExec(ctx.Block.Time,
+			[]string{"/cosmos.staking.v1beta1.MsgDelegate", "/cosmos.staking.v1beta1.MsgDelegate"},
+			[]any{map[string]any{}, map[string]any{}},
+		)
+		c := NewCursor(events)
+		require.NoError(t, handleExec(ctx, c, msg))
+		require.Equal(t, 2, ctx.Delegations.Len())
+
+		next, ok := c.Peek()
+		require.True(t, ok)
+		require.Equal(t, "1", next.Data["msg_index"])
+	})
+
+	t.Run("handler leaves its own trailing events", func(t *testing.T) {
+		ctx := newCtx()
+		events := []storage.Event{
+			execEvent,
+			{
+				Height: 45631,
+				Type:   "proposal_vote",
+				Data: map[string]string{
+					"authz_msg_index": "0",
+					"msg_index":       "0",
+					"option":          `[{"option":1,"weight":"1.000000000000000000"}]`,
+					"proposal_id":     "3",
+					"voter":           "celestia1xu5fsc3jgcfwmr3a7uefcfs4r0u42q4c64grjp",
+				},
+			}, {
+				Height: 45631,
+				Type:   "coin_received",
+				Data: map[string]string{
+					"amount":          "1utia",
+					"authz_msg_index": "0",
+					"msg_index":       "0",
+				},
+			},
+			nextTxMsg,
+		}
+		msg := newExec(ctx.Block.Time,
+			[]string{"/cosmos.gov.v1.MsgVote"},
+			[]any{map[string]any{}},
+		)
+		c := NewCursor(events)
+		require.NoError(t, handleExec(ctx, c, msg))
+		require.Equal(t, 1, ctx.Votes.Len())
+
+		next, ok := c.Peek()
+		require.True(t, ok)
+		require.Equal(t, "1", next.Data["msg_index"])
+	})
+}

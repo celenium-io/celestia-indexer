@@ -94,6 +94,32 @@ func (c *Cursor) Sub(stopKey string) *Cursor {
 	return NewCursor(c.events[start:c.pos])
 }
 
+// SubAuthz returns a cursor over the following events of the MsgExec inner
+// message idx (authz_msg_index == idx) and advances c past them. Leading events
+// of MsgExec itself (no index, e.g. EventRevoke of a used-up grant) are skipped.
+func (c *Cursor) SubAuthz(idx int) (*Cursor, error) {
+	for c.pos < len(c.events) {
+		data := c.events[c.pos].Data
+		if _, ok := data["authz_msg_index"]; ok || decoder.StringFromMap(data, "action") != "" {
+			break
+		}
+		c.pos++
+	}
+
+	start := c.pos
+	for c.pos < len(c.events) {
+		authzIdx, err := decoder.AuthMsgIndexFromMap(c.events[c.pos].Data)
+		if err != nil {
+			return nil, err
+		}
+		if authzIdx == nil || *authzIdx != int64(idx) {
+			break
+		}
+		c.pos++
+	}
+	return NewCursor(c.events[start:c.pos]), nil
+}
+
 // Skip advances the cursor by n events without inspecting or reporting
 // them, for handlers that unconditionally jump a fixed number of events.
 // n must be non-negative. If fewer than n events remain, the cursor is

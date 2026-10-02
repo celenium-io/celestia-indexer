@@ -75,3 +75,21 @@ func processUnjail(ctx *context.Context, c *Cursor, _ *storage.Message) error {
 
 	return nil
 }
+
+// processExecUnjail reads the validator from the message: since SDK 0.50 an unjail inside MsgExec emits no events.
+func processExecUnjail(ctx *context.Context, msg *storage.Message) error {
+	address, err := msg.Data.GetString("ValidatorAddr")
+	if err != nil {
+		return errors.Wrap(err, "get unjail validator in exec")
+	}
+	if _, _, err := pkgTypes.Address(address).Decode(); err != nil {
+		return errors.Wrap(err, "parsing validator address")
+	}
+
+	jailed := false
+	v := storage.EmptyValidator()
+	v.Address = address
+	v.Jailed = &jailed
+	ctx.AddValidator(v)
+	return nil
+}

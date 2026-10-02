@@ -312,6 +312,7 @@ func (s *ForwardingTestSuite) TestGet() {
 				Amount:       "12345",
 				Denom:        "utia",
 				Counterparty: 123456789,
+				Type:         "hyperlane",
 			}, {
 				Height: 101,
 				Time:   testTime.Add(time.Minute),
@@ -319,6 +320,17 @@ func (s *ForwardingTestSuite) TestGet() {
 				From:   testAddress,
 				Amount: "54321",
 				Denom:  "utia",
+				Type:   "send",
+			}, {
+				Height:    102,
+				Time:      testTime.Add(2 * time.Minute),
+				TxHash:    testTx.Hash,
+				From:      "osmo1m8wg4vxkefhs374qxmmqpyusgz289wmulex5qdwpfx7jnrxzer5s9cv83q",
+				Amount:    "777",
+				Denom:     "utia",
+				Type:      "ibc",
+				ChainId:   "osmosis-1",
+				ChannelId: "channel-1",
 			},
 		}, nil).
 		Times(1)
@@ -341,7 +353,7 @@ func (s *ForwardingTestSuite) TestGet() {
 	s.Require().Equal("1000000", response.Amount)
 	s.Require().Equal("hyperlane/0x726f757465725f61707000000000000000000000000000020000000000000024", response.Denom)
 	s.Require().Equal("ac8852bd411c0c88cdadfe9b2386b2bcd702f35479c25a4b2d2cc3fb49d095d4", response.MessageId)
-	s.Require().Len(response.Inputs, 2)
+	s.Require().Len(response.Inputs, 3)
 
 	input1 := response.Inputs[0]
 	s.Require().EqualValues(100, input1.Height)
@@ -352,6 +364,7 @@ func (s *ForwardingTestSuite) TestGet() {
 	s.Require().Equal("utia", input1.Denom)
 	s.Require().NotNil(input1.Chain)
 	s.Require().Equal(testChainMetadata.DisplayName, input1.Chain.Name)
+	s.Require().Equal("hyperlane", input1.Type)
 
 	input2 := response.Inputs[1]
 	s.Require().EqualValues(101, input2.Height)
@@ -360,7 +373,17 @@ func (s *ForwardingTestSuite) TestGet() {
 	s.Require().Equal(testAddress, input2.From)
 	s.Require().Equal("54321", input2.Amount)
 	s.Require().Equal("utia", input2.Denom)
+	s.Require().Equal("send", input2.Type)
 	s.Require().Nil(input2.Chain)
+	s.Require().Empty(input2.ChainId)
+
+	input3 := response.Inputs[2]
+	s.Require().Equal("ibc", input3.Type)
+	s.Require().Equal("osmo1m8wg4vxkefhs374qxmmqpyusgz289wmulex5qdwpfx7jnrxzer5s9cv83q", input3.From)
+	s.Require().Equal("777", input3.Amount)
+	s.Require().Equal("osmosis-1", input3.ChainId)
+	s.Require().Equal("channel-1", input3.ChannelId)
+	s.Require().Nil(input3.Chain)
 }
 
 func (s *ForwardingTestSuite) TestGetValidationError() {

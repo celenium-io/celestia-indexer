@@ -36,82 +36,91 @@ func processHyperlaneRemoteTransfer(ctx *context.Context, c *Cursor, msg *storag
 	}
 
 	for event := range c.MsgEvents("action") {
-		switch event.Type {
-		case types.EventTypeHyperlanecorev1EventDispatch:
-			dispatchEvent, err := decode.NewHyperlaneDispatchEvent(event.Data)
-			if err != nil {
-				return errors.Wrap(err, "parse hyperlane dispatch event")
-			}
-
-			originMailboxId, err := util.DecodeHexAddress(dispatchEvent.OriginMailboxId)
-			if err != nil {
-				return errors.Wrap(err, "decode mailbox id")
-			}
-
-			if dispatchEvent.Message == nil {
-				return errors.New("empty message in hyperlane dispatch event")
-			}
-
-			transfer.Counterparty = dispatchEvent.Destination
-			transfer.MessageId = dispatchEvent.Message.Id().Bytes()
-			transfer.Version = dispatchEvent.Message.Version
-			transfer.Nonce = dispatchEvent.Message.Nonce
-			transfer.Body = dispatchEvent.Message.Body
-			transfer.Type = types.HLTransferTypeSend
-
-			transfer.Mailbox = &storage.HLMailbox{
-				Mailbox:      originMailboxId.Bytes(),
-				InternalId:   originMailboxId.GetInternalId(),
-				SentMessages: 1,
-			}
-
+		if err := fillHyperlaneSendTransfer(ctx, event, transfer); err != nil {
+			return err
+		}
+		if event.Type == types.EventTypeHyperlanecorev1EventDispatch {
 			ctx.AddHlTransfer(transfer)
-		case types.EventTypeHyperlanewarpv1EventSendRemoteTransfer:
-			sendEvent, err := decode.NewHyperlaneSendTransferEvent(event.Data)
-			if err != nil {
-				return errors.Wrap(err, "parse hyperlane send transfer event")
-			}
-
-			if err := makeHyperlaneTransferAddress(ctx, sendEvent.Sender, transfer, msg.Height); err != nil {
-				return errors.Wrap(err, "makeHyperlaneTransferAddress")
-			}
-			if err := makeHyperlaneTransferAddress(ctx, sendEvent.Recipient, transfer, msg.Height); err != nil {
-				return errors.Wrap(err, "makeHyperlaneTransferAddress")
-			}
-
-			transfer.Denom = sendEvent.Denom
-			transfer.Amount = sendEvent.Amount
-			tokenId, err := util.DecodeHexAddress(sendEvent.TokenId)
-			if err != nil {
-				return errors.Wrap(err, "decode token id")
-			}
-			transfer.Token = &storage.HLToken{
-				TokenId:       tokenId.Bytes(),
-				SentTransfers: 1,
-				Sent:          sendEvent.Amount,
-				Type:          types.HLTokenTypeCollateral,
-			}
-		case types.EventTypeHyperlanecorepostDispatchv1EventGasPayment:
-			gasEvent, err := decode.NewHyperlaneGasPaymentEvent(event.Data)
-			if err != nil {
-				return errors.Wrap(err, "parse hyperlane gas payment event")
-			}
-
-			igpId, err := util.DecodeHexAddress(gasEvent.IgpId)
-			if err != nil {
-				return errors.Wrap(err, "decode igp id")
-			}
-			transfer.GasPayment = &storage.HLGasPayment{
-				Height:    ctx.Block.Height,
-				Time:      ctx.Block.Time,
-				Amount:    gasEvent.Amount,
-				GasAmount: gasEvent.GasAmount,
-				Igp: &storage.HLIGP{
-					IgpId: igpId.Bytes(),
-				},
-			}
 		}
 	}
 
+	return nil
+}
+
+// fillHyperlaneSendTransfer fills an outgoing transfer from the events of a warp send; other events are ignored.
+func fillHyperlaneSendTransfer(ctx *context.Context, event storage.Event, transfer *storage.HLTransfer) error {
+	switch event.Type {
+	case types.EventTypeHyperlanecorev1EventDispatch:
+		dispatchEvent, err := decode.NewHyperlaneDispatchEvent(event.Data)
+		if err != nil {
+			return errors.Wrap(err, "parse hyperlane dispatch event")
+		}
+
+		originMailboxId, err := util.DecodeHexAddress(dispatchEvent.OriginMailboxId)
+		if err != nil {
+			return errors.Wrap(err, "decode mailbox id")
+		}
+
+		if dispatchEvent.Message == nil {
+			return errors.New("empty message in hyperlane dispatch event")
+		}
+
+		transfer.Counterparty = dispatchEvent.Destination
+		transfer.MessageId = dispatchEvent.Message.Id().Bytes()
+		transfer.Version = dispatchEvent.Message.Version
+		transfer.Nonce = dispatchEvent.Message.Nonce
+		transfer.Body = dispatchEvent.Message.Body
+		transfer.Type = types.HLTransferTypeSend
+
+		transfer.Mailbox = &storage.HLMailbox{
+			Mailbox:      originMailboxId.Bytes(),
+			InternalId:   originMailboxId.GetInternalId(),
+			SentMessages: 1,
+		}
+	case types.EventTypeHyperlanewarpv1EventSendRemoteTransfer:
+		sendEvent, err := decode.NewHyperlaneSendTransferEvent(event.Data)
+		if err != nil {
+			return errors.Wrap(err, "parse hyperlane send transfer event")
+		}
+
+		if err := makeHyperlaneTransferAddress(ctx, sendEvent.Sender, transfer, transfer.Height); err != nil {
+			return errors.Wrap(err, "makeHyperlaneTransferAddress")
+		}
+		if err := makeHyperlaneTransferAddress(ctx, sendEvent.Recipient, transfer, transfer.Height); err != nil {
+			return errors.Wrap(err, "makeHyperlaneTransferAddress")
+		}
+
+		transfer.Denom = sendEvent.Denom
+		transfer.Amount = sendEvent.Amount
+		tokenId, err := util.DecodeHexAddress(sendEvent.TokenId)
+		if err != nil {
+			return errors.Wrap(err, "decode token id")
+		}
+		transfer.Token = &storage.HLToken{
+			TokenId:       tokenId.Bytes(),
+			SentTransfers: 1,
+			Sent:          sendEvent.Amount,
+			Type:          types.HLTokenTypeCollateral,
+		}
+	case types.EventTypeHyperlanecorepostDispatchv1EventGasPayment:
+		gasEvent, err := decode.NewHyperlaneGasPaymentEvent(event.Data)
+		if err != nil {
+			return errors.Wrap(err, "parse hyperlane gas payment event")
+		}
+
+		igpId, err := util.DecodeHexAddress(gasEvent.IgpId)
+		if err != nil {
+			return errors.Wrap(err, "decode igp id")
+		}
+		transfer.GasPayment = &storage.HLGasPayment{
+			Height:    transfer.Height,
+			Time:      transfer.Time,
+			Amount:    gasEvent.Amount,
+			GasAmount: gasEvent.GasAmount,
+			Igp: &storage.HLIGP{
+				IgpId: igpId.Bytes(),
+			},
+		}
+	}
 	return nil
 }

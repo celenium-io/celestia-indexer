@@ -32,6 +32,7 @@ func (tx Transaction) SaveAddresses(ctx context.Context, addresses ...*models.Ad
 		Column("address", "height", "last_height", "hash", "name", "is_forwarding").
 		On("CONFLICT ON CONSTRAINT address_idx DO UPDATE").
 		Set("last_height = EXCLUDED.last_height").
+		Set("is_forwarding = ?TableAlias.is_forwarding OR EXCLUDED.is_forwarding").
 		Returning("xmax, id").
 		Exec(ctx)
 	if err != nil {

@@ -3,6 +3,7 @@
   time: '2024-07-04T03:00:00+00:00'
   address_id: 5
   tx_id: 5
+  msg_id: 3
   dest_domain: 11155111
   dest_recipient: '\x000000000000000000000000d5e85e86fc692cedad6d6992f1f0ccf273e39913'
   token_id: 1
@@ -14,6 +15,7 @@
   time: '2024-07-04T03:00:00+00:00'
   address_id: 5
   tx_id: 5
+  msg_id: 3
   dest_domain: 11155111
   dest_recipient: '\x000000000000000000000000d5e85e86fc692cedad6d6992f1f0ccf273e39913'
   token_id: 1
@@ -25,9 +27,34 @@
   time: '2024-07-04T03:07:00+00:00'
   address_id: 5
   tx_id: 5
+  msg_id: 3
   dest_domain: 11155111
   dest_recipient: '\x000000000000000000000000d5e85e86fc692cedad6d6992f1f0ccf273e39913'
   token_id: 1
   message_id: 'cc3fb49d095d4ac8852bd411c0c88cdadfe9b2386b2bcd702f35479c25a4b2d2'
   amount: 750000
+  denom: 'hyperlane/0x726f757465725f61707000000000000000000000000000020000000000000024'
+- id: 4
+  height: 10002
+  time: '2024-07-04T03:10:00+00:00'
+  address_id: 2
+  tx_id: 5
+  msg_id: 3
+  dest_domain: 11155111
+  dest_recipient: '\x000000000000000000000000d5e85e86fc692cedad6d6992f1f0ccf273e39913'
+  token_id: 1
+  message_id: 'd095d4ac8852bd411c0c88cdadfe9b2386b2bcd702f35479c25a4b2d2cc3fb49'
+  amount: 200000
+  denom: 'hyperlane/0x726f757465725f61707000000000000000000000000000020000000000000024'
+- id: 5
+  height: 10003
+  time: '2024-07-04T03:20:00+00:00'
+  address_id: 5
+  tx_id: 5
+  msg_id: 3
+  dest_domain: 11155111
+  dest_recipient: '\x000000000000000000000000d5e85e86fc692cedad6d6992f1f0ccf273e39913'
+  token_id: 1
+  message_id: '2b2d2cc3fb49d095d4ac8852bd411c0c88cdadfe9b2386b2bcd702f35479c25a'
+  amount: 300000
   denom: 'hyperlane/0x726f757465725f61707000000000000000000000000000020000000000000024'

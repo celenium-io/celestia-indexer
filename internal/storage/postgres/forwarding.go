@@ -31,6 +31,7 @@ func (f *Forwarding) ById(ctx context.Context, id uint64) (forwarding storage.Fo
 	subQuery := f.DB().NewSelect().
 		Model(&forwarding).
 		Where("id <= ?", id).
+		Where("address_id = (SELECT address_id FROM forwarding WHERE id = ?)", id).
 		Order("id desc", "time desc").
 		Limit(2)
 
@@ -122,21 +123,32 @@ func (f *Forwarding) Inputs(ctx context.Context, addressId uint64, from, to time
 		Where("address_id = ?", addressId).
 		Where("type = ?", types.HLTransferTypeReceive)
 	if !from.IsZero() {
-		transfersQuery = transfersQuery.Where("time >= ?", from)
+		transfersQuery = transfersQuery.Where("time > ?", from)
 	}
 	if !to.IsZero() {
 		transfersQuery = transfersQuery.Where("time <= ?", to)
 	}
 
+	ibcQuery := f.DB().NewSelect().
+		Model((*storage.IbcTransfer)(nil)).
+		Where("receiver_id = ?", addressId)
+	if !from.IsZero() {
+		ibcQuery = ibcQuery.Where("time > ?", from)
+	}
+	if !to.IsZero() {
+		ibcQuery = ibcQuery.Where("time <= ?", to)
+	}
+
 	subQuery := f.DB().NewSelect().
 		Table("address_messages").
-		ColumnExpr("message.height as height, message.time as time, tx.hash as hash, 'utia' as denom, '0' as amount, NULL as src, NULL as counterparty, message.data as data").
+		ColumnExpr("message.height as height, message.time as time, tx.hash as hash, 'utia' as denom, '0' as amount, NULL as src, NULL as counterparty, message.data as data, 'send' as type, NULL as chain_id, NULL as channel_id").
 		Join("left join message on message.id = msg_id").
 		Join("left join tx on tx.id = message.tx_id").
-		Where("message.type = ?", types.MsgSend)
+		Where("message.type = ?", types.MsgSend).
+		Where("tx.status = ?", types.StatusSuccess)
 
 	if !from.IsZero() {
-		subQuery = subQuery.Where("message.time >= ?", from)
+		subQuery = subQuery.Where("message.time > ?", from)
 	}
 	if !to.IsZero() {
 		subQuery = subQuery.Where("message.time <= ?", to)
@@ -145,13 +157,23 @@ func (f *Forwarding) Inputs(ctx context.Context, addressId uint64, from, to time
 	subQuery = subQuery.UnionAll(
 		f.DB().NewSelect().
 			Table("address_transfers").
-			ColumnExpr("tx.height, tx.time, tx.hash as hash, denom, amount, counterparty_address as src, counterparty, NULL as data").
+			ColumnExpr("tx.height, tx.time, tx.hash as hash, denom, amount, counterparty_address as src, counterparty, NULL as data, 'hyperlane' as type, NULL as chain_id, NULL as channel_id").
 			Join("left join tx on tx.id = address_transfers.tx_id"),
+	).UnionAll(
+		f.DB().NewSelect().
+			ColumnExpr("t.height, t.time, tx.hash as hash, t.denom, t.amount, coalesce(t.sender_address, sender.address) as src, NULL as counterparty, NULL as data, 'ibc' as type, ibc_client.chain_id as chain_id, t.channel_id as channel_id").
+			TableExpr("address_ibc_transfers as t").
+			Join("left join tx on tx.id = t.tx_id").
+			Join("left join address as sender on sender.id = t.sender_id").
+			Join("left join ibc_connection on ibc_connection.connection_id = t.connection_id").
+			Join("left join ibc_client on ibc_client.id = ibc_connection.client_id").
+			Where("tx.status = ?", types.StatusSuccess),
 	)
 
 	query := f.DB().NewSelect().
 		With("address_messages", messagesQuery).
 		With("address_transfers", transfersQuery).
+		With("address_ibc_transfers", ibcQuery).
 		TableExpr("(?) as inputs", subQuery).
 		Order("time desc")
 

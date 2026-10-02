@@ -540,6 +540,9 @@ func (ctx *Context) RemoveIbcTransfer(msgId uint64) {
 }
 
 func (ctx *Context) AddForwarding(fwd *storage.Forwarding) {
+	if fwd == nil || fwd.Token == nil {
+		return
+	}
 	ctx.Forwardings = append(ctx.Forwardings, fwd)
 }
 
