@@ -33,6 +33,12 @@ func processExec(ctx *context.Context, c *Cursor, msg *storage.Message) error {
 			return err
 		}
 
+		// handlers read only the events of inner message i and can't overrun into the next ones
+		sub, err := c.SubAuthz(i)
+		if err != nil {
+			return err
+		}
+
 		// inner messages have no rows of their own: entities point at the MsgExec
 		internalMessage := &storage.Message{
 			Id:     msg.Id,
@@ -44,70 +50,48 @@ func processExec(ctx *context.Context, c *Cursor, msg *storage.Message) error {
 
 		switch msg.InternalMsgs[i] {
 		case "/cosmos.staking.v1beta1.MsgCancelUnbondingDelegation":
-			if err := processCancelUnbonding(ctx, c, internalMessage); err != nil {
+			if err := processCancelUnbonding(ctx, sub, internalMessage); err != nil {
 				return err
 			}
 		case "/cosmos.staking.v1beta1.MsgDelegate":
-			if err := processDelegate(ctx, c, internalMessage); err != nil {
+			if err := processDelegate(ctx, sub, internalMessage); err != nil {
 				return err
 			}
 		case "/cosmos.staking.v1beta1.MsgBeginRedelegate":
-			if err := processRedelegate(ctx, c, internalMessage); err != nil {
+			if err := processRedelegate(ctx, sub, internalMessage); err != nil {
 				return err
 			}
 		case "/cosmos.staking.v1beta1.MsgUndelegate":
-			if err := processUndelegate(ctx, c, internalMessage); err != nil {
+			if err := processUndelegate(ctx, sub, internalMessage); err != nil {
 				return err
 			}
 		case msgWithdrawValidatorCommission:
-			if err := processWithdrawValidatorCommission(ctx, c, internalMessage); err != nil {
+			if err := processWithdrawValidatorCommission(ctx, sub, internalMessage); err != nil {
 				return err
 			}
 		case "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward":
-			if err := processWithdrawDelegatorRewards(ctx, c, internalMessage); err != nil {
+			if err := processWithdrawDelegatorRewards(ctx, sub, internalMessage); err != nil {
 				return err
 			}
 		case "/cosmos.slashing.v1beta1.MsgUnjail":
-			if err := processUnjail(ctx, c, internalMessage); err != nil {
+			if err := processExecUnjail(ctx, internalMessage); err != nil {
 				return err
 			}
 		case "/celestia.signal.v1.MsgSignalVersion":
-			data, err := getInternalDataForExec(msg.Data, i)
-			if err != nil {
-				return err
-			}
-			if err := processSignalVersion(ctx, c, msg, data); err != nil {
+			if err := processSignalVersion(ctx, sub, msg, internalMessage.Data); err != nil {
 				return err
 			}
 		case "/celestia.signal.v1.MsgTryUpgrade":
-			if err := processTryUpgrade(ctx, c, msg, internalMessage.Data); err != nil {
+			if err := processTryUpgrade(ctx, sub, msg, internalMessage.Data); err != nil {
 				return err
 			}
 		case "/cosmos.gov.v1beta1.MsgVote", "/cosmos.gov.v1.MsgVote", "/cosmos.gov.v1.MsgVoteWeighted", "/cosmos.gov.v1beta1.MsgVoteWeighted":
-			if err := processVote(ctx, c, internalMessage); err != nil {
+			if err := processVote(ctx, sub, internalMessage); err != nil {
 				return err
 			}
 		case "/celestia.forwarding.v1.MsgForward":
-			if err := processForward(ctx, c, internalMessage); err != nil {
+			if err := processForward(ctx, sub, internalMessage); err != nil {
 				return err
-			}
-		default:
-			for {
-				event, ok := c.Peek()
-				if !ok {
-					break
-				}
-				authMsgIdxPtr, err := decoder.AuthMsgIndexFromMap(event.Data)
-				if err != nil {
-					return err
-				}
-				if authMsgIdxPtr == nil {
-					break
-				}
-				if *authMsgIdxPtr != int64(i) {
-					break
-				}
-				c.Next()
 			}
 		}
 	}
