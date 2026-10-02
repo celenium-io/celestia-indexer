@@ -2608,7 +2608,7 @@
         },
         "/forwarding/{id}": {
             "get": {
-                "description": "Returns a single forwarding event by its internal ID. The response includes details about\nthe cross-domain token transfer such as destination domain, destination address,\nforwarding address, success/failed counts, and the list of individual transfers.",
+                "description": "Returns a single forwarding event by its internal ID. The response includes details about\nthe cross-domain token transfer such as destination domain, destination address and\nforwarding address, and the inputs: deposits to the forwarding address since its previous\nforwarding (MsgSend, Hyperlane and IBC transfers).",
                 "produces": [
                     "application/json"
                 ],
@@ -9882,6 +9882,16 @@
                 "chain": {
                     "$ref": "#/definitions/responses.ChainMetadata"
                 },
+                "chain_id": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "osmosis-1"
+                },
+                "channel_id": {
+                    "type": "string",
+                    "format": "string",
+                    "example": "channel-2"
+                },
                 "denom": {
                     "type": "string",
                     "format": "string",
@@ -9911,6 +9921,16 @@
                     "type": "string",
                     "format": "binary",
                     "example": "652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"
+                },
+                "type": {
+                    "type": "string",
+                    "format": "string",
+                    "enum": [
+                        "send",
+                        "hyperlane",
+                        "ibc"
+                    ],
+                    "example": "ibc"
                 }
             }
         },

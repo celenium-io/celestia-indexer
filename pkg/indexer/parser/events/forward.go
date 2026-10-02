@@ -33,14 +33,17 @@ func processForward(ctx *context.Context, c *Cursor, msg *storage.Message) error
 		Height: msg.Height,
 		Time:   msg.Time,
 		TxId:   msg.TxId,
+		MsgId:  msg.Id,
 	}
+	// the warp send made by the forward, registered only once the event format is known
+	var transfer = &storage.HLTransfer{
+		Height: msg.Height,
+		Time:   msg.Time,
+		TxId:   msg.TxId,
+	}
+	var dispatched bool
 
-	for {
-		event, ok := c.Peek()
-		if !ok {
-			break
-		}
-
+	for event := range c.MsgEvents("action") {
 		switch event.Type {
 		case types.EventTypeCelestiaforwardingv1EventTokenForwarded:
 			forwarded, err := decode.NewEventTokenForwarded(event.Data)
@@ -48,12 +51,9 @@ func processForward(ctx *context.Context, c *Cursor, msg *storage.Message) error
 				return errors.Wrap(err, "decoding token forwarded event")
 			}
 
-			// Pre-v8 format lacks token_id — drain remaining events for this
-			// message without creating a forwarding entity.
+			// Only the pre-v8 (v7) format lacks token_id, and no indexed network has it.
 			if forwarded.TokenId == "" {
-				c.Next()
-				c.SkipToNext("action")
-				return nil
+				return errors.New("token_id is missing in EventTokenForwarded")
 			}
 
 			forwarding.Amount, err = types.NumericFromString(forwarded.Amount)
@@ -81,7 +81,6 @@ func processForward(ctx *context.Context, c *Cursor, msg *storage.Message) error
 			if err = ctx.AddAddress(forwarding.Address); err != nil {
 				return errors.Wrap(err, "add forwarding address")
 			}
-			c.Next()
 
 		case types.EventTypeHyperlanewarpv1EventSendRemoteTransfer:
 			transferEvent, err := decode.NewHyperlaneSendTransferEvent(event.Data)
@@ -95,14 +94,13 @@ func processForward(ctx *context.Context, c *Cursor, msg *storage.Message) error
 			}
 			forwarding.DestDomain = transferEvent.DestinationDomain
 			forwarding.DestRecipient = recipient.Bytes()
-			c.Next()
 
-		default:
-			if action := decoder.StringFromMap(event.Data, "action"); action != "" {
-				ctx.AddForwarding(&forwarding)
-				return nil
-			}
-			c.Next()
+		case types.EventTypeHyperlanecorev1EventDispatch:
+			dispatched = true
+		}
+
+		if err := fillHyperlaneSendTransfer(ctx, event, transfer); err != nil {
+			return errors.Wrap(err, "forward transfer")
 		}
 	}
 
@@ -112,5 +110,8 @@ func processForward(ctx *context.Context, c *Cursor, msg *storage.Message) error
 	}
 
 	ctx.AddForwarding(&forwarding)
+	if dispatched {
+		ctx.AddHlTransfer(transfer)
+	}
 	return nil
 }

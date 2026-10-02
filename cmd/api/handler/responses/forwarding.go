@@ -71,17 +71,24 @@ type ForwardingInput struct {
 	Amount string         `example:"123445"                                                           format:"string"    json:"received" swaggertype:"string"`
 	Denom  string         `example:"utia"                                                             format:"string"    json:"denom"    swaggertype:"string"`
 
+	Type      string `enums:"send,hyperlane,ibc" example:"ibc"   format:"string"             json:"type"          swaggertype:"string"`
+	ChainId   string `example:"osmosis-1"        format:"string" json:"chain_id,omitempty"   swaggertype:"string"`
+	ChannelId string `example:"channel-2"        format:"string" json:"channel_id,omitempty" swaggertype:"string"`
+
 	Chain *ChainMetadata `json:"chain,omitempty"`
 }
 
-func NewForwardingInputFromHyperlaneTransfer(input storage.ForwardingInput, store hyperlane.IChainStore) ForwardingInput {
+func NewForwardingInput(input storage.ForwardingInput, store hyperlane.IChainStore) ForwardingInput {
 	response := ForwardingInput{
-		Height: input.Height,
-		Time:   input.Time,
-		TxHash: hex.EncodeToString(input.TxHash),
-		From:   input.From,
-		Amount: input.Amount,
-		Denom:  input.Denom,
+		Height:    input.Height,
+		Time:      input.Time,
+		TxHash:    hex.EncodeToString(input.TxHash),
+		From:      input.From,
+		Amount:    input.Amount,
+		Denom:     input.Denom,
+		Type:      input.Type,
+		ChainId:   input.ChainId,
+		ChannelId: input.ChannelId,
 	}
 	if input.Counterparty > 0 {
 		response.Chain = NewChainMetadata(input.Counterparty, store)

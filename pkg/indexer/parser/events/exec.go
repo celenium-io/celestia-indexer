@@ -33,7 +33,10 @@ func processExec(ctx *context.Context, c *Cursor, msg *storage.Message) error {
 			return err
 		}
 
+		// inner messages have no rows of their own: entities point at the MsgExec
 		internalMessage := &storage.Message{
+			Id:     msg.Id,
+			TxId:   msg.TxId,
 			Height: msg.Height,
 			Time:   msg.Time,
 			Data:   msgs,

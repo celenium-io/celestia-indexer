@@ -137,8 +137,9 @@ func (handler *ForwardingsHandler) List(c echo.Context) error {
 //
 //	@Summary		Get forwarding event by ID
 //	@Description	Returns a single forwarding event by its internal ID. The response includes details about
-//	@Description	the cross-domain token transfer such as destination domain, destination address,
-//	@Description	forwarding address, success/failed counts, and the list of individual transfers.
+//	@Description	the cross-domain token transfer such as destination domain, destination address and
+//	@Description	forwarding address, and the inputs: deposits to the forwarding address since its previous
+//	@Description	forwarding (MsgSend, Hyperlane and IBC transfers).
 //	@Tags			forwarding
 //	@ID				get-forwarding
 //	@Param			id	path	integer	true	"Internal forwarding event ID"	minimum(1)	example(1)
@@ -168,7 +169,7 @@ func (handler *ForwardingsHandler) Get(c echo.Context) error {
 
 	response.Inputs = make([]responses.ForwardingInput, len(inputs))
 	for i, input := range inputs {
-		response.Inputs[i] = responses.NewForwardingInputFromHyperlaneTransfer(input, handler.chainStore)
+		response.Inputs[i] = responses.NewForwardingInput(input, handler.chainStore)
 	}
 	return c.JSON(http.StatusOK, response)
 }

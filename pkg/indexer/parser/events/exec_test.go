@@ -1451,3 +1451,81 @@ func Test_handleExec_TryUpgrade(t *testing.T) {
 	require.True(t, ok)
 	require.Equal(t, "1", next.Data["msg_index"])
 }
+
+// Inner messages have no rows of their own, so the forwarding points at the MsgExec.
+func Test_handleExec_Forward(t *testing.T) {
+	ctx := context.NewContext()
+	ctx.Block = &storage.Block{Time: time.Now(), Height: 45631}
+
+	events := []storage.Event{
+		{
+			Height: 45631,
+			Type:   "message",
+			Data: map[string]string{
+				"action":    "/cosmos.authz.v1beta1.MsgExec",
+				"module":    "authz",
+				"msg_index": "0",
+				"sender":    "celestia10vj4f36sd4nr27c9meta7elxt87t9ww9vw8euw",
+			},
+		}, {
+			Height: 45631,
+			Type:   types.EventTypeHyperlanewarpv1EventSendRemoteTransfer,
+			Data: map[string]string{ //nolint:gosec
+				"authz_msg_index":    "0",
+				"msg_index":          "0",
+				"destination_domain": "11155111",
+				"recipient":          "\"0x000000000000000000000000d5e85e86fc692cedad6d6992f1f0ccf273e39913\"",
+				"sender":             "\"celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60\"",
+				"token_id":           "\"0x726f757465725f61707000000000000000000000000000020000000000000024\"",
+			},
+		}, {
+			Height: 45631,
+			Type:   types.EventTypeCelestiaforwardingv1EventTokenForwarded,
+			Data: map[string]string{ //nolint:gosec
+				"authz_msg_index": "0",
+				"msg_index":       "0",
+				"forward_addr":    "\"celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60\"",
+				"denom":           "\"utia\"",
+				"amount":          "\"1000\"",
+				"message_id":      "\"0xac8852bd411c0c88cdadfe9b2386b2bcd702f35479c25a4b2d2cc3fb49d095d4\"",
+				"token_id":        "\"0x726f757465725f61707000000000000000000000000000020000000000000024\"",
+			},
+		}, {
+			Height: 45631,
+			Type:   "message",
+			Data: map[string]string{
+				"action":    "/cosmos.bank.v1beta1.MsgSend",
+				"msg_index": "1",
+			},
+		},
+	}
+	msg := &storage.Message{
+		Id:     10,
+		TxId:   5,
+		Type:   types.MsgExec,
+		Height: 45631,
+		Time:   ctx.Block.Time,
+		Data: map[string]any{
+			"Grantee": "celestia10vj4f36sd4nr27c9meta7elxt87t9ww9vw8euw",
+			"Msgs": []any{
+				map[string]any{"ForwardAddr": "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"},
+			},
+		},
+		InternalMsgs: []string{"/celestia.forwarding.v1.MsgForward"},
+	}
+
+	c := NewCursor(events)
+	require.NoError(t, handleExec(ctx, c, msg))
+
+	require.Len(t, ctx.Forwardings, 1)
+	fwd := ctx.Forwardings[0]
+	require.EqualValues(t, 5, fwd.TxId)
+	require.EqualValues(t, 10, fwd.MsgId)
+	require.EqualValues(t, 11155111, fwd.DestDomain)
+	require.Equal(t, "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60", fwd.Address.Address)
+
+	// the event of the next message is left for its handler
+	next, ok := c.Peek()
+	require.True(t, ok)
+	require.Equal(t, "1", next.Data["msg_index"])
+}

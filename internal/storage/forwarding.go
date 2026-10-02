@@ -43,6 +43,7 @@ type Forwarding struct {
 	DestDomain    uint64         `bun:"dest_domain,notnull"               comment:"The destination domain of the forwarding"`
 	DestRecipient []byte         `bun:"dest_recipient,notnull,type:bytea" comment:"The destination recipient of the forwarding"`
 	TxId          uint64         `bun:"tx_id,notnull"                     comment:"Foreign key to transactions table"`
+	MsgId         uint64         `bun:"msg_id,notnull"                    comment:"Foreign key to messages table"`
 	TokenId       uint64         `bun:"token_id,notnull"                  comment:"Foreign key to hyperlane tokens table"`
 	MessageId     string         `bun:"message_id,notnull"                comment:"The message id of the forwarding"`
 	Amount        types.Numeric  `bun:"amount,notnull"                    comment:"The amount forwarded"`
@@ -66,4 +67,7 @@ type ForwardingInput struct {
 	Denom        string            `bun:"denom"`
 	Counterparty uint64            `bun:"counterparty"`
 	Data         types.PackedBytes `bun:"data"`
+	Type         string            `bun:"type"`
+	ChainId      string            `bun:"chain_id"`
+	ChannelId    string            `bun:"channel_id"`
 }

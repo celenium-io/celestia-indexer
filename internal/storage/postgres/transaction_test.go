@@ -221,6 +221,58 @@ func (s *TransactionTestSuite) TestSaveAddresses() {
 	s.Require().Equal(replyAddress.Id, addresses[2].Id)
 }
 
+func (s *TransactionTestSuite) TestSaveAddressesIsForwarding() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, err := BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+	defer tx.Close(ctx)
+
+	addresses := []*storage.Address{
+		{
+			// existing, not forwarding: becomes forwarding
+			Address:      "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60",
+			Hash:         testsuite.MustHexDecode("960aa0366b254e1ea79bda467eb3aa5c97cba5ae"),
+			Height:       2000,
+			LastHeight:   2000,
+			IsForwarding: true,
+		}, {
+			// existing forwarding: a later plain save must not reset the flag
+			Address:    "celestia1ccqy2wlzf2zndn4vspmuksw5frqq0ufsgw4gmt",
+			Hash:       testsuite.MustHexDecode("C600453BE24A8536CEAC8077CB41D448C007F130"),
+			Height:     2000,
+			LastHeight: 2000,
+		}, {
+			// existing, not forwarding: stays as is
+			Address:    "celestia1mm8yykm46ec3t0dgwls70g0jvtm055wk9ayal8",
+			Hash:       testsuite.MustHexDecode("dece425b75d67115bda877e1e7a1f262f6fa51d6"),
+			Height:     2000,
+			LastHeight: 2000,
+		},
+	}
+
+	count, err := tx.SaveAddresses(ctx, addresses...)
+	s.Require().NoError(err)
+	s.Require().EqualValues(0, count)
+
+	s.Require().NoError(tx.Flush(ctx))
+
+	for _, want := range []struct {
+		id           uint64
+		isForwarding bool
+	}{
+		{id: 2, isForwarding: true},
+		{id: 5, isForwarding: true},
+		{id: 1, isForwarding: false},
+	} {
+		address, err := s.storage.Address.GetByID(ctx, want.id)
+		s.Require().NoError(err)
+		s.Require().Equal(want.isForwarding, address.IsForwarding, "address %d", want.id)
+		s.Require().EqualValues(2000, address.LastHeight, "address %d", want.id)
+	}
+}
+
 func (s *TransactionTestSuite) TestSaveTxAddresses() {
 	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()
@@ -1128,7 +1180,7 @@ func (s *TransactionTestSuite) TestSaveForwardings() {
 
 	items, err := s.storage.Forwardings.List(ctx, 10, 0, sdk.SortOrderAsc)
 	s.Require().NoError(err)
-	s.Require().Len(items, 4)
+	s.Require().Len(items, 6)
 }
 
 func (s *TransactionTestSuite) TestRollbackBlockStats() {
@@ -3101,7 +3153,7 @@ func (s *TransactionTestSuite) TestRollbackForwardings() {
 
 	items, err := s.storage.Forwardings.List(ctx, 10, 0, sdk.SortOrderAsc)
 	s.Require().NoError(err)
-	s.Require().Len(items, 1)
+	s.Require().Len(items, 3)
 }
 
 func (s *TransactionTestSuite) TestIbcTransfers() {
