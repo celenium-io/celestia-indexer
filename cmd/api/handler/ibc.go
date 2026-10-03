@@ -116,7 +116,7 @@ func (req *getIbcClientsRequest) ToFilters(ctx context.Context, address storage.
 //	@Tags			ibc
 //	@ID				get-ibc-clients
 //	@Param			limit		query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)	example(10)
-//	@Param			offset		query	integer	false	"Offset"										minimum(1)	example(10)
+//	@Param			offset		query	integer	false	"Offset"										minimum(0)	example(10)
 //	@Param			sort		query	string	false	"Sort order. Default: desc"						Enums(asc, desc)	example(asc)
 //	@Param			chain_id	query	string	false	"Chain id"	example(celestia)
 //	@Param			creator		query	string	false	"Creator address"						    	minlength(47)	maxlength(47)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
@@ -202,7 +202,7 @@ func (req *getIbcConnsRequest) SetDefault() {
 //	@Tags			ibc
 //	@ID				get-ibc-conns
 //	@Param			limit	    query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)	example(10)
-//	@Param			offset	    query	integer	false	"Offset"										minimum(1)	example(10)
+//	@Param			offset	    query	integer	false	"Offset"										minimum(0)	example(10)
 //	@Param			sort	    query	string	false	"Sort order. Default: desc"						Enums(asc, desc)	example(asc)
 //	@Param			client_id	query	string	false	"Client id"	example(client-1)
 //	@Produce		json
@@ -291,7 +291,7 @@ func (req *getIbcChannelsRequest) SetDefault() {
 //	@Tags			ibc
 //	@ID				get-ibc-channels
 //	@Param			limit	        query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)	example(10)
-//	@Param			offset	        query	integer	false	"Offset"										minimum(1)	example(10)
+//	@Param			offset	        query	integer	false	"Offset"										minimum(0)	example(10)
 //	@Param			sort	        query	string	false	"Sort order. Default: desc"						Enums(asc, desc)	example(asc)
 //	@Param			client_id	    query	string	false	"Client id"	example(client-1)
 //	@Param			connection_id	query	string	false	"Connection id"	example(connection-1)
@@ -356,7 +356,7 @@ func (req *getIbcTransfersRequest) SetDefault() {
 //	@Tags			ibc
 //	@ID				get-ibc-transfers
 //	@Param			limit	    	query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)	example(10)
-//	@Param			offset	    	query	integer	false	"Offset"										minimum(1)	example(10)
+//	@Param			offset	    	query	integer	false	"Offset"										minimum(0)	example(10)
 //	@Param			sort	   		query	string	false	"Sort order. Default: desc"						Enums(asc, desc)	example(asc)
 //	@Param			channel_id		query	string	false	"Channel id"	example(channel-1)
 //	@Param			chain_id		query	string	false	"Chain id"	example(celestia)
@@ -455,7 +455,7 @@ func (handler *IbcHandler) ListTransfers(c echo.Context) error {
 //	@Description	Returns a single IBC token transfer by its internal id, including sender, receiver, amount, denom, and transaction reference.
 //	@Tags			ibc
 //	@ID				get-ibc-transfer
-//	@Param			id	path	integer	true	"Internal identity"	minimum(1)	example(1)
+//	@Param			id	path	integer	true	"Internal identity"	minimum(1)	example(1)	format(int64)
 //	@Produce		json
 //	@Success		200	{object}	responses.IbcTransfer
 //	@Success		204

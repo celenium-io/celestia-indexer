@@ -13,8 +13,8 @@ import (
 )
 
 type Vesting struct {
-	Id        uint64            `example:"12"                                                               format:"integer"   json:"id"                   swaggertype:"integer"`
-	Height    pkgTypes.Level    `example:"100"                                                              format:"integer"   json:"height"               swaggertype:"integer"`
+	Id        uint64            `example:"12"                                                               format:"int64"     json:"id"                   swaggertype:"integer"`
+	Height    pkgTypes.Level    `example:"100"                                                              format:"int64"     json:"height"               swaggertype:"integer"`
 	Time      time.Time         `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"                 swaggertype:"string"`
 	StartTime *time.Time        `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"start_time,omitempty" swaggertype:"string"`
 	EndTime   *time.Time        `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"end_time,omitempty"   swaggertype:"string"`

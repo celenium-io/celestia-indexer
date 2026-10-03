@@ -63,8 +63,8 @@ type summaryRequest struct {
 //	@Param					table		path	string	true	"Table name"	Enums(block, block_stats, tx, event, message, validator)	example(block_stats)
 //	@Param					function	path	string	true	"Function name"	Enums(min, max, avg, sum, count)	example(avg)
 //	@Param					column		query	string	false	"Column name which will be used for computation. Optional for count."	example(fee)
-//	@Param					from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
-//	@Param					to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)
+//	@Param					from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)	format(int64)
+//	@Param					to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)	format(int64)
 //	@Produce				json
 //	@Success				200	{object}	string
 //	@Failure				400	{object}	Error
@@ -129,7 +129,7 @@ func (sh StatsHandler) TPS(c echo.Context) error {
 //	@Tags			stats
 //	@ID				stats-24h-changes
 //	@Produce		json
-//	@Success		200	{array}		responses.Change24hBlockStats
+//	@Success		200	{object}		responses.Change24hBlockStats
 //	@Failure		500	{object}	Error
 //	@Router			/stats/changes_24h [get]
 func (sh StatsHandler) Change24hBlockStats(c echo.Context) error {
@@ -209,8 +209,8 @@ type seriesRequest struct {
 //	@ID				stats-series
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, week, month, year)	example(day)
 //	@Param			name		path	string	true	"Series name"					Enums(blobs_size, blobs_count, tps, bps, fee, supply_change, block_time, tx_count, events_count, gas_price, gas_efficiency, gas_used, gas_limit, bytes_in_block, rewards, commissions)	example(blobs_size)
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)	format(int64)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)	format(int64)
 //	@Produce		json
 //	@Success		200	{array}		responses.SeriesItem
 //	@Failure		400	{object}	Error
@@ -254,8 +254,8 @@ type seriesCumulativeRequest struct {
 //	@ID				stats-series-cumulative
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, week, month, year)	example(day)
 //	@Param			name		path	string	true	"Series name"					Enums(blobs_size, blobs_count, fee, tx_count, gas_used, gas_limit, bytes_in_block, supply_change)	example(blobs_size)
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)	format(int64)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)	format(int64)
 //	@Produce		json
 //	@Success		200	{array}		responses.SeriesItem
 //	@Failure		400	{object}	Error
@@ -301,8 +301,8 @@ type namespaceSeriesRequest struct {
 //	@Param			id			path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)	example(4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02)
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, week, month, year)	example(day)
 //	@Param			name		path	string	true	"Series name"					Enums(pfb_count, pff_count, size)	example(pfb_count)
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)	format(int64)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)	format(int64)
 //	@Produce		json
 //	@Success		200	{array}		responses.SeriesItem
 //	@Failure		400	{object}	Error
@@ -359,11 +359,11 @@ type stakingSeriesRequest struct {
 //	@Description	Returns a time-series histogram of staking metrics (rewards, commissions, delegation flows, etc.) for the specified validator and timeframe.
 //	@Tags			stats
 //	@ID				stats-staking-series
-//	@Param			id			path	integer	true	"Internal validator id"			minimum(1)	example(1)
+//	@Param			id			path	integer	true	"Internal validator id"			minimum(1)	example(1)	format(int64)
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)	example(day)
 //	@Param			name		path	string	true	"Series name"					Enums(rewards, commissions, flow, delegations, unbondings, delegations_count, unbondings_count, cumulative_flow)	example(rewards)
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)	format(int64)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)	format(int64)
 //	@Produce		json
 //	@Success		200	{array}		responses.SeriesItem
 //	@Failure		400	{object}	Error
@@ -404,8 +404,8 @@ type stakingDistributionRequest struct {
 //	@Description	Returns the distribution of delegated stake across validators grouped by delegation size buckets, useful for understanding stake concentration over the selected time range.
 //	@Tags			stats
 //	@ID				stats-staking-distribution
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)	format(int64)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)	format(int64)
 //	@Produce		json
 //	@Success		200	{object}	responses.StakingDistribution
 //	@Failure		400	{object}	Error
@@ -445,8 +445,8 @@ type ibcSeriesRequest struct {
 //	@Param			id			path	string	true	"Channel id"	example(channel-1)
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)	example(day)
 //	@Param			name		path	string	true	"Series name"					Enums(count, amount)	example(count)
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)	format(int64)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)	format(int64)
 //	@Produce		json
 //	@Success		200	{array}		responses.HistogramItem
 //	@Failure		400	{object}	Error
@@ -494,7 +494,7 @@ func (req *limitOffsetRequest) SetDefault() {
 //	@Tags			stats
 //	@ID				stats-ibc-chains
 //	@Param			limit				query	integer			false	"Count of requested entities"	minimum(1)	maximum(100)	example(10)
-//	@Param			offset				query	integer			false	"Offset"						minimum(1)	example(10)
+//	@Param			offset				query	integer			false	"Offset"						minimum(0)	example(10)
 //	@Produce		json
 //	@Success		200	{array}		responses.IbcChainStats
 //	@Failure		400	{object}	Error
@@ -530,7 +530,7 @@ func (sh StatsHandler) IbcByChains(c echo.Context) error {
 //	@Tags			stats
 //	@ID				stats-ibc-summary
 //	@Produce		json
-//	@Success		200	{array}		responses.IbcSummaryStats
+//	@Success		200	{object}		responses.IbcSummaryStats
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
 //	@Router			/stats/ibc/summary [get]
@@ -562,10 +562,10 @@ type squareSizeRequest struct {
 //	@Description	Returns the frequency distribution of data availability square sizes (number of rows/columns) used across blocks in the selected time range.
 //	@Tags			stats
 //	@ID				stats-square-size
-//	@Param			from	query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
-//	@Param			to		query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)
+//	@Param			from	query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)	format(int64)
+//	@Param			to		query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)	format(int64)
 //	@Produce		json
-//	@Success		200	{array}		responses.SquareSizeResponse
+//	@Success		200	{object}		responses.SquareSizeResponse
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
 //	@Router			/stats/square_size [get]
@@ -688,11 +688,11 @@ type hlSeriesRequest struct {
 //	@Description	Returns a time-series histogram of Hyperlane transfer statistics (count or amount) for the specified domain, filtered by timeframe and optional time range.
 //	@Tags			stats
 //	@ID				stats-hl-series
-//	@Param			id			path	integer	true	"Domain id"	example(1)
+//	@Param			id			path	integer	true	"Domain id"	example(1)	format(int64)
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)	example(day)
 //	@Param			name		path	string	true	"Series name"					Enums(count, amount)	example(count)
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)	format(int64)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)	format(int64)
 //	@Produce		json
 //	@Success		200	{array}		responses.HistogramItem
 //	@Failure		400	{object}	Error
@@ -737,8 +737,8 @@ type hlTotalSeriesRequest struct {
 //	@ID				stats-hl-total-series
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)	example(day)
 //	@Param			name		path	string	true	"Series name"					Enums(count, amount)	example(count)
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)	format(int64)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)	format(int64)
 //	@Produce		json
 //	@Success		200	{array}		responses.HistogramItem
 //	@Failure		400	{object}	Error
@@ -774,7 +774,7 @@ func (sh StatsHandler) HlTotalSeries(c echo.Context) error {
 //	@Tags			stats
 //	@ID				stats-hl-domains
 //	@Param			limit				query	integer			false	"Count of requested entities"	minimum(1)	maximum(100)	example(10)
-//	@Param			offset				query	integer			false	"Offset"						minimum(1)	example(10)
+//	@Param			offset				query	integer			false	"Offset"						minimum(0)	example(10)
 //	@Produce		json
 //	@Success		200	{array}		responses.HlDomainStats
 //	@Failure		400	{object}	Error

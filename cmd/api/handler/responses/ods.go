@@ -17,7 +17,7 @@ import (
 )
 
 type ODS struct {
-	Width uint `example:"2" json:"width" swaggertype:"integer"`
+	Width uint `example:"2" format:"int64" json:"width" swaggertype:"integer"`
 
 	Items []ODSItem `json:"items"`
 }

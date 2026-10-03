@@ -227,8 +227,8 @@ func NewChainMetadata(domainId uint64, store hyperlane.IChainStore) *ChainMetada
 }
 
 type DomainMetadata struct {
-	Domain         uint64          `example:"1488"         json:"domain,omitempty" swaggertype:"integer"`
-	Name           string          `example:"name"         json:"name,omitempty"   swaggertype:"string"`
+	Domain         uint64          `example:"1488"         format:"int64"        json:"domain,omitempty" swaggertype:"integer"`
+	Name           string          `example:"name"         json:"name,omitempty" swaggertype:"string"`
 	BlockExplorers []BlockExplorer `json:"block_explorers"`
 	NativeToken    NativeToken     `json:"native_token"`
 }
@@ -251,9 +251,9 @@ func NewDomainMetadata(domainId uint64, metadata pkgHyperlane.ChainMetadata) *Do
 }
 
 type HlDomainStats struct {
-	Domain         uint64         `example:"123456"                format:"integer" json:"domain_id"       swaggertype:"integer"`
-	Amount         string         `example:"1234.5678"             format:"string"  json:"amount"          swaggertype:"string"`
-	TransfersCount uint64         `example:"123445"                format:"integer" json:"transfers_count" swaggertype:"integer"`
+	Domain         uint64         `example:"123456"                format:"int64"  json:"domain_id"       swaggertype:"integer"`
+	Amount         string         `example:"1234.5678"             format:"string" json:"amount"          swaggertype:"string"`
+	TransfersCount uint64         `example:"123445"                format:"int64"  json:"transfers_count" swaggertype:"integer"`
 	ChainMetadata  *ChainMetadata `json:"chain_metadata,omitempty"`
 }
 

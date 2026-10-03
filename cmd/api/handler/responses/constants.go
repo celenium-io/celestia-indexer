@@ -27,7 +27,7 @@ type DenomMetadata struct {
 	Symbol      string `example:"TIA"                 json:"symbol"      swaggertype:"string"`
 	Uri         string `example:"https://example.com" json:"uri"         swaggertype:"string"`
 
-	Units json.RawMessage `json:"units"`
+	Units json.RawMessage `json:"units" swaggertype:"array,object"`
 }
 
 func roundCounstant(val string) string {

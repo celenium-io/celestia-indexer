@@ -15,9 +15,9 @@ import (
 )
 
 type Block struct {
-	Id                 uint64       `example:"321"                                                              json:"id"                   swaggertype:"integer"`
-	Height             uint64       `example:"100"                                                              json:"height"               swaggertype:"integer"`
-	Time               time.Time    `example:"2023-07-04T03:10:57+00:00"                                        json:"time"                 swaggertype:"string"`
+	Id                 uint64       `example:"321"                                                              format:"int64"              json:"id"            swaggertype:"integer"`
+	Height             uint64       `example:"100"                                                              format:"int64"              json:"height"        swaggertype:"integer"`
+	Time               time.Time    `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time"          json:"time"          swaggertype:"string"`
 	VersionBlock       string       `example:"11"                                                               json:"version_block"        swaggertype:"string"`
 	VersionApp         string       `example:"1"                                                                json:"version_app"          swaggertype:"string"`
 	Hash               pkgTypes.Hex `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" json:"hash"                 swaggertype:"string"`
@@ -66,9 +66,9 @@ func NewBlock(block storage.Block, withStats bool) Block {
 }
 
 type BlockStats struct {
-	TxCount       int64  `example:"12"          json:"tx_count"       swaggertype:"integer"`
-	EventsCount   int64  `example:"18"          json:"events_count"   swaggertype:"integer"`
-	BlobsSize     int64  `example:"12354"       json:"blobs_size"     swaggertype:"integer"`
+	TxCount       int64  `example:"12"          format:"int64"        json:"tx_count"       swaggertype:"integer"`
+	EventsCount   int64  `example:"18"          format:"int64"        json:"events_count"   swaggertype:"integer"`
+	BlobsSize     int64  `example:"12354"       format:"int64"        json:"blobs_size"     swaggertype:"integer"`
 	BlobsCount    int    `example:"100"         json:"blobs_count"    swaggertype:"integer"`
 	Fee           string `example:"28347628346" json:"fee"            swaggertype:"string"`
 	SupplyChange  string `example:"8635234"     json:"supply_change"  swaggertype:"string"`
@@ -76,11 +76,11 @@ type BlockStats struct {
 	FillRate      string `example:"0.0800"      json:"fill_rate"      swaggertype:"string"`
 	Rewards       string `example:"102102812"   json:"rewards"        swaggertype:"string"`
 	Commissions   string `example:"123133"      json:"commissions"    swaggertype:"string"`
-	BlockTime     uint64 `example:"12354"       json:"block_time"     swaggertype:"integer"`
-	GasLimit      int64  `example:"1234"        json:"gas_limit"      swaggertype:"integer"`
-	GasUsed       int64  `example:"1234"        json:"gas_used"       swaggertype:"integer"`
-	BytesInBlock  int64  `example:"1234"        json:"bytes_in_block" swaggertype:"integer"`
-	SquareSize    uint64 `example:"16"          json:"square_size"    swaggertype:"integer"`
+	BlockTime     uint64 `example:"12354"       format:"int64"        json:"block_time"     swaggertype:"integer"`
+	GasLimit      int64  `example:"1234"        format:"int64"        json:"gas_limit"      swaggertype:"integer"`
+	GasUsed       int64  `example:"1234"        format:"int64"        json:"gas_used"       swaggertype:"integer"`
+	BytesInBlock  int64  `example:"1234"        format:"int64"        json:"bytes_in_block" swaggertype:"integer"`
+	SquareSize    uint64 `example:"16"          format:"int64"        json:"square_size"    swaggertype:"integer"`
 }
 
 var (

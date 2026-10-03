@@ -114,6 +114,8 @@ func (manager *Manager) listenHead(ctx context.Context) {
 //	@ID						websocket
 //	@x-internal				true
 //	@Produce				json
+//	@Success				101	"Switching Protocols: connection is upgraded to websocket"
+//	@Failure				500	"Too many websocket connections from this IP or upgrade failed"
 //	@Router					/ws [get]
 func (manager *Manager) Handle(c echo.Context) error {
 	ip := c.RealIP()
