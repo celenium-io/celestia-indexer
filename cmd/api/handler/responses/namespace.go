@@ -18,8 +18,8 @@ type Namespace struct {
 	Size            int64          `example:"12345"                                                    format:"integer"   json:"size"              swaggertype:"integer"`
 	BlobsCount      int64          `example:"10000"                                                    format:"integer"   json:"blobs_count"       swaggertype:"integer"`
 	FibreSize       int64          `example:"12345"                                                    format:"integer"   json:"fibre_size"        swaggertype:"integer"`
-	Version         byte           `examle:"1"                                                         format:"byte"      json:"version"           swaggertype:"integer"`
-	NamespaceID     string         `example:"4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02" format:"binary"    json:"namespace_id"      swaggertype:"string"`
+	Version         byte           `example:"1"                                                        format:"byte"      json:"version"           swaggertype:"integer"`
+	NamespaceID     string         `example:"4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02" format:"hex"       json:"namespace_id"      swaggertype:"string"`
 	Hash            string         `example:"U3dhZ2dlciByb2Nrcw=="                                     format:"base64"    json:"hash"              swaggertype:"string"`
 	PfbCount        int64          `example:"12"                                                       format:"integer"   json:"pfb_count"         swaggertype:"integer"`
 	PffCount        int64          `example:"10000"                                                    format:"integer"   json:"pff_count"         swaggertype:"integer"`

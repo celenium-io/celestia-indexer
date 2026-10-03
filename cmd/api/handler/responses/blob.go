@@ -88,7 +88,7 @@ type LightBlobLog struct {
 	Time         time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"          swaggertype:"string"`
 	ContentType  string         `example:"image/png"                                                        format:"string"    json:"content_type"  swaggertype:"string"`
 	Namespace    string         `example:"AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0="                         format:"base64"    json:"namespace"     swaggertype:"string"`
-	TxHash       string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash"       swaggertype:"string"`
+	TxHash       string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"tx_hash"       swaggertype:"string"`
 	Source       string         `example:"fibre"                                                            format:"string"    json:"source"        swaggertype:"string"`
 
 	Signer *ShortAddress `json:"signer,omitempty"`

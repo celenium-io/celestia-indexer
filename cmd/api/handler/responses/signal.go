@@ -18,7 +18,7 @@ type SignalVersion struct {
 	Time        time.Time      `example:"2025-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"         swaggertype:"string"`
 	VotingPower string         `example:"9348"                                                             format:"int64"     json:"voting_power" swaggertype:"string"`
 	Version     uint64         `example:"1"                                                                format:"int64"     json:"version"      swaggertype:"integer"`
-	TxHash      string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash"      swaggertype:"string"`
+	TxHash      string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"tx_hash"      swaggertype:"string"`
 
 	Validator *ShortValidator `json:"validator,omitempty"`
 }
@@ -56,7 +56,7 @@ type Upgrade struct {
 	AppliedAt      *time.Time     `example:"2025-07-04T03:10:57+00:00"                                        format:"date-time" json:"applied_at,omitempty"              swaggertype:"string"`
 	Version        uint64         `example:"1"                                                                format:"int64"     json:"version"                           swaggertype:"integer"`
 	MsgId          uint64         `example:"2"                                                                format:"int64"     json:"msg_id,omitempty"                  swaggertype:"integer"`
-	TxHash         string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash,omitempty"                 swaggertype:"string"`
+	TxHash         string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"tx_hash,omitempty"                 swaggertype:"string"`
 	VotingPower    string         `example:"9348"                                                             format:"int64"     json:"voting_power"                      swaggertype:"string"`
 	VotedPower     string         `example:"9348"                                                             format:"int64"     json:"voted_power"                       swaggertype:"string"`
 	SignalsCount   int            `example:"2"                                                                format:"int64"     json:"signals_count"                     swaggertype:"integer"`

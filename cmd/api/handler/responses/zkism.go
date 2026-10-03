@@ -13,15 +13,15 @@ import (
 
 type ZkISM struct {
 	Id                  uint64         `example:"321"                                                              format:"int64"     json:"id"                              swaggertype:"integer"`
-	ExternalId          string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"external_id"                     swaggertype:"string"`
+	ExternalId          string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"external_id"                     swaggertype:"string"`
 	Height              pkgTypes.Level `example:"100"                                                              format:"int64"     json:"height"                          swaggertype:"integer"`
 	Time                time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"                            swaggertype:"string"`
-	TxHash              string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash,omitempty"               swaggertype:"string"`
-	State               string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"state,omitempty"                 swaggertype:"string"`
-	MerkleTreeAddress   string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"merkle_tree_address,omitempty"   swaggertype:"string"`
-	StateTransitionVKey string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"state_transition_vkey,omitempty" swaggertype:"string"`
-	StateMembershipVKey string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"state_membership_vkey,omitempty" swaggertype:"string"`
-	Groth16VKey         string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"groth16_vkey,omitempty"          swaggertype:"string"`
+	TxHash              string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"tx_hash,omitempty"               swaggertype:"string"`
+	State               string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"state,omitempty"                 swaggertype:"string"`
+	MerkleTreeAddress   string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"merkle_tree_address,omitempty"   swaggertype:"string"`
+	StateTransitionVKey string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"state_transition_vkey,omitempty" swaggertype:"string"`
+	StateMembershipVKey string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"state_membership_vkey,omitempty" swaggertype:"string"`
+	Groth16VKey         string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"groth16_vkey,omitempty"          swaggertype:"string"`
 
 	Creator *ShortAddress `json:"creator,omitempty"`
 }
@@ -63,8 +63,8 @@ type ZkISMUpdate struct {
 	Id       uint64         `example:"321"                                                              format:"int64"     json:"id"                  swaggertype:"integer"`
 	Height   pkgTypes.Level `example:"100"                                                              format:"int64"     json:"height"              swaggertype:"integer"`
 	Time     time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"                swaggertype:"string"`
-	TxHash   string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash,omitempty"   swaggertype:"string"`
-	NewState string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"new_state,omitempty" swaggertype:"string"`
+	TxHash   string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"tx_hash,omitempty"   swaggertype:"string"`
+	NewState string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"new_state,omitempty" swaggertype:"string"`
 
 	Signer *ShortAddress `json:"signer,omitempty"`
 }
@@ -91,9 +91,9 @@ type ZkISMMessage struct {
 	Id        uint64         `example:"321"                                                              format:"int64"     json:"id"                   swaggertype:"integer"`
 	Height    pkgTypes.Level `example:"100"                                                              format:"int64"     json:"height"               swaggertype:"integer"`
 	Time      time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"                 swaggertype:"string"`
-	TxHash    string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash,omitempty"    swaggertype:"string"`
-	StateRoot string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"state_root,omitempty" swaggertype:"string"`
-	MessageId string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"message_id,omitempty" swaggertype:"string"`
+	TxHash    string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"tx_hash,omitempty"    swaggertype:"string"`
+	StateRoot string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"state_root,omitempty" swaggertype:"string"`
+	MessageId string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"message_id,omitempty" swaggertype:"string"`
 
 	Signer *ShortAddress `json:"signer,omitempty"`
 }
