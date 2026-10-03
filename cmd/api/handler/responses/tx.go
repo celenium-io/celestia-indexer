@@ -72,9 +72,9 @@ func NewTx(tx storage.Tx) Tx {
 }
 
 type TxForAddress struct {
-	MessagesCount int64  `example:"1"                                                                format:"int64"  json:"messages_count" swaggertype:"integer"`
-	Hash          string `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"    json:"hash"           swaggertype:"string"`
-	Fee           string `example:"9348"                                                             format:"int64"  json:"fee"            swaggertype:"string"`
+	MessagesCount int64  `example:"1"                                                                format:"int64" json:"messages_count" swaggertype:"integer"`
+	Hash          string `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"   json:"hash"           swaggertype:"string"`
+	Fee           string `example:"9348"                                                             format:"int64" json:"fee"            swaggertype:"string"`
 
 	MessageTypes []types.MsgType `example:"MsgSend,MsgUnjail" json:"message_types"`
 	Status       types.Status    `example:"success"           json:"status"`
