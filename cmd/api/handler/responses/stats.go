@@ -12,10 +12,10 @@ import (
 )
 
 type TPS struct {
-	High              float64 `example:"1.023" format:"float" json:"high"                 swaggertype:"number"`
-	Low               float64 `example:"0.123" format:"float" json:"low"                  swaggertype:"number"`
-	Current           float64 `example:"0.567" format:"float" json:"current"              swaggertype:"number"`
-	ChangeLastHourPct float64 `example:"0.275" format:"float" json:"change_last_hour_pct" swaggertype:"number"`
+	High              float64 `example:"1.023" format:"double" json:"high"                 swaggertype:"number"`
+	Low               float64 `example:"0.123" format:"double" json:"low"                  swaggertype:"number"`
+	Current           float64 `example:"0.567" format:"double" json:"current"              swaggertype:"number"`
+	ChangeLastHourPct float64 `example:"0.275" format:"double" json:"change_last_hour_pct" swaggertype:"number"`
 }
 
 func NewTPS(tps storage.TPS) TPS {
@@ -28,10 +28,10 @@ func NewTPS(tps storage.TPS) TPS {
 }
 
 type Change24hBlockStats struct {
-	TxCount      float64 `example:"0.1234" format:"float" json:"tx_count_24h"       swaggertype:"number"`
-	Fee          float64 `example:"0.1234" format:"float" json:"fee_24h"            swaggertype:"number"`
-	BytesInBlock float64 `example:"0.1234" format:"float" json:"bytes_in_block_24h" swaggertype:"number"`
-	BlobsSize    float64 `example:"0.1234" format:"float" json:"blobs_size_24h"     swaggertype:"number"`
+	TxCount      float64 `example:"0.1234" format:"double" json:"tx_count_24h"       swaggertype:"number"`
+	Fee          float64 `example:"0.1234" format:"double" json:"fee_24h"            swaggertype:"number"`
+	BytesInBlock float64 `example:"0.1234" format:"double" json:"bytes_in_block_24h" swaggertype:"number"`
+	BlobsSize    float64 `example:"0.1234" format:"double" json:"blobs_size_24h"     swaggertype:"number"`
 }
 
 func NewChange24hBlockStats(response storage.Change24hBlockStats) Change24hBlockStats {
@@ -44,10 +44,10 @@ func NewChange24hBlockStats(response storage.Change24hBlockStats) Change24hBlock
 }
 
 type NamespaceUsage struct {
-	Name        string `example:"00112233"                                                 format:"string"  json:"name"                   swaggertype:"string"`
-	Version     *byte  `examle:"1"                                                         format:"byte"    json:"version,omitempty"      swaggertype:"integer"`
-	NamespaceID string `example:"4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02" format:"binary"  json:"namespace_id,omitempty" swaggertype:"string"`
-	Size        int64  `example:"1283518"                                                  format:"integer" json:"size"                   swaggertype:"number"`
+	Name        string `example:"00112233"                                                 format:"string" json:"name"                   swaggertype:"string"`
+	Version     *byte  `example:"1"                                                        format:"byte"   json:"version,omitempty"      swaggertype:"integer"`
+	NamespaceID string `example:"4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02" format:"hex"    json:"namespace_id,omitempty" swaggertype:"string"`
+	Size        int64  `example:"1283518"                                                  format:"int64"  json:"size"                   swaggertype:"integer"`
 }
 
 func NewNamespaceUsage(ns storage.Namespace) NamespaceUsage {
@@ -123,12 +123,12 @@ func NewSquareSizeResponse(m map[int][]storage.SeriesItem) SquareSizeResponse {
 }
 
 type RollupStats24h struct {
-	Id         int64   `example:"321"                             format:"integer" json:"id,omitempty"   swaggertype:"integer"`
-	Name       string  `example:"Rollup name"                     format:"string"  json:"name,omitempty" swaggertype:"string"`
-	Logo       string  `example:"https://some_link.com/image.png" format:"string"  json:"logo,omitempty" swaggertype:"string"`
-	Size       int64   `example:"123"                             format:"integer" json:"size"           swaggertype:"integer"`
-	Fee        float64 `example:"123"                             format:"number"  json:"fee"            swaggertype:"integer"`
-	BlobsCount int64   `example:"123"                             format:"integer" json:"blobs_count"    swaggertype:"integer"`
+	Id         int64   `example:"321"                             format:"int64"  json:"id,omitempty"   swaggertype:"integer"`
+	Name       string  `example:"Rollup name"                     format:"string" json:"name,omitempty" swaggertype:"string"`
+	Logo       string  `example:"https://some_link.com/image.png" format:"string" json:"logo,omitempty" swaggertype:"string"`
+	Size       int64   `example:"123"                             format:"int64"  json:"size"           swaggertype:"integer"`
+	Fee        float64 `example:"123"                             format:"double" json:"fee"            swaggertype:"number"`
+	BlobsCount int64   `example:"123"                             format:"int64"  json:"blobs_count"    swaggertype:"integer"`
 }
 
 func NewRollupStats24h(stats storage.RollupStats24h) RollupStats24h {
@@ -144,7 +144,7 @@ func NewRollupStats24h(stats storage.RollupStats24h) RollupStats24h {
 
 type CountItem struct {
 	Name  string `example:"test"  format:"string" json:"name"  swaggertype:"string"`
-	Value int64  `example:"17632" format:"string" json:"value" swaggertype:"string"`
+	Value int64  `example:"17632" format:"int64"  json:"value" swaggertype:"integer"`
 }
 
 func NewCountItem(item storage.CountItem) CountItem {
@@ -155,11 +155,11 @@ func NewCountItem(item storage.CountItem) CountItem {
 }
 
 type RollupAllSeriesItem struct {
-	Name       string `example:"Rollup name"                     format:"string"  json:"name,omitempty" swaggertype:"string"`
-	Logo       string `example:"https://some_link.com/image.png" format:"string"  json:"logo,omitempty" swaggertype:"string"`
-	Size       int64  `example:"123"                             format:"integer" json:"size"           swaggertype:"integer"`
-	Fee        string `example:"123"                             format:"string"  json:"fee"            swaggertype:"string"`
-	BlobsCount int64  `example:"123"                             format:"integer" json:"blobs_count"    swaggertype:"integer"`
+	Name       string `example:"Rollup name"                     format:"string" json:"name,omitempty" swaggertype:"string"`
+	Logo       string `example:"https://some_link.com/image.png" format:"string" json:"logo,omitempty" swaggertype:"string"`
+	Size       int64  `example:"123"                             format:"int64"  json:"size"           swaggertype:"integer"`
+	Fee        string `example:"123"                             format:"string" json:"fee"            swaggertype:"string"`
+	BlobsCount int64  `example:"123"                             format:"int64"  json:"blobs_count"    swaggertype:"integer"`
 }
 
 func NewRollupAllSeriesItem(stats storage.RollupHistogramItem) RollupAllSeriesItem {
@@ -178,10 +178,10 @@ type RollupAllSeriesResponse struct {
 }
 
 type SizeGroup struct {
-	Name    string `example:"Rollup name" format:"string"  json:"name"     swaggertype:"string"`
-	Count   int64  `example:"123"         format:"integer" json:"count"    swaggertype:"integer"`
-	Size    int64  `example:"123"         format:"integer" json:"size"     swaggertype:"integer"`
-	AvgSize int64  `example:"123"         format:"integer" json:"avg_size" swaggertype:"integer"`
+	Name    string `example:"Rollup name" format:"string" json:"name"     swaggertype:"string"`
+	Count   int64  `example:"123"         format:"int64"  json:"count"    swaggertype:"integer"`
+	Size    int64  `example:"123"         format:"int64"  json:"size"     swaggertype:"integer"`
+	AvgSize int64  `example:"123"         format:"int64"  json:"avg_size" swaggertype:"integer"`
 }
 
 func NewSizeGroup(sg storage.SizeGroup) SizeGroup {

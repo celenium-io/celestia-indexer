@@ -197,7 +197,7 @@ func (p *namespaceList) SetDefault() {
 //	@Tags			namespace
 //	@ID				list-namespace
 //	@Param			limit	query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)	example(10)
-//	@Param			offset	query	integer	false	"Offset"										minimum(1)	example(10)
+//	@Param			offset	query	integer	false	"Offset"										minimum(0)	example(10)
 //	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)	example(asc)
 //	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, pfb_count, pff_count, size)	example(time)
 //	@Produce		json
@@ -225,7 +225,7 @@ func (handler *NamespaceHandler) List(c echo.Context) error {
 
 type getBlobsRequest struct {
 	Hash   string      `param:"hash"   validate:"required,base64"`
-	Height types.Level `param:"height" validation:"required,min=1"`
+	Height types.Level `param:"height" validate:"required,min=1"`
 }
 
 // GetBlobs godoc
@@ -235,7 +235,7 @@ type getBlobsRequest struct {
 //	@Tags			namespace
 //	@ID				get-namespace-blobs
 //	@Param			hash	path	string	true	"Base64-encoded namespace id and version"	example(AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0=)
-//	@Param			height	path	integer	true	"Block height"	minimum(1)	example(123)
+//	@Param			height	path	integer	true	"Block height"	minimum(1)	example(123)	format(int64)
 //	@Produce		json
 //	@Success		200	{array}		responses.Blob
 //	@Failure		400	{object}	Error
@@ -276,7 +276,7 @@ func (req *listByNamespace) SetDefault() {
 //	@Param			id		path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)	example(4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02)
 //	@Param			version	path	integer	true	"Version of namespace"	example(1)
 //	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)	example(10)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(0)	example(10)
 //	@Produce		json
 //	@Success		200	{array}	responses.NamespaceMessage
 //	@Success		204
@@ -399,15 +399,15 @@ func (req listBlobsRequest) toDbRequest(ctx context.Context, ns storage.INamespa
 //	@Tags			namespace
 //	@ID				get-blobs
 //	@Param			limit		query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)	example(10)
-//	@Param			offset		query	integer	false	"Offset"										minimum(1)	example(10)
+//	@Param			offset		query	integer	false	"Offset"										minimum(0)	example(10)
 //	@Param			sort		query	string	false	"Sort order. Default: desc"						Enums(asc, desc)	example(asc)
 //	@Param			sort_by		query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)	example(time)
 //	@Param			commitment	query	string	false	"Commitment value in URLbase64 format"	example(vbGakK59-Non81TE3ULg5Ve5ufT9SFm_bCyY-WLR3gg=)
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)
-//	@Param			signers		query	string	false	"Comma-separated celestia addresses"	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
-//	@Param			namespaces	query	string	false	"Comma-separated celestia namespaces"	example(AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0=)
-//	@Param			cursor		query	integer	false	"Last entity id which is used for cursor pagination"	minimum(1)	example(100)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)	format(int64)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)	format(int64)
+//	@Param			signers		query	[]string	false	"Comma-separated celestia addresses"	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)	collectionFormat(csv)
+//	@Param			namespaces	query	[]string	false	"Comma-separated celestia namespaces"	example(AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0=)	collectionFormat(csv)
+//	@Param			cursor		query	integer	false	"Last entity id which is used for cursor pagination"	minimum(0)	example(100)	format(int64)
 //	@Param			source	query	string	false	"Blob source. If it's empty both sources are returned"	Enums(pfb, fibre)	example(fibre)
 //	@Accept			json
 //	@Produce		json
@@ -570,15 +570,15 @@ func (req *getBlobLogsForNamespace) SetDefault() {
 //	@Param			id			path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)	example(4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02)
 //	@Param			version		path	integer	true	"Version of namespace"	example(1)
 //	@Param			limit		query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)	example(10)
-//	@Param			offset		query	integer	false	"Offset"										minimum(1)	example(10)
+//	@Param			offset		query	integer	false	"Offset"										minimum(0)	example(10)
 //	@Param			sort		query	string	false	"Sort order. Default: desc"						Enums(asc, desc)	example(asc)
 //	@Param			sort_by		query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)	example(time)
 //	@Param			commitment	query	string	false	"Commitment value in URLbase64 format"	example(vbGakK59-Non81TE3ULg5Ve5ufT9SFm_bCyY-WLR3gg=)
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)	format(int64)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)	format(int64)
 //	@Param			joins		query	boolean	false	"Flag indicating whether entities of rollup, transaction and signer should be attached or not. Default: true"	example(true)
-//	@Param			signers		query	string	false	"Comma-separated celestia addresses"	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
-//	@Param			cursor		query	integer	false	"Last entity id which is used for cursor pagination"	minimum(1)	example(100)
+//	@Param			signers		query	[]string	false	"Comma-separated celestia addresses"	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)	collectionFormat(csv)
+//	@Param			cursor		query	integer	false	"Last entity id which is used for cursor pagination"	minimum(0)	example(100)	format(int64)
 //	@Param			source	query	string	false	"Blob source. If it's empty both sources are returned"	Enums(pfb, fibre)	example(fibre)
 //	@Produce		json
 //	@Success		200	{array}		responses.BlobLog
@@ -669,7 +669,7 @@ func (handler *NamespaceHandler) GetBlobLogs(c echo.Context) error {
 //	@Param			id		path	string	true	"Namespace id in hexadecimal"	minlength(56)	maxlength(56)	example(4723ce10b187716adfc55ff7e6d9179c226e6b5440b02577cca49d02)
 //	@Param			version	path	integer	true	"Version of namespace"	example(1)
 //	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)	example(10)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(0)	example(10)
 //	@Produce		json
 //	@Success		200	{array}		responses.Rollup
 //	@Failure		400	{object}	Error
@@ -719,7 +719,7 @@ func (handler *NamespaceHandler) Rollups(c echo.Context) error {
 //	@Param			request	body postBlobRequest	true "Request body containing height, commitment and namespace hash"
 //	@Accept			json
 //	@Produce		json
-//	@Success		200	{object}	responses.BlobLog
+//	@Success		200	{array}		responses.BlobProof
 //	@Failure		400	{object}	Error
 //	@Router			/blob/proofs [post]
 func (handler *NamespaceHandler) BlobProofs(c echo.Context) error {

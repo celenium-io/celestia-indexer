@@ -31,11 +31,11 @@ type getVestingPeriodsRequest struct {
 //	@Description	Returns vesting periods by vesting id. Returns a non-empty array only for periodic vestings.
 //	@Tags			vesting
 //	@ID				get-vesting-periods
-//	@Param			id		path	integer	true	"Internal identity"	example(1)
+//	@Param			id		path	integer	true	"Internal identity"	example(1)	format(int64)
 //	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)	example(10)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(0)	example(10)
 //	@Produce		json
-//	@Success		200	{object}	responses.VestingPeriod
+//	@Success		200	{array}	responses.VestingPeriod
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
 //	@Router			/vesting/{id}/periods [get]

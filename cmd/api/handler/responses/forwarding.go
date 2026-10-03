@@ -16,13 +16,13 @@ type Forwarding struct {
 	Id          uint64         `example:"321"                                                                          format:"int64"     json:"id"           swaggertype:"integer"`
 	Height      pkgTypes.Level `example:"100"                                                                          format:"int64"     json:"height"       swaggertype:"integer"`
 	Time        time.Time      `example:"2023-07-04T03:10:57+00:00"                                                    format:"date-time" json:"time"         swaggertype:"string"`
-	TxHash      string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"             format:"binary"    json:"tx_hash"      swaggertype:"string"`
+	TxHash      string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF"             format:"hex"       json:"tx_hash"      swaggertype:"string"`
 	DestDomain  uint64         `example:"11155111"                                                                     format:"int64"     json:"dest_domain"  swaggertype:"integer"`
-	DestAddress string         `example:"0x000000000000000000000000d5e85e86fc692cedad6d6992f1f0ccf273e39913"           format:"binary"    json:"dest_address" swaggertype:"string"`
+	DestAddress string         `example:"0x000000000000000000000000d5e85e86fc692cedad6d6992f1f0ccf273e39913"           format:"hex"       json:"dest_address" swaggertype:"string"`
 	Amount      string         `example:"1000000"                                                                      format:"string"    json:"amount"       swaggertype:"string"`
-	Denom       string         `example:"hyperlane/0x726f757465725f61707000000000000000000000000000020000000000000024" format:"string"    json:"denom"        swaggertype:"string"`
-	MessageId   string         `example:"0xac8852bd411c0c88cdadfe9b2386b2bcd702f35479c25a4b2d2cc3fb49d095d4"           format:"string"    json:"message_id"   swaggertype:"string"`
-	TokenId     string         `example:"12652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF345"        format:"string"    json:"token_id"     swaggertype:"string"`
+	Denom       string         `example:"hyperlane/0x726f757465725f61707000000000000000000000000000020000000000000024" format:"hex"       json:"denom"        swaggertype:"string"`
+	MessageId   string         `example:"₀xac8852bd411c₀c88cdadfe9b2386b2bcd7₀2f35479c25a4b2d2cc3fb49d₀95d4"           format:"hex"       json:"message_id"   swaggertype:"string"`
+	TokenId     string         `example:"12652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF345"        format:"hex"       json:"token_id"     swaggertype:"string"`
 
 	Chain          *ChainMetadata    `json:"chain,omitempty"`
 	ForwardAddress *ShortAddress     `json:"forward_address,omitempty"`
@@ -66,7 +66,7 @@ func NewForwarding(forwarding storage.Forwarding, store hyperlane.IChainStore) F
 type ForwardingInput struct {
 	Height pkgTypes.Level `example:"100"                                                              format:"int64"     json:"height"   swaggertype:"integer"`
 	Time   time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"     swaggertype:"string"`
-	TxHash string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash"  swaggertype:"string"`
+	TxHash string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"tx_hash"  swaggertype:"string"`
 	From   string         `example:"0x000000000000000000000000123456789abcdef123456789abcdef12345609" format:"string"    json:"from"     swaggertype:"string"`
 	Amount string         `example:"123445"                                                           format:"string"    json:"received" swaggertype:"string"`
 	Denom  string         `example:"utia"                                                             format:"string"    json:"denom"    swaggertype:"string"`

@@ -31,10 +31,10 @@ func NewDelegation(d storage.Delegation) Delegation {
 }
 
 type Undelegation struct {
-	Height         pkgTypes.Level `example:"100"                       json:"height"          swaggertype:"integer"`
-	Time           time.Time      `example:"2023-07-04T03:10:57+00:00" json:"time"            swaggertype:"string"`
-	CompletionTime time.Time      `example:"2023-07-04T03:10:57+00:00" json:"completion_time" swaggertype:"string"`
-	Amount         string         `example:"0.1"                       json:"amount"          swaggertype:"string"`
+	Height         pkgTypes.Level `example:"100"                       format:"int64"     json:"height"          swaggertype:"integer"`
+	Time           time.Time      `example:"2023-07-04T03:10:57+00:00" format:"date-time" json:"time"            swaggertype:"string"`
+	CompletionTime time.Time      `example:"2023-07-04T03:10:57+00:00" format:"date-time" json:"completion_time" swaggertype:"string"`
+	Amount         string         `example:"0.1"                       json:"amount"      swaggertype:"string"`
 
 	Delegator *ShortAddress   `json:"delegator,omitempty"`
 	Validator *ShortValidator `json:"validator,omitempty"`
@@ -57,10 +57,10 @@ func NewUndelegation(d storage.Undelegation) Undelegation {
 }
 
 type Redelegation struct {
-	Height         pkgTypes.Level `example:"100"                       json:"height"          swaggertype:"integer"`
-	Time           time.Time      `example:"2023-07-04T03:10:57+00:00" json:"time"            swaggertype:"string"`
-	CompletionTime time.Time      `example:"2023-07-04T03:10:57+00:00" json:"completion_time" swaggertype:"string"`
-	Amount         string         `example:"0.1"                       json:"amount"          swaggertype:"string"`
+	Height         pkgTypes.Level `example:"100"                       format:"int64"     json:"height"          swaggertype:"integer"`
+	Time           time.Time      `example:"2023-07-04T03:10:57+00:00" format:"date-time" json:"time"            swaggertype:"string"`
+	CompletionTime time.Time      `example:"2023-07-04T03:10:57+00:00" format:"date-time" json:"completion_time" swaggertype:"string"`
+	Amount         string         `example:"0.1"                       json:"amount"      swaggertype:"string"`
 
 	Delegator   *ShortAddress   `json:"delegator,omitempty"`
 	Source      *ShortValidator `json:"source,omitempty"`

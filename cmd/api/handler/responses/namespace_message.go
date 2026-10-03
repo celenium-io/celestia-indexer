@@ -19,7 +19,7 @@ type NamespaceMessage struct {
 
 	Type string `enums:"MsgWithdrawValidatorCommission,MsgWithdrawDelegatorReward,MsgEditValidator,MsgBeginRedelegate,MsgCreateValidator,MsgDelegate,MsgUndelegate,MsgUnjail,MsgSend,MsgCreateVestingAccount,MsgCreatePeriodicVestingAccount,MsgPayForBlobs,MsgGrantAllowance" example:"MsgCreatePeriodicVestingAccount" format:"string" json:"type" swaggertype:"string"`
 
-	Data      map[string]any `json:"data"`
+	Data      map[string]any `json:"data"      swaggertype:"object"`
 	Tx        Tx             `json:"tx"`
 	Namespace Namespace      `json:"namespace"`
 }

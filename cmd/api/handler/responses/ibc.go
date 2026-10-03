@@ -16,19 +16,19 @@ type IbcClient struct {
 	Type                  string         `example:"client"                                                           format:"string"    json:"type"                    swaggertype:"string"`
 	CreatedAt             time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"created_at"              swaggertype:"string"`
 	UpdatedAt             time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"updated_at"              swaggertype:"string"`
-	Height                pkgTypes.Level `example:"100"                                                              format:"integer"   json:"height"                  swaggertype:"integer"`
+	Height                pkgTypes.Level `example:"100"                                                              format:"int64"     json:"height"                  swaggertype:"integer"`
 	ChainId               string         `example:"osmosis-1"                                                        format:"string"    json:"chain_id"                swaggertype:"string"`
-	TxHash                string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash"                 swaggertype:"string"`
-	LatestRevisionHeight  uint64         `example:"100"                                                              format:"integer"   json:"latest_revision_height"  swaggertype:"integer"`
-	LatestRevisionNumber  uint64         `example:"100"                                                              format:"integer"   json:"latest_revision_number"  swaggertype:"integer"`
-	FrozenRevisionHeight  uint64         `example:"100"                                                              format:"integer"   json:"frozen_revision_height"  swaggertype:"integer"`
-	FrozenRevisionNumber  uint64         `example:"100"                                                              format:"integer"   json:"frozen_revision_number"  swaggertype:"integer"`
-	TrustingPeriod        time.Duration  `example:"100"                                                              format:"integer"   json:"trusting_period"         swaggertype:"integer"`
-	UnbondingPeriod       time.Duration  `example:"100"                                                              format:"integer"   json:"unbonding_period"        swaggertype:"integer"`
-	MaxClockDrift         time.Duration  `example:"100"                                                              format:"integer"   json:"max_clock_drift"         swaggertype:"integer"`
-	TrustLevelDenominator uint64         `example:"100"                                                              format:"integer"   json:"trust_level_denominator" swaggertype:"integer"`
-	TrustLevelNumerator   uint64         `example:"100"                                                              format:"integer"   json:"trust_level_numerator"   swaggertype:"integer"`
-	ConnectionCount       uint64         `example:"100"                                                              format:"integer"   json:"connection_count"        swaggertype:"integer"`
+	TxHash                string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"tx_hash"                 swaggertype:"string"`
+	LatestRevisionHeight  uint64         `example:"100"                                                              format:"int64"     json:"latest_revision_height"  swaggertype:"integer"`
+	LatestRevisionNumber  uint64         `example:"100"                                                              format:"int64"     json:"latest_revision_number"  swaggertype:"integer"`
+	FrozenRevisionHeight  uint64         `example:"100"                                                              format:"int64"     json:"frozen_revision_height"  swaggertype:"integer"`
+	FrozenRevisionNumber  uint64         `example:"100"                                                              format:"int64"     json:"frozen_revision_number"  swaggertype:"integer"`
+	TrustingPeriod        time.Duration  `example:"100"                                                              format:"int64"     json:"trusting_period"         swaggertype:"integer"`
+	UnbondingPeriod       time.Duration  `example:"100"                                                              format:"int64"     json:"unbonding_period"        swaggertype:"integer"`
+	MaxClockDrift         time.Duration  `example:"100"                                                              format:"int64"     json:"max_clock_drift"         swaggertype:"integer"`
+	TrustLevelDenominator uint64         `example:"100"                                                              format:"int64"     json:"trust_level_denominator" swaggertype:"integer"`
+	TrustLevelNumerator   uint64         `example:"100"                                                              format:"int64"     json:"trust_level_numerator"   swaggertype:"integer"`
+	ConnectionCount       uint64         `example:"100"                                                              format:"int64"     json:"connection_count"        swaggertype:"integer"`
 
 	Creator *ShortAddress `json:"creator,omitempty"`
 }
@@ -64,7 +64,7 @@ func NewIbcClient(client storage.IbcClient) IbcClient {
 type ShortIbcClient struct {
 	Id      string `example:"client-1"  format:"string" json:"id"       swaggertype:"string"`
 	Type    string `example:"client"    format:"string" json:"type"     swaggertype:"string"`
-	ChainId string `example:"osmosis-1" format:"binary" json:"chain_id" swaggertype:"string"`
+	ChainId string `example:"osmosis-1" format:"string" json:"chain_id" swaggertype:"string"`
 }
 
 func NewShortIbcClient(client *storage.IbcClient) *ShortIbcClient {
@@ -84,11 +84,11 @@ type IbcConnection struct {
 	CounterpartyClientId string         `example:"client-1"                                                         format:"string"    json:"counterparty_client_id"     swaggertype:"string"`
 	CreatedAt            time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"created_at"                 swaggertype:"string"`
 	ConnectedAt          time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"connected_at"               swaggertype:"string"`
-	Height               pkgTypes.Level `example:"100"                                                              format:"integer"   json:"height"                     swaggertype:"integer"`
-	ConnectedHeight      pkgTypes.Level `example:"100"                                                              format:"integer"   json:"connected_height"           swaggertype:"integer"`
-	CreatedTxHash        string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"created_tx_hash"            swaggertype:"string"`
-	ConnectedTxHash      string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"connected_tx_hash"          swaggertype:"string"`
-	ChannelsCount        int64          `example:"100"                                                              format:"integer"   json:"channels_count"             swaggertype:"integer"`
+	Height               pkgTypes.Level `example:"100"                                                              format:"int64"     json:"height"                     swaggertype:"integer"`
+	ConnectedHeight      pkgTypes.Level `example:"100"                                                              format:"int64"     json:"connected_height"           swaggertype:"integer"`
+	CreatedTxHash        string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"created_tx_hash"            swaggertype:"string"`
+	ConnectedTxHash      string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"connected_tx_hash"          swaggertype:"string"`
+	ChannelsCount        int64          `example:"100"                                                              format:"int64"     json:"channels_count"             swaggertype:"integer"`
 
 	Client *ShortIbcClient `json:"client,omitempty"`
 }
@@ -125,10 +125,10 @@ type IbcChannel struct {
 	Version               string         `example:"ics20-1"                                                          format:"string"    json:"version"                        swaggertype:"string"`
 	CreatedAt             time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"created_at"                     swaggertype:"string"`
 	ConfirmedAt           *time.Time     `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"confirmed_at,omitempty"         swaggertype:"string"`
-	Height                pkgTypes.Level `example:"100"                                                              format:"integer"   json:"height"                         swaggertype:"integer"`
-	ConfirmationHeight    pkgTypes.Level `example:"100"                                                              format:"integer"   json:"confirmation_height,omitempty"  swaggertype:"integer"`
-	CreatedTxHash         string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"created_tx_hash"                swaggertype:"string"`
-	ConfirmationTxHash    string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"confirmation_tx_hash,omitempty" swaggertype:"string"`
+	Height                pkgTypes.Level `example:"100"                                                              format:"int64"     json:"height"                         swaggertype:"integer"`
+	ConfirmationHeight    pkgTypes.Level `example:"100"                                                              format:"int64"     json:"confirmation_height,omitempty"  swaggertype:"integer"`
+	CreatedTxHash         string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"created_tx_hash"                swaggertype:"string"`
+	ConfirmationTxHash    string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"confirmation_tx_hash,omitempty" swaggertype:"string"`
 	Ordering              bool           `example:"false"                                                            format:"boolean"   json:"ordering"                       swaggertype:"boolean"`
 	Status                string         `example:"opened"                                                           format:"string"    json:"status"                         swaggertype:"string"`
 
@@ -168,9 +168,9 @@ func NewIbcChannel(channel storage.IbcChannel) IbcChannel {
 }
 
 type IbcTransfer struct {
-	Id            uint64         `example:"123456"                                                           format:"integer"   json:"id"                       swaggertype:"integer"`
+	Id            uint64         `example:"123456"                                                           format:"int64"     json:"id"                       swaggertype:"integer"`
 	Time          time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"                     swaggertype:"string"`
-	Height        pkgTypes.Level `example:"100"                                                              format:"integer"   json:"height"                   swaggertype:"integer"`
+	Height        pkgTypes.Level `example:"100"                                                              format:"int64"     json:"height"                   swaggertype:"integer"`
 	ChannelId     string         `example:"channel-1"                                                        format:"string"    json:"channel_id"               swaggertype:"string"`
 	ConnectionId  string         `example:"connection-1"                                                     format:"string"    json:"connection_id"            swaggertype:"string"`
 	Port          string         `example:"transfer"                                                         format:"string"    json:"port"                     swaggertype:"string"`
@@ -178,10 +178,10 @@ type IbcTransfer struct {
 	Denom         string         `example:"utia"                                                             format:"string"    json:"denom"                    swaggertype:"string"`
 	Memo          string         `example:"memo"                                                             format:"string"    json:"memo,omitempty"           swaggertype:"string"`
 	Timeout       *time.Time     `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"timeout,omitempty"        swaggertype:"string"`
-	TimeoutHeight uint64         `example:"100"                                                              format:"integer"   json:"timeout_height,omitempty" swaggertype:"integer"`
-	TxHash        string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash"                  swaggertype:"string"`
-	Sequence      uint64         `example:"123456"                                                           format:"integer"   json:"sequence"                 swaggertype:"integer"`
-	ChainId       string         `example:"osmosis-1"                                                        format:"binary"    json:"chain_id"                 swaggertype:"string"`
+	TimeoutHeight uint64         `example:"100"                                                              format:"int64"     json:"timeout_height,omitempty" swaggertype:"integer"`
+	TxHash        string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"tx_hash"                  swaggertype:"string"`
+	Sequence      uint64         `example:"123456"                                                           format:"int64"     json:"sequence"                 swaggertype:"integer"`
+	ChainId       string         `example:"osmosis-1"                                                        format:"string"    json:"chain_id"                 swaggertype:"string"`
 
 	Sender   *ShortAddress `json:"sender,omitempty"`
 	Receiver *ShortAddress `json:"receiver,omitempty"`
@@ -258,9 +258,9 @@ func NewIbcChainStats(stats storage.ChainStats) IbcChainStats {
 }
 
 type BusiestChannel struct {
-	ChannelId      string `example:"channel-1" format:"string"  json:"channel_id"      swaggertype:"string"`
-	TransfersCount int64  `example:"100"       format:"integer" json:"transfers_count" swaggertype:"integer"`
-	ChainId        string `example:"osmosis-1" format:"string"  json:"chain_id"        swaggertype:"string"`
+	ChannelId      string `example:"channel-1" format:"string" json:"channel_id"      swaggertype:"string"`
+	TransfersCount int64  `example:"100"       format:"int64"  json:"transfers_count" swaggertype:"integer"`
+	ChainId        string `example:"osmosis-1" format:"string" json:"chain_id"        swaggertype:"string"`
 }
 
 type IbcSummaryStats struct {

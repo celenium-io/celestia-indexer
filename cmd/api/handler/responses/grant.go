@@ -10,14 +10,14 @@ import (
 )
 
 type Grant struct {
-	Authorization string     `example:"/cosmos.staking.v1beta1.MsgDelegate" json:"authorization"           swaggertype:"string"`
-	Expiration    *time.Time `example:"2023-07-04T03:10:57+00:00"           json:"expiration,omitempty"    swaggertype:"string"`
-	Revoked       bool       `example:"true"                                json:"revoked"                 swaggertype:"boolean"`
-	RevokeHeight  uint64     `example:"123123"                              json:"revoke_height,omitempty" swaggertype:"integer"`
-	Height        uint64     `example:"123123"                              json:"height"                  swaggertype:"integer"`
-	Time          time.Time  `example:"2023-07-04T03:10:57+00:00"           json:"time"                    swaggertype:"string"`
+	Authorization string     `example:"/cosmos.staking.v1beta1.MsgDelegate" json:"authorization" swaggertype:"string"`
+	Expiration    *time.Time `example:"2023-07-04T03:10:57+00:00"           format:"date-time"   json:"expiration,omitempty"    swaggertype:"string"`
+	Revoked       bool       `example:"true"                                json:"revoked"       swaggertype:"boolean"`
+	RevokeHeight  uint64     `example:"123123"                              format:"int64"       json:"revoke_height,omitempty" swaggertype:"integer"`
+	Height        uint64     `example:"123123"                              format:"int64"       json:"height"                  swaggertype:"integer"`
+	Time          time.Time  `example:"2023-07-04T03:10:57+00:00"           format:"date-time"   json:"time"                    swaggertype:"string"`
 
-	Params  map[string]any `json:"params"`
+	Params  map[string]any `json:"params"            swaggertype:"object"`
 	Granter *ShortAddress  `json:"granter,omitempty"`
 	Grantee *ShortAddress  `json:"grantee,omitempty"`
 }

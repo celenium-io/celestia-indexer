@@ -67,13 +67,14 @@ func (p *rollupList) SetDefault() {
 //		@Tags			rollup
 //		@ID				list-rollup
 //		@Param			limit	 query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)	example(10)
-//		@Param			offset	 query	integer	false	"Offset"						minimum(1)	example(10)
+//		@Param			offset	 query	integer	false	"Offset"						minimum(0)	example(10)
 //		@Param			sort	 query	string	false	"Sort order. Default: desc"		Enums(asc, desc)	example(asc)
 //		@Param			sort_by	 query	string	false	"Sort field. Default: size"		Enums(time, blobs_count, size, fee)	example(time)
-//	    @Param          category query  string  false   "Comma-separated rollup category list"	example(nft)
-//	    @Param          tags     query  string  false   "Comma-separated rollup tags list"	example(gaming)
-//	    @Param          stack    query  string  false   "Comma-separated rollup stack list"	example(op_stack)
-//	    @Param          provider query  string  false   "Comma-separated rollup provider list"	example(name)
+//	    @Param          category query  []string  false   "Comma-separated rollup category list"	example(nft)	collectionFormat(csv)
+//	    @Param          tags     query  []string  false   "Comma-separated rollup tags list"	example(gaming)	collectionFormat(csv)
+//	    @Param          stack    query  []string  false   "Comma-separated rollup stack list"	example(op_stack)	collectionFormat(csv)
+//	    @Param          provider query  []string  false   "Comma-separated rollup provider list"	example(name)	collectionFormat(csv)
+//	    @Param          type     query  []string  false   "Comma-separated rollup type list"	Enums(sovereign, settled, other)	example(sovereign)	collectionFormat(csv)
 //		@Param			is_active query	boolean	false	"If true, shows rollups with activity over the last month"	example(true)
 //		@Produce		json
 //		@Success		200	{array}		responses.RollupWithStats
@@ -150,13 +151,14 @@ func (p *rollupDayList) SetDefault() {
 //	@Tags			rollup
 //	@ID				list-rollup-24h
 //	@Param			limit	 query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)	example(10)
-//	@Param			offset	 query	integer	false	"Offset"						minimum(1)	example(10)
+//	@Param			offset	 query	integer	false	"Offset"						minimum(0)	example(10)
 //	@Param			sort	 query	string	false	"Sort order. Default: desc"		Enums(asc, desc)	example(asc)
 //	@Param			sort_by	 query	string	false	"Sort field. Default: mb_price"	Enums(avg_size, blobs_count, fibre_blobs_count, total_size, total_fee, throughput, namespace_count, pfb_count, pff_count, mb_price)	example(avg_size)
-//	@Param          category query  string  false   "Comma-separated rollup category list"	example(nft)
-//	@Param          tags     query  string  false   "Comma-separated rollup tags list"	example(gaming)
-//	@Param          stack    query  string  false   "Comma-separated rollup stack list"	example(op_stack)
-//	@Param          provider query  string  false   "Comma-separated rollup provider list"	example(name)
+//	@Param          category query  []string  false   "Comma-separated rollup category list"	example(nft)	collectionFormat(csv)
+//	@Param          tags     query  []string  false   "Comma-separated rollup tags list"	example(gaming)	collectionFormat(csv)
+//	@Param          stack    query  []string  false   "Comma-separated rollup stack list"	example(op_stack)	collectionFormat(csv)
+//	@Param          provider query  []string  false   "Comma-separated rollup provider list"	example(name)	collectionFormat(csv)
+//	@Param          type     query  []string  false   "Comma-separated rollup type list"	Enums(sovereign, settled, other)	example(sovereign)	collectionFormat(csv)
 //	@Produce		json
 //	@Success		200	{array}		responses.RollupWithDayStats
 //	@Failure		400	{object}	Error
@@ -206,7 +208,7 @@ func (handler RollupHandler) LeaderboardDay(c echo.Context) error {
 //	@Description	Returns detailed information and cumulative statistics for the rollup identified by its internal id, including name, description, social links, namespaces, and providers.
 //	@Tags			rollup
 //	@ID				get-rollup
-//	@Param			id	path	integer	true	"Internal identity"	minimum(1)	example(1)
+//	@Param			id	path	integer	true	"Internal identity"	minimum(1)	example(1)	format(int64)
 //	@Produce		json
 //	@Success		200	{object}	responses.Rollup
 //	@Success		204
@@ -245,9 +247,9 @@ func (req *getRollupPages) SetDefault() {
 //	@Description	Returns a paginated list of namespaces that the rollup has submitted blobs to.
 //	@Tags			rollup
 //	@ID				get-rollup-namespaces
-//	@Param			id		path	integer	true	"Internal identity"				minimum(1)	example(1)
+//	@Param			id		path	integer	true	"Internal identity"				minimum(1)	example(1)	format(int64)
 //	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)	example(10)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(0)	example(10)
 //	@Produce		json
 //	@Success		200	{array}		responses.Namespace
 //	@Failure		400	{object}	Error
@@ -286,7 +288,7 @@ func (handler RollupHandler) GetNamespaces(c echo.Context) error {
 //	@Description	Returns a list of data availability providers associated with the rollup (e.g. Celestia addresses used for blob submission).
 //	@Tags			rollup
 //	@ID				get-rollup-providers
-//	@Param			id		path	integer	true	"Internal identity"				minimum(1)	example(1)
+//	@Param			id		path	integer	true	"Internal identity"				minimum(1)	example(1)	format(int64)
 //	@Produce		json
 //	@Success		200	{array}		responses.RollupProvider
 //	@Failure		400	{object}	Error
@@ -339,9 +341,9 @@ func (p *getRollupPagesWithSort) SetDefault() {
 //	@Description	Returns a paginated list of blobs submitted by the rollup. Supports sorting by time or size and optionally joining transaction and signer entities.
 //	@Tags			rollup
 //	@ID				get-rollup-blobs
-//	@Param			id		path	integer	true	"Internal identity"								minimum(1)	example(1)
+//	@Param			id		path	integer	true	"Internal identity"								minimum(1)	example(1)	format(int64)
 //	@Param			limit	query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)	example(10)
-//	@Param			offset	query	integer	false	"Offset"										minimum(1)	example(10)
+//	@Param			offset	query	integer	false	"Offset"										minimum(0)	example(10)
 //	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)	example(asc)
 //	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)	example(time)
 //	@Param			joins	query	boolean	false	"Flag indicating whether entities of transaction and signer should be attached or not. Default: true"	example(true)
@@ -403,11 +405,11 @@ type rollupStatsRequest struct {
 //	@Description	Returns a time-series histogram for the rollup with the selected metric (blobs_count, size, size_per_blob, or fee) aggregated by the given timeframe.
 //	@Tags			rollup
 //	@ID				get-rollup-stats
-//	@Param			id			path	integer	true	"Internal identity"				minimum(1)	example(1)
+//	@Param			id			path	integer	true	"Internal identity"				minimum(1)	example(1)	format(int64)
 //	@Param			name		path	string	true	"Series name"					Enums(blobs_count, size, size_per_blob, fee)	example(blobs_count)
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)	example(day)
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)	format(int64)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)	format(int64)
 //	@Produce		json
 //	@Success		200	{array}		responses.HistogramItem
 //	@Failure		400	{object}	Error
@@ -498,7 +500,7 @@ func (handler RollupHandler) AllSeries(c echo.Context) error {
 //	@Tags			rollup
 //	@ID				get-rollups-count
 //	@Produce		json
-//	@Success		200	{integer}	uint64
+//	@Success		200	{object}	uint64
 //	@Failure		500	{object}	Error
 //	@Router			/rollup/count [get]
 func (handler RollupHandler) Count(c echo.Context) error {
@@ -552,7 +554,7 @@ type rollupDistributionRequest struct {
 //	@Description	Returns the intra-timeframe distribution (e.g. by hour-of-day) for the selected rollup metric, useful for identifying activity patterns.
 //	@Tags			rollup
 //	@ID				get-rollup-distribution
-//	@Param			id			path	integer	true	"Internal identity"	minimum(1)	example(1)
+//	@Param			id			path	integer	true	"Internal identity"	minimum(1)	example(1)	format(int64)
 //	@Param			name		path	string	true	"Series name"		Enums(blobs_count, size, size_per_blob, fee_per_blob)	example(blobs_count)
 //	@Param			timeframe	path	string	true	"Timeframe"			Enums(hour, day)	example(day)
 //	@Produce		json
@@ -595,9 +597,10 @@ type exportBlobsRequest struct {
 //	@Description	Streams a plain-text export of blob metadata submitted by the rollup, optionally filtered by a time range. The response is streamed line by line.
 //	@Tags			rollup
 //	@ID				rollup-export
-//	@Param			id		path	integer	true	"Internal identity"				minimum(1)	example(1)
-//	@Param			from	query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
-//	@Param			to		query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)
+//	@Param			id		path	integer	true	"Internal identity"				minimum(1)	example(1)	format(int64)
+//	@Param			from	query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)	format(int64)
+//	@Param			to		query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)	format(int64)
+//	@Produce		text/plain
 //	@Success		200
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error

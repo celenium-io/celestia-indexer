@@ -39,11 +39,11 @@ func NewBlob(blob types.Blob) (Blob, error) {
 }
 
 type BlobLog struct {
-	Id           uint64         `example:"200"                                          format:"integer"   json:"id"            swaggertype:"integer"`
+	Id           uint64         `example:"200"                                          format:"int64"     json:"id"            swaggertype:"integer"`
 	Commitment   string         `example:"vbGakK59+Non81TE3ULg5Ve5ufT9SFm/bCyY+WLR3gg=" format:"base64"    json:"commitment"    swaggertype:"string"`
-	Size         int64          `example:"10"                                           format:"integer"   json:"size"          swaggertype:"integer"`
+	Size         int64          `example:"10"                                           format:"int64"     json:"size"          swaggertype:"integer"`
 	ShareVersion int            `example:"0"                                            format:"integer"   json:"share_version" swaggertype:"integer"`
-	Height       pkgTypes.Level `example:"100"                                          format:"integer"   json:"height"        swaggertype:"integer"`
+	Height       pkgTypes.Level `example:"100"                                          format:"int64"     json:"height"        swaggertype:"integer"`
 	Time         time.Time      `example:"2023-07-04T03:10:57+00:00"                    format:"date-time" json:"time"          swaggertype:"string"`
 	ContentType  string         `example:"image/png"                                    format:"string"    json:"content_type"  swaggertype:"string"`
 	Source       string         `example:"fibre"                                        format:"string"    json:"source"        swaggertype:"string"`
@@ -80,15 +80,15 @@ func NewBlobLog(blob storage.BlobLog) BlobLog {
 }
 
 type LightBlobLog struct {
-	Id           uint64         `example:"200"                                                              format:"integer"   json:"id"            swaggertype:"integer"`
+	Id           uint64         `example:"200"                                                              format:"int64"     json:"id"            swaggertype:"integer"`
 	Commitment   string         `example:"vbGakK59+Non81TE3ULg5Ve5ufT9SFm/bCyY+WLR3gg="                     format:"base64"    json:"commitment"    swaggertype:"string"`
-	Size         int64          `example:"10"                                                               format:"integer"   json:"size"          swaggertype:"integer"`
+	Size         int64          `example:"10"                                                               format:"int64"     json:"size"          swaggertype:"integer"`
 	ShareVersion int            `example:"0"                                                                format:"integer"   json:"share_version" swaggertype:"integer"`
-	Height       pkgTypes.Level `example:"100"                                                              format:"integer"   json:"height"        swaggertype:"integer"`
+	Height       pkgTypes.Level `example:"100"                                                              format:"int64"     json:"height"        swaggertype:"integer"`
 	Time         time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"          swaggertype:"string"`
 	ContentType  string         `example:"image/png"                                                        format:"string"    json:"content_type"  swaggertype:"string"`
 	Namespace    string         `example:"AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0="                         format:"base64"    json:"namespace"     swaggertype:"string"`
-	TxHash       string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash"       swaggertype:"string"`
+	TxHash       string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"tx_hash"       swaggertype:"string"`
 	Source       string         `example:"fibre"                                                            format:"string"    json:"source"        swaggertype:"string"`
 
 	Signer *ShortAddress `json:"signer,omitempty"`

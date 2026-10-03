@@ -90,13 +90,13 @@ func (req *signalsRequest) ToFilters(
 //		@Description	Returns a paginated list of validator upgrade signals (MsgSignalVersion messages) indicating readiness to upgrade to a new software version. Supports filtering by version, validator, transaction hash, and time range.
 //		@Tags			signal
 //		@ID				list-signal
-//	    @Param			version	query	integer	false	"Version"	example(1)
-//	    @Param			validator_id	query	integer	false	"Validator internal id"	example(1)
+//	    @Param			version	query	integer	false	"Version"	example(1)	format(int64)
+//	    @Param			validator_id	query	integer	false	"Validator internal id"	example(1)	format(int64)
 //	    @Param			tx_hash	query	string	false	"Transaction hash"	example(652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF)
 //		@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)	example(10)
-//		@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
-//		@Param			from	query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
-//		@Param			to		query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)
+//		@Param			offset	query	integer	false	"Offset"						minimum(0)	example(10)
+//		@Param			from	query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)	format(int64)
+//		@Param			to		query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)	format(int64)
 //		@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)	example(asc)
 //		@Produce		json
 //		@Success		200	{array}		responses.SignalVersion
@@ -185,11 +185,11 @@ func (req *upgradesRequest) ToFilters(
 //	@Description	Returns a paginated list of on-chain network upgrades that were activated. Supports filtering by block height, transaction hash, and signer address.
 //	@Tags			signal
 //	@ID				list-upgrades
-//	@Param			height	query	integer	false	"Number of block"	example(123)
+//	@Param			height	query	integer	false	"Number of block"	example(123)	format(int64)
 //	@Param			tx_hash	query	string	false	"Transaction hash"	example(652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF)
 //	@Param			signer	query	string	false	"Signer address"	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
 //	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)	example(10)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(0)	example(10)
 //	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)	example(asc)
 //	@Produce		json
 //	@Success		200	{array}		responses.Upgrade
@@ -229,7 +229,7 @@ type upgradeRequest struct {
 //	@Description	Returns details of the on-chain network upgrade for the given software version number, including the activation block height and quorum of signals received.
 //	@Tags			signal
 //	@ID				get-upgrade
-//	@Param			version	path	integer	true	"Upgrade version"	example(1)
+//	@Param			version	path	integer	true	"Upgrade version"	example(1)	format(int64)
 //	@Produce		json
 //	@Success		200	{object}		responses.Upgrade
 //	@Failure		400	{object}	Error

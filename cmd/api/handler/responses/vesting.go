@@ -13,12 +13,12 @@ import (
 )
 
 type Vesting struct {
-	Id        uint64            `example:"12"                                                               format:"integer"   json:"id"                   swaggertype:"integer"`
-	Height    pkgTypes.Level    `example:"100"                                                              format:"integer"   json:"height"               swaggertype:"integer"`
+	Id        uint64            `example:"12"                                                               format:"int64"     json:"id"                   swaggertype:"integer"`
+	Height    pkgTypes.Level    `example:"100"                                                              format:"int64"     json:"height"               swaggertype:"integer"`
 	Time      time.Time         `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"                 swaggertype:"string"`
 	StartTime *time.Time        `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"start_time,omitempty" swaggertype:"string"`
 	EndTime   *time.Time        `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"end_time,omitempty"   swaggertype:"string"`
-	Hash      string            `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"hash,omitempty"       swaggertype:"string"`
+	Hash      string            `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"hash,omitempty"       swaggertype:"string"`
 	Type      types.VestingType `example:"delayed"                                                          format:"string"    json:"type"                 swaggertype:"string"`
 	Amount    string            `example:"123.13333"                                                        format:"string"    json:"amount"               swaggertype:"string"`
 }
