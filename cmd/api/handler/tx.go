@@ -111,15 +111,16 @@ func maxTime(a, b time.Time) time.Time {
 //	@Tags			transactions
 //	@ID				list-transactions
 //	@Param			limit				query	integer			false	"Count of requested entities"	minimum(1)	maximum(100)	example(10)
-//	@Param			offset				query	integer			false	"Offset"						minimum(1)	example(10)
+//	@Param			offset				query	integer			false	"Offset"						minimum(0)	example(10)
 //	@Param			sort				query	string			false	"Sort order"					Enums(asc, desc)	example(asc)
-//	@Param			status				query	types.Status	false	"Comma-separated status list"	example(success)
-//	@Param			msg_type			query	types.MsgType	false	"Comma-separated message types list"	example(MsgSend)
-//	@Param			excluded_msg_type	query	types.MsgType	false	"Comma-separated message types list which should be excluded"	example(MsgSend)
-//	@Param			from				query	integer			false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
-//	@Param			to					query	integer			false	"Time to in unix timestamp"		minimum(1)	example(1720000000)
-//	@Param			height				query	integer			false	"Block number"					minimum(1)	example(123)
+//	@Param			status				query	[]types.Status	false	"Comma-separated status list"	example(success)	collectionFormat(csv)
+//	@Param			msg_type			query	[]types.MsgType	false	"Comma-separated message types list"	example(MsgSend)	collectionFormat(csv)
+//	@Param			excluded_msg_type	query	[]types.MsgType	false	"Comma-separated message types list which should be excluded"	example(MsgSend)	collectionFormat(csv)
+//	@Param			from				query	integer			false	"Time from in unix timestamp"	minimum(1)	example(1690000000)	format(int64)
+//	@Param			to					query	integer			false	"Time to in unix timestamp"		minimum(1)	example(1720000000)	format(int64)
+//	@Param			height				query	integer			false	"Block number"					minimum(0)	example(123)	format(int64)
 //	@Param			messages			query	boolean			false	"If true join messages"	example(true)
+//	@Param			cursor				query	integer			false	"Last entity id which is used for cursor pagination"	minimum(1)	example(100)	format(int64)
 //	@Produce		json
 //	@Success		200	{array}		responses.Tx
 //	@Failure		400	{object}	Error
@@ -199,7 +200,7 @@ func (p *getTxRequestWithPagination) SetDefault() {
 //	@ID				get-transaction-events
 //	@Param			hash	path	string	true	"Transaction hash in hexadecimal"	minlength(64)	maxlength(64)	example(652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF)
 //	@Param			limit	query	integer	false	"Count of requested entities"		minimum(1)	maximum(100)	example(10)
-//	@Param			offset	query	integer	false	"Offset"							minimum(1)	example(10)
+//	@Param			offset	query	integer	false	"Offset"							minimum(0)	example(10)
 //	@Produce		json
 //	@Success		200	{array}		responses.Event
 //	@Failure		400	{object}	Error
@@ -247,7 +248,7 @@ func (handler *TxHandler) GetEvents(c echo.Context) error {
 //	@ID				get-transaction-messages
 //	@Param			hash	path	string	true	"Transaction hash in hexadecimal"	minlength(64)	maxlength(64)	example(652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF)
 //	@Param			limit	query	integer	false	"Count of requested entities"		minimum(1)	maximum(100)	example(10)
-//	@Param			offset	query	integer	false	"Offset"							minimum(1)	example(10)
+//	@Param			offset	query	integer	false	"Offset"							minimum(0)	example(10)
 //	@Produce		json
 //	@Success		200	{array}		responses.Message
 //	@Failure		400	{object}	Error
@@ -288,7 +289,7 @@ func (handler *TxHandler) GetMessages(c echo.Context) error {
 //	@Tags			transactions
 //	@ID				get-transactions-count
 //	@Produce		json
-//	@Success		200	{integer}	uint64
+//	@Success		200	{object}	uint64
 //	@Failure		500	{object}	Error
 //	@Router			/tx/count [get]
 func (handler *TxHandler) Count(c echo.Context) error {
@@ -306,7 +307,7 @@ func (handler *TxHandler) Count(c echo.Context) error {
 //	@Tags			transactions
 //	@ID				list-genesis-transactions
 //	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)	example(10)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(0)	example(10)
 //	@Param			sort	query	string	false	"Sort order"					Enums(asc, desc)	example(asc)
 //	@Produce		json
 //	@Success		200	{array}		responses.Tx
@@ -357,7 +358,7 @@ func (req *getBlobsForTx) SetDefault() {
 //	@ID				list-transaction-blobs
 //	@Param			hash	path	string	true	"Transaction hash in hexadecimal"				minlength(64)	maxlength(64)	example(652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF)
 //	@Param			limit	query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)	example(10)
-//	@Param			offset	query	integer	false	"Offset"										minimum(1)	example(10)
+//	@Param			offset	query	integer	false	"Offset"										minimum(0)	example(10)
 //	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)	example(asc)
 //	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)	example(time)
 //	@Param			source	query	string	false	"Blob source. If it's empty both sources are returned"	Enums(pfb, fibre)	example(fibre)
@@ -413,7 +414,7 @@ func (handler *TxHandler) Blobs(c echo.Context) error {
 //	@ID				transaction-blobs-count
 //	@Param			hash	path	string	true	"Transaction hash in hexadecimal"				minlength(64)	maxlength(64)	example(652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF)
 //	@Produce		json
-//	@Success		200	{integer}	uint64
+//	@Success		200	{object}	uint64
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
 //	@Router			/tx/{hash}/blobs/count [get]

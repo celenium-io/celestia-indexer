@@ -28,8 +28,8 @@ type State struct {
 	TotalValidators  int            `example:"100"                                                              format:"int64"     json:"total_validators"   swaggertype:"integer"`
 	TotalSupply      string         `example:"312"                                                              format:"string"    json:"total_supply"       swaggertype:"string"`
 	TotalVotingPower string         `example:"312"                                                              format:"string"    json:"total_voting_power" swaggertype:"string"`
-	TotalNamespaces  int64          `example:"312"                                                              format:"string"    json:"total_namespaces"   swaggertype:"integer"`
-	TotalIbcClients  int64          `example:"312"                                                              format:"string"    json:"total_ibc_clients"  swaggertype:"integer"`
+	TotalNamespaces  int64          `example:"312"                                                              format:"int64"     json:"total_namespaces"   swaggertype:"integer"`
+	TotalIbcClients  int64          `example:"312"                                                              format:"int64"     json:"total_ibc_clients"  swaggertype:"integer"`
 	Synced           bool           `example:"true"                                                             format:"boolean"   json:"synced"             swaggertype:"boolean"`
 }
 

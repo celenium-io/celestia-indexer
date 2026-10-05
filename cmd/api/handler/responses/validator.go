@@ -13,8 +13,8 @@ import (
 )
 
 type Validator struct {
-	Id          uint64 `example:"321"                                      json:"id"           swaggertype:"integer"`
-	Version     uint64 `example:"5"                                        json:"version"      swaggertype:"integer"`
+	Id          uint64 `example:"321"                                      format:"int64"      json:"id"            swaggertype:"integer"`
+	Version     uint64 `example:"5"                                        format:"int64"      json:"version"       swaggertype:"integer"`
 	ConsAddress string `example:"E641C7A2C964833E556AEF934FBF166B712874B6" json:"cons_address" swaggertype:"string"`
 
 	Moniker  string `example:"Easy 2 Stake"                   json:"moniker"  swaggertype:"string"`
@@ -35,8 +35,8 @@ type Validator struct {
 	Status string `example:"active" json:"status" swaggertype:"string"`
 	Jailed bool   `example:"false"  json:"jailed" swaggertype:"boolean"`
 
-	MessagesCount    uint64 `example:"1" json:"messages_count"     swaggertype:"integer"`
-	BondUpdatesCount int64  `example:"1" json:"bond_updates_count" swaggertype:"integer"`
+	MessagesCount    uint64 `example:"1" format:"int64" json:"messages_count"     swaggertype:"integer"`
+	BondUpdatesCount int64  `example:"1" format:"int64" json:"bond_updates_count" swaggertype:"integer"`
 
 	CreationTime time.Time `example:"2025-07-04T03:10:57+00:00" format:"date-time" json:"creation_time" swaggertype:"string"`
 
@@ -101,7 +101,7 @@ func NewValidator(val storage.Validator) *Validator {
 }
 
 type ShortValidator struct {
-	Id          uint64 `example:"321"                                      json:"id"           swaggertype:"integer"`
+	Id          uint64 `example:"321"                                      format:"int64"      json:"id"            swaggertype:"integer"`
 	ConsAddress string `example:"E641C7A2C964833E556AEF934FBF166B712874B6" json:"cons_address" swaggertype:"string"`
 	Moniker     string `example:"Easy 2 Stake"                             json:"moniker"      swaggertype:"string"`
 }
@@ -123,8 +123,8 @@ type ValidatorUptime struct {
 }
 
 type SignedBlocks struct {
-	Height types.Level `example:"100"  json:"height" swaggertype:"integer"`
-	Signed bool        `example:"true" json:"signed" swaggertype:"boolean"`
+	Height types.Level `example:"100"  format:"int64" json:"height"         swaggertype:"integer"`
+	Signed bool        `example:"true" json:"signed"  swaggertype:"boolean"`
 }
 
 func NewValidatorUptime(levels []types.Level, currentLevel types.Level, count types.Level) (uptime ValidatorUptime) {
@@ -158,10 +158,10 @@ func NewValidatorUptime(levels []types.Level, currentLevel types.Level, count ty
 }
 
 type Jail struct {
-	Height types.Level `example:"100"                       json:"height" swaggertype:"integer"`
-	Time   time.Time   `example:"2023-07-04T03:10:57+00:00" json:"time"   swaggertype:"string"`
-	Reason string      `example:"double_sign"               json:"reason" swaggertype:"string"`
-	Burned string      `example:"10000000000"               json:"burned" swaggertype:"string"`
+	Height types.Level `example:"100"                       format:"int64"     json:"height"        swaggertype:"integer"`
+	Time   time.Time   `example:"2023-07-04T03:10:57+00:00" format:"date-time" json:"time"          swaggertype:"string"`
+	Reason string      `example:"double_sign"               json:"reason"      swaggertype:"string"`
+	Burned string      `example:"10000000000"               json:"burned"      swaggertype:"string"`
 
 	Validator *ShortValidator `json:"validator,omitempty"`
 }
@@ -189,21 +189,21 @@ type ValidatorCount struct {
 }
 
 type Metrics struct {
-	Id                    uint64    `example:"321"                       json:"id"                      swaggertype:"integer"`
-	Moniker               string    `example:"Easy 2 Stake"              json:"moniker"                 swaggertype:"string"`
-	MaxRate               string    `example:"0.1"                       json:"max_rate"                swaggertype:"string"`
-	MaxChangeRate         string    `example:"0.01"                      json:"max_change_rate"         swaggertype:"string"`
-	Stake                 string    `example:"1"                         json:"stake"                   swaggertype:"string"`
-	CreationTime          time.Time `example:"2025-07-04T03:10:57+00:00" format:"date-time"             json:"creation_time"  swaggertype:"string"`
-	SelfDelegationAmount  string    `example:"1"                         json:"self_delegation_amount"  swaggertype:"string"`
-	AppliedProposalsCount uint64    `example:"321"                       json:"applied_proposals_count" swaggertype:"integer"`
-	VotesCount            uint64    `example:"321"                       json:"votes_count"             swaggertype:"integer"`
-	BlockMissedCount      uint64    `example:"321"                       json:"block_missed_count"      swaggertype:"integer"`
-	VotesMetric           string    `example:"1"                         json:"votes_metric"            swaggertype:"string"`
-	CommissionMetric      string    `example:"1"                         json:"commission_metric"       swaggertype:"string"`
-	OperationTimeMetric   string    `example:"1"                         json:"operation_time_metric"   swaggertype:"string"`
-	SelfDelegationMetric  string    `example:"1"                         json:"self_delegation_metric"  swaggertype:"string"`
-	BlockMissedMetric     string    `example:"1"                         json:"block_missed_metric"     swaggertype:"string"`
+	Id                    uint64    `example:"321"                       format:"int64"                json:"id"                      swaggertype:"integer"`
+	Moniker               string    `example:"Easy 2 Stake"              json:"moniker"                swaggertype:"string"`
+	MaxRate               string    `example:"0.1"                       json:"max_rate"               swaggertype:"string"`
+	MaxChangeRate         string    `example:"0.01"                      json:"max_change_rate"        swaggertype:"string"`
+	Stake                 string    `example:"1"                         json:"stake"                  swaggertype:"string"`
+	CreationTime          time.Time `example:"2025-07-04T03:10:57+00:00" format:"date-time"            json:"creation_time"           swaggertype:"string"`
+	SelfDelegationAmount  string    `example:"1"                         json:"self_delegation_amount" swaggertype:"string"`
+	AppliedProposalsCount uint64    `example:"321"                       format:"int64"                json:"applied_proposals_count" swaggertype:"integer"`
+	VotesCount            uint64    `example:"321"                       format:"int64"                json:"votes_count"             swaggertype:"integer"`
+	BlockMissedCount      uint64    `example:"321"                       format:"int64"                json:"block_missed_count"      swaggertype:"integer"`
+	VotesMetric           string    `example:"1"                         json:"votes_metric"           swaggertype:"string"`
+	CommissionMetric      string    `example:"1"                         json:"commission_metric"      swaggertype:"string"`
+	OperationTimeMetric   string    `example:"1"                         json:"operation_time_metric"  swaggertype:"string"`
+	SelfDelegationMetric  string    `example:"1"                         json:"self_delegation_metric" swaggertype:"string"`
+	BlockMissedMetric     string    `example:"1"                         json:"block_missed_metric"    swaggertype:"string"`
 }
 
 func NewMetrics(value storage.ValidatorMetrics) Metrics {
@@ -245,8 +245,8 @@ func NewTopNMetrics(value storage.ValidatorMetrics) TopNMetrics {
 }
 
 type Fibre struct {
-	Host   string      `example:"100.100.100.100:12345" json:"host"   swaggertype:"string"`
-	Height types.Level `example:"100"                   json:"height" swaggertype:"integer"`
+	Host   string      `example:"100.100.100.100:12345" json:"host"    swaggertype:"string"`
+	Height types.Level `example:"100"                   format:"int64" json:"height"        swaggertype:"integer"`
 }
 
 func NewFibreForValidator(val storage.Validator) *Fibre {
@@ -260,8 +260,8 @@ func NewFibreForValidator(val storage.Validator) *Fibre {
 }
 
 type BondUpdate struct {
-	Height types.Level `example:"100"                       json:"height"          swaggertype:"integer"`
-	Time   time.Time   `example:"2023-07-04T03:10:57+00:00" format:"date-time"     json:"time"           swaggertype:"string"`
+	Height types.Level `example:"100"                       format:"int64"         json:"height"        swaggertype:"integer"`
+	Time   time.Time   `example:"2023-07-04T03:10:57+00:00" format:"date-time"     json:"time"          swaggertype:"string"`
 	Power  *string     `example:"123123"                    json:"power,omitempty" swaggertype:"string"`
 }
 

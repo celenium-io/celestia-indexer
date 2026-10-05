@@ -33,8 +33,10 @@ var rootCmd = &cobra.Command{
 // @externalDocs.description	Full documentation
 // @externalDocs.url			https://api-docs.celenium.io/
 //
-// @x-servers					[{"url": "api-mainnet.celenium.io", "description": "Celenium Mainnet API"},{"url": "api-mocha.celenium.io", "description": "Celenium Mocha API"},{"url": "api-arabica.celenium.io", "description": "Celenium Arabica API"}]
+// @x-servers					[{"url": "api-mainnet.celenium.io", "description": "Celenium Mainnet API"},{"url": "api-mocha.celenium.io", "description": "Celenium Mocha API"}]
 // @query.collection.format	multi
+//
+// @security					ApiKeyAuth
 //
 // @securityDefinitions.apikey	ApiKeyAuth
 // @in							header

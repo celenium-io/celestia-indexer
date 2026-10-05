@@ -101,7 +101,7 @@ func (req *listHyperlaneMailboxRequest) SetDefault() {
 //	@Tags			hyperlane
 //	@ID				list-hyperlane-mailbox
 //	@Param			limit	query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)	example(10)
-//	@Param			offset	query	integer	false	"Offset"										minimum(1)	example(10)
+//	@Param			offset	query	integer	false	"Offset"										minimum(0)	example(10)
 //	@Produce		json
 //	@Success		200	{array}	responses.HyperlaneMailbox
 //	@Success		204
@@ -224,11 +224,11 @@ func (req *listHyperlaneTokenRequest) ToFilters(ctx context.Context, address sto
 //	@Tags			hyperlane
 //	@ID				list-hyperlane-tokens
 //	@Param			limit	query	integer	false	"Count of requested entities"				minimum(1)	maximum(100)	example(10)
-//	@Param			offset	query	integer	false	"Offset"									minimum(1)	example(10)
+//	@Param			offset	query	integer	false	"Offset"									minimum(0)	example(10)
 //	@Param			sort    query	string	false	"Sort order. Default: desc"					Enums(asc, desc)	example(asc)
 //	@Param			owner	query	string	false	"Owner celestia address"					minlength(47)	maxlength(47)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
 //	@Param			mailbox	query	string	false	"Mailbox hexademical identity"	example(652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF)
-//	@Param			type    query	string	false	"Comma-separated string of tokens type"		Enums(synthetic, collateral)	example(synthetic)
+//	@Param			type    query	[]string	false	"Comma-separated string of tokens type"		Enums(synthetic, collateral)	example(synthetic)	collectionFormat(csv)
 //	@Produce		json
 //	@Success		200	{array}	responses.HyperlaneToken
 //	@Success		204
@@ -356,14 +356,14 @@ func (req *listHyperlaneTransferRequest) ToFilters(ctx context.Context, address 
 //	@Tags			hyperlane
 //	@ID				list-hyperlane-transfers
 //	@Param			limit	query	integer	false	"Count of requested entities"				minimum(1)	maximum(100)	example(10)
-//	@Param			offset	query	integer	false	"Offset"									minimum(1)	example(10)
+//	@Param			offset	query	integer	false	"Offset"									minimum(0)	example(10)
 //	@Param			sort    query	string	false	"Sort order. Default: desc"					Enums(asc, desc)	example(asc)
 //	@Param			address	query	string	false	"Celestia address"				         	minlength(47)	maxlength(47)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
 //	@Param			relayer	query	string	false	"Celestia address of relayer"				minlength(47)	maxlength(47)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
 //	@Param			mailbox	query	string	false	"Mailbox hexademical identity"	example(652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF)
 //	@Param			token	query	string	false	"Token hexademical identity"	example(652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF)
-//	@Param			type    query	string	false	"Comma-separated string of transfer type"	Enums(send, receive)	example(send)
-//	@Param			domain	query	integer	false	"Domain of counterparty chain"				minimum(1)	example(1)
+//	@Param			type    query	[]string	false	"Comma-separated string of transfer type"	Enums(send, receive)	example(send)	collectionFormat(csv)
+//	@Param			domain	query	integer	false	"Domain of counterparty chain"				minimum(1)	example(1)	format(int64)
 //	@Param			hash	query	string	false	"Transaction hash in hexadecimal"	minlength(64)	maxlength(64)	example(652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF)
 //	@Produce		json
 //	@Success		200	{array}	responses.HyperlaneTransfer
@@ -402,7 +402,7 @@ func (handler *HyperlaneHandler) ListTransfers(c echo.Context) error {
 //	@Description	Returns a single Hyperlane cross-chain token transfer by its internal id, including source/destination domain, amount, and associated transaction.
 //	@Tags			hyperlane
 //	@ID				get-hyperlane-transfer
-//	@Param			id	path	integer	true	"Internal identity"	minimum(1)	example(1)
+//	@Param			id	path	integer	true	"Internal identity"	minimum(1)	example(1)	format(int64)
 //	@Produce		json
 //	@Success		200	{object}	responses.HyperlaneTransfer
 //	@Success		204
@@ -430,7 +430,7 @@ func (handler *HyperlaneHandler) GetTransfer(c echo.Context) error {
 //	@Tags			hyperlane
 //	@ID				list-hyperlane-domains
 //	@Produce		json
-//	@Success		200	{array}	responses.DomainMetadata
+//	@Success		200	{object}	map[string]responses.DomainMetadata
 //	@Success		204
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
@@ -451,7 +451,7 @@ func (handler *HyperlaneHandler) ListDomains(c echo.Context) error {
 //	@Tags			hyperlane
 //	@ID				list-hyperlane-igps
 //	@Param			limit	query	integer	false	"Count of requested entities"				minimum(1)	maximum(100)	example(10)
-//	@Param			offset	query	integer	false	"Offset"									minimum(1)	example(10)
+//	@Param			offset	query	integer	false	"Offset"									minimum(0)	example(10)
 //	@Param			sort    query	string	false	"Sort order. Default: desc"					Enums(asc, desc)	example(asc)
 //	@Produce		json
 //	@Success		200	{array}	responses.HyperlaneIgp
@@ -488,7 +488,7 @@ type getHyperlaneIgpRequest struct {
 //	@Description	Returns a single Hyperlane Interchain Gas Paymaster (IGP) by its hexadecimal identity, including its owner and destination gas configs.
 //	@Tags			hyperlane
 //	@ID				get-hyperlane-igp
-//	@Param			id	path	integer	true	"Internal identity"	minimum(1)	example(1)
+//	@Param			id	path	string	true	"Hyperlane IGP id"	example(652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF)
 //	@Produce		json
 //	@Success		200	{object}	responses.HyperlaneIgp
 //	@Success		204

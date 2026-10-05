@@ -102,9 +102,9 @@ func (req *listForwardingsRequest) toFilters(ctx context.Context, address storag
 //	@Param			sort	query	string	false	"Sort order. Default: desc"				Enums(asc, desc)	example(asc)
 //	@Param			tx_hash	query	string	false	"Filter by transaction hash (hex)"		minlength(64)	maxlength(64)	example(652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF)
 //	@Param			address	query	string	false	"Filter by Celestia address"			minlength(47)	maxlength(47)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
-//	@Param			height	query	integer	false	"Filter by block height"				minimum(1)	example(123)
-//	@Param			from	query	integer	false	"Filter by start time (Unix timestamp)"	minimum(1)	example(1690000000)
-//	@Param			to		query	integer	false	"Filter by end time (Unix timestamp)"	minimum(1)	example(1720000000)
+//	@Param			height	query	integer	false	"Filter by block height"				minimum(1)	example(123)	format(int64)
+//	@Param			from	query	integer	false	"Filter by start time (Unix timestamp)"	minimum(1)	example(1690000000)	format(int64)
+//	@Param			to		query	integer	false	"Filter by end time (Unix timestamp)"	minimum(1)	example(1720000000)	format(int64)
 //	@Produce		json
 //	@Success		200	{array}		responses.Forwarding
 //	@Failure		400	{object}	Error
@@ -142,7 +142,7 @@ func (handler *ForwardingsHandler) List(c echo.Context) error {
 //	@Description	forwarding (MsgSend, Hyperlane and IBC transfers).
 //	@Tags			forwarding
 //	@ID				get-forwarding
-//	@Param			id	path	integer	true	"Internal forwarding event ID"	minimum(1)	example(1)
+//	@Param			id	path	integer	true	"Internal forwarding event ID"	minimum(1)	example(1)	format(int64)
 //	@Produce		json
 //	@Success		200	{object}	responses.Forwarding
 //	@Success		204

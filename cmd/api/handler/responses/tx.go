@@ -22,7 +22,7 @@ type Tx struct {
 	TimeoutHeight uint64         `example:"0"                                                                format:"int64"     json:"timeout_height"      swaggertype:"integer"`
 	EventsCount   int64          `example:"2"                                                                format:"int64"     json:"events_count"        swaggertype:"integer"`
 	MessagesCount int64          `example:"1"                                                                format:"int64"     json:"messages_count"      swaggertype:"integer"`
-	Hash          string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"hash"                swaggertype:"string"`
+	Hash          string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"hash"                swaggertype:"string"`
 	Fee           string         `example:"9348"                                                             format:"int64"     json:"fee"                 swaggertype:"string"`
 	Error         string         `example:""                                                                 format:"string"    json:"error,omitempty"     swaggertype:"string"`
 	Codespace     string         `example:"sdk"                                                              format:"string"    json:"codespace,omitempty" swaggertype:"string"`
@@ -72,9 +72,9 @@ func NewTx(tx storage.Tx) Tx {
 }
 
 type TxForAddress struct {
-	MessagesCount int64  `example:"1"                                                                format:"int64"  json:"messages_count" swaggertype:"integer"`
-	Hash          string `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary" json:"hash"           swaggertype:"string"`
-	Fee           string `example:"9348"                                                             format:"int64"  json:"fee"            swaggertype:"string"`
+	MessagesCount int64  `example:"1"                                                                format:"int64" json:"messages_count" swaggertype:"integer"`
+	Hash          string `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"   json:"hash"           swaggertype:"string"`
+	Fee           string `example:"9348"                                                             format:"int64" json:"fee"            swaggertype:"string"`
 
 	MessageTypes []types.MsgType `example:"MsgSend,MsgUnjail" json:"message_types"`
 	Status       types.Status    `example:"success"           json:"status"`

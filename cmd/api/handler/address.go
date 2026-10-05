@@ -128,7 +128,7 @@ func (p *addressListRequest) SetDefault() {
 //	@Tags			address
 //	@ID				list-address
 //	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)	example(10)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(0)	example(10)
 //	@Param			sort	query	string	false	"Sort order"					Enums(asc, desc)	example(asc)
 //	@Param			sort_by	query	string	false	"Sort field"					Enums(id, delegated, spendable, unbonding, first_height, last_height)	example(id)
 //	@Produce		json
@@ -171,13 +171,13 @@ func (handler *AddressHandler) List(c echo.Context) error {
 //	@ID				address-transactions
 //	@Param			hash		path	string					true	"Hash"							minlength(47)	maxlength(128)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
 //	@Param			limit		query	integer					false	"Count of requested entities"	minimum(1)		maximum(100)	example(10)
-//	@Param			offset		query	integer					false	"Offset"						minimum(1)	example(10)
+//	@Param			offset		query	integer					false	"Offset"						minimum(0)	example(10)
 //	@Param			sort		query	string					false	"Sort order"					Enums(asc, desc)	example(asc)
-//	@Param			status		query	storageTypes.Status		false	"Comma-separated status list"	example(success)
-//	@Param			msg_type	query	storageTypes.MsgType	false	"Comma-separated message types list"	example(MsgSend)
-//	@Param			from		query	integer					false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
-//	@Param			to			query	integer					false	"Time to in unix timestamp"		minimum(1)	example(1720000000)
-//	@Param			height		query	integer					false	"Block number"					minimum(1)	example(123)
+//	@Param			status		query	[]storageTypes.Status		false	"Comma-separated status list"	example(success)	collectionFormat(csv)
+//	@Param			msg_type	query	[]storageTypes.MsgType	false	"Comma-separated message types list"	example(MsgSend)	collectionFormat(csv)
+//	@Param			from		query	integer					false	"Time from in unix timestamp"	minimum(1)	example(1690000000)	format(int64)
+//	@Param			to			query	integer					false	"Time to in unix timestamp"		minimum(1)	example(1720000000)	format(int64)
+//	@Param			height		query	integer					false	"Block number"					minimum(0)	example(123)	format(int64)
 //	@Produce		json
 //	@Success		200	{array}		responses.Tx
 //	@Failure		400	{object}	Error
@@ -278,9 +278,9 @@ func (p *getAddressMessages) ToFilters() storage.AddressMsgsFilter {
 //	@ID				address-messages
 //	@Param			hash		path	string					true	"Hash"							minlength(47)	maxlength(128)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
 //	@Param			limit		query	integer					false	"Count of requested entities"	minimum(1)		maximum(100)	example(10)
-//	@Param			offset		query	integer					false	"Offset"						minimum(1)	example(10)
+//	@Param			offset		query	integer					false	"Offset"						minimum(0)	example(10)
 //	@Param			sort		query	string					false	"Sort order"					Enums(asc, desc)	example(asc)
-//	@Param			msg_type	query	storageTypes.MsgType	false	"Comma-separated message types list"	example(MsgSend)
+//	@Param			msg_type	query	[]storageTypes.MsgType	false	"Comma-separated message types list"	example(MsgSend)	collectionFormat(csv)
 //	@Produce		json
 //	@Success		200	{array}		responses.MessageForAddress
 //	@Failure		400	{object}	Error
@@ -348,7 +348,7 @@ func (req *getBlobLogsForAddress) SetDefault() {
 //	@ID				address-blobs
 //	@Param			hash	path	string	true	"Hash"											minlength(47)	maxlength(128)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
 //	@Param			limit	query	integer	false	"Count of requested entities"					minimum(1)		maximum(100)	example(10)
-//	@Param			offset	query	integer	false	"Offset"										minimum(1)	example(10)
+//	@Param			offset	query	integer	false	"Offset"										minimum(0)	example(10)
 //	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)	example(asc)
 //	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)	example(time)
 //	@Param			joins	query	boolean	false	"Flag indicating whether entities of transaction and namespace should be attached or not. Default: true"	example(true)
@@ -406,7 +406,7 @@ func (handler *AddressHandler) Blobs(c echo.Context) error {
 //	@Tags			address
 //	@ID				get-address-count
 //	@Produce		json
-//	@Success		200	{integer}	uint64
+//	@Success		200	{object}	uint64
 //	@Failure		500	{object}	Error
 //	@Router			/address/count [get]
 func (handler *AddressHandler) Count(c echo.Context) error {
@@ -438,7 +438,7 @@ func (req *getAddressDelegations) SetDefault() {
 //	@ID				address-delegations
 //	@Param			hash		path	string	true	"Hash"							minlength(47)	maxlength(128)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
 //	@Param			limit		query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)	example(10)
-//	@Param			offset		query	integer	false	"Offset"						minimum(1)	example(10)
+//	@Param			offset		query	integer	false	"Offset"						minimum(0)	example(10)
 //	@Param			show_zero	query	boolean	false	"Show zero delegations"	example(false)
 //	@Produce		json
 //	@Success		200	{array}		responses.Delegation
@@ -501,7 +501,7 @@ func (req *getAddressPageable) SetDefault() {
 //	@ID				address-undelegations
 //	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
 //	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)	example(10)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(0)	example(10)
 //	@Produce		json
 //	@Success		200	{array}		responses.Undelegation
 //	@Failure		400	{object}	Error
@@ -550,7 +550,7 @@ func (handler *AddressHandler) Undelegations(c echo.Context) error {
 //	@ID				address-redelegations
 //	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
 //	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)	example(10)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(0)	example(10)
 //	@Produce		json
 //	@Success		200	{array}		responses.Redelegation
 //	@Failure		400	{object}	Error
@@ -612,7 +612,7 @@ func (req *getAddressVestings) SetDefault() {
 //	@ID				address-vesting
 //	@Param			hash		path	string	true	"Hash"							minlength(47)	maxlength(128)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
 //	@Param			limit		query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)	example(10)
-//	@Param			offset		query	integer	false	"Offset"						minimum(1)	example(10)
+//	@Param			offset		query	integer	false	"Offset"						minimum(0)	example(10)
 //	@Param			show_ended	query	boolean	false	"Show finished vestings delegations"	example(false)
 //	@Produce		json
 //	@Success		200	{array}		responses.Vesting
@@ -662,7 +662,7 @@ func (handler *AddressHandler) Vestings(c echo.Context) error {
 //	@ID				address-grants
 //	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
 //	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)	example(10)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(0)	example(10)
 //	@Produce		json
 //	@Success		200	{array}		responses.Grant
 //	@Failure		400	{object}	Error
@@ -710,7 +710,7 @@ func (handler *AddressHandler) Grants(c echo.Context) error {
 //	@ID				address-grantee
 //	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
 //	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)	example(10)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(0)	example(10)
 //	@Produce		json
 //	@Success		200	{array}		responses.Grant
 //	@Failure		400	{object}	Error
@@ -766,8 +766,8 @@ type addressStatsRequest struct {
 //	@Param			hash		path	string	true	"Hash"							minlength(47)	maxlength(128)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
 //	@Param			name		path	string	true	"Series name"					Enums(gas_used, gas_wanted, fee, tx_count)	example(gas_used)
 //	@Param			timeframe	path	string	true	"Timeframe"						Enums(hour, day, month)	example(day)
-//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)
-//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)
+//	@Param			from		query	integer	false	"Time from in unix timestamp"	minimum(1)	example(1690000000)	format(int64)
+//	@Param			to			query	integer	false	"Time to in unix timestamp"		minimum(1)	example(1720000000)	format(int64)
 //	@Produce		json
 //	@Success		200	{array}		responses.HistogramItem
 //	@Failure		400	{object}	Error
@@ -831,7 +831,7 @@ func (handler *AddressHandler) getIdByHash(ctx context.Context, hash []byte, add
 //	@ID				address-celestials
 //	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
 //	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)	example(10)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(0)	example(10)
 //	@Produce		json
 //	@Success		200	{array}		responses.Celestial
 //	@Failure		400	{object}	Error
@@ -878,7 +878,7 @@ func (handler *AddressHandler) Celestials(c echo.Context) error {
 //	@ID				address-votes
 //	@Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
 //	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)	example(10)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(0)	example(10)
 //	@Produce		json
 //	@Success		200	{array}		responses.Vote
 //	@Failure		400	{object}	Error
@@ -920,7 +920,7 @@ func (handler *AddressHandler) Votes(c echo.Context) error {
 // @ID				address-balances
 // @Param			hash	path	string	true	"Hash"							minlength(47)	maxlength(128)	example(celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60)
 // @Param			limit	query	integer	false	"Count of requested entities"	minimum(1)		maximum(100)	example(10)
-// @Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
+// @Param			offset	query	integer	false	"Offset"						minimum(0)	example(10)
 // @Produce		json
 // @Success		200	{array}		responses.Balance
 // @Failure		400	{object}	Error

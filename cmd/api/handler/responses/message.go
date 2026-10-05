@@ -21,7 +21,7 @@ type Message struct {
 
 	Type types.MsgType `example:"MsgCreatePeriodicVestingAccount" json:"type"`
 
-	Data map[string]any `json:"data"`
+	Data map[string]any `json:"data" swaggertype:"object"`
 
 	Tx *Tx `json:"tx,omitempty"`
 }
@@ -86,7 +86,7 @@ type MessageForAddress struct {
 	Type           types.MsgType        `example:"MsgCreatePeriodicVestingAccount" json:"type"`
 	InvocationType types.MsgAddressType `example:"fromAddress"                     json:"invocation_type"`
 
-	Data map[string]any `json:"data"`
+	Data map[string]any `json:"data" swaggertype:"object"`
 	Tx   TxForAddress   `json:"tx"`
 }
 

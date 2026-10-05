@@ -71,7 +71,7 @@ type getBlockRequest struct {
 //	@Description	Returns detailed information about the block at the given height, including proposer, hash, time, and transaction count. Pass stats=true to also include aggregated block statistics.
 //	@Tags			block
 //	@ID				get-block
-//	@Param			height	path	integer	true	"Block height"	minimum(1)	example(123)
+//	@Param			height	path	integer	true	"Block height"	minimum(0)	example(123)	format(int64)
 //	@Param			stats	query	boolean	false	"Need join stats for block"	example(true)
 //	@Produce		json
 //	@Success		200	{object}	responses.Block
@@ -122,7 +122,7 @@ func (p *blockListRequest) SetDefault() {
 //	@Tags			block
 //	@ID				list-block
 //	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)	example(10)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(0)	example(10)
 //	@Param			sort	query	string	false	"Sort order"					Enums(asc, desc)	example(asc)
 //	@Param			stats	query	boolean	false	"Need join stats for block"	example(true)
 //	@Produce		json
@@ -174,9 +174,9 @@ func (p *getBlockEvents) SetDefault() {
 //	@Description	Returns begin-block and end-block ABCI events for the block at the given height. These events are emitted by the Cosmos SDK before and after transaction execution.
 //	@Tags			block
 //	@ID				get-block-events
-//	@Param			height	path	integer	true	"Block height"					minimum(1)	example(123)
+//	@Param			height	path	integer	true	"Block height"					minimum(0)	example(123)	format(int64)
 //	@Param			limit	query	integer	false	"Count of requested entities"	minimum(1)	maximum(100)	example(10)
-//	@Param			offset	query	integer	false	"Offset"						minimum(1)	example(10)
+//	@Param			offset	query	integer	false	"Offset"						minimum(0)	example(10)
 //	@Produce		json
 //	@Success		200	{array}		responses.Event
 //	@Failure		400	{object}	Error
@@ -222,7 +222,7 @@ func (handler *BlockHandler) GetEvents(c echo.Context) error {
 //	@Description	Returns aggregated statistics for the block at the given height: blob count, total blob size, total fee, gas used/limit, transactions count, and more.
 //	@Tags			block
 //	@ID				get-block-stats
-//	@Param			height	path	integer	true	"Block height"	minimum(1)	example(123)
+//	@Param			height	path	integer	true	"Block height"	minimum(0)	example(123)	format(int64)
 //	@Produce		json
 //	@Success		200	{object}	responses.BlockStats
 //	@Failure		400	{object}	Error
@@ -248,7 +248,7 @@ func (handler *BlockHandler) GetStats(c echo.Context) error {
 //	@Tags			block
 //	@ID				get-block-count
 //	@Produce		json
-//	@Success		200	{integer}	uint64
+//	@Success		200	{object}	uint64
 //	@Failure		500	{object}	Error
 //	@Router			/block/count [get]
 func (handler *BlockHandler) Count(c echo.Context) error {
@@ -265,11 +265,11 @@ func (handler *BlockHandler) Count(c echo.Context) error {
 //	@Description	Returns a paginated list of Cosmos SDK messages included in transactions within the given block. Supports filtering by message type and exclusion list.
 //	@Tags			block
 //	@ID				get-block-messages
-//	@Param			height				path	integer			true	"Block height"					minimum(1)	example(123)
+//	@Param			height				path	integer			true	"Block height"					minimum(1)	example(123)	format(int64)
 //	@Param			limit				query	integer			false	"Count of requested entities"	minimum(1)	maximum(100)	example(10)
-//	@Param			offset				query	integer			false	"Offset"						minimum(1)	example(10)
-//	@Param			msg_type			query	types.MsgType	false	"Comma-separated message types list"	example(MsgSend)
-//	@Param			excluded_msg_type	query	types.MsgType	false	"Comma-separated message types which should be excluded from list"	example(MsgSend)
+//	@Param			offset				query	integer			false	"Offset"						minimum(0)	example(10)
+//	@Param			msg_type			query	[]types.MsgType	false	"Comma-separated message types list"	example(MsgSend)	collectionFormat(csv)
+//	@Param			excluded_msg_type	query	[]types.MsgType	false	"Comma-separated message types which should be excluded from list"	example(MsgSend)	collectionFormat(csv)
 //	@Produce		json
 //	@Success		200	{array}		responses.Message
 //	@Failure		400	{object}	Error
@@ -327,9 +327,9 @@ func (req *getBlobsForBlock) SetDefault() {
 //	@Description	Returns a paginated list of blobs submitted via PayForBlobs or PayForFibre transactions included in the block at the given height. Supports sorting by time or size.
 //	@Tags			block
 //	@ID				get-block-blobs
-//	@Param			height	path	integer	true	"Block height"									minimum(1)	example(123)
+//	@Param			height	path	integer	true	"Block height"									minimum(0)	example(123)	format(int64)
 //	@Param			limit	query	integer	false	"Count of requested entities"					minimum(1)	maximum(100)	example(10)
-//	@Param			offset	query	integer	false	"Offset"										minimum(1)	example(10)
+//	@Param			offset	query	integer	false	"Offset"										minimum(0)	example(10)
 //	@Param			sort	query	string	false	"Sort order. Default: desc"						Enums(asc, desc)	example(asc)
 //	@Param			sort_by	query	string	false	"Sort field. If it's empty internal id is used"	Enums(time, size)	example(time)
 //	@Param			source	query	string	false	"Blob source. If it's empty both sources are returned"	Enums(pfb, fibre)	example(fibre)
@@ -384,9 +384,9 @@ func (handler *BlockHandler) Blobs(c echo.Context) error {
 //	@Description	Returns the total number of blobs included in the block at the given height
 //	@Tags			block
 //	@ID				block-blobs-count
-//	@Param			height	path	integer	true	"Block height"	minimum(1)	example(123)
+//	@Param			height	path	integer	true	"Block height"	minimum(0)	example(123)	format(int64)
 //	@Produce		json
-//	@Success		200	{integer}	uint64
+//	@Success		200	{object}	uint64
 //	@Failure		400	{object}	Error
 //	@Failure		500	{object}	Error
 //	@Router			/block/{height}/blobs/count [get]
@@ -410,7 +410,7 @@ func (handler *BlockHandler) BlobsCount(c echo.Context) error {
 //	@Description	Returns the Original Data Square (ODS) structure for the block at the given height, representing the raw data availability square layout used for blob verification.
 //	@Tags			block
 //	@ID				block-ods
-//	@Param			height	path	integer	true	"Block height"	minimum(1)	example(123)
+//	@Param			height	path	integer	true	"Block height"	minimum(0)	example(123)	format(int64)
 //	@Produce		json
 //	@x-internal		true
 //	@Success		200	{object}	responses.ODS

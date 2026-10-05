@@ -53,8 +53,8 @@ type estimatePfbGas struct {
 //	@Description	Returns the estimated gas required to submit a MsgPayForBlobs transaction for the given blob sizes and share versions, using current on-chain gas parameters.
 //	@Tags			gas
 //	@ID				gas-estimate-for-pfb
-//	@Param			sizes	  query	string	true	"Comma-separated array of blob sizes"	example(100,200)
-//	 @Param         versions  query string  false   "Comma-separated array of share versions. Default is 0"	example(0,1)
+//	@Param			sizes	  query	[]integer	true	"Comma-separated array of blob sizes"	example(100,200)	collectionFormat(csv)
+//	 @Param         versions  query []integer  false   "Comma-separated array of share versions. Default is 0"	example(0,1)	collectionFormat(csv)
 //	@Produce		json
 //	@Success		200	{object}	uint64
 //	@Failure		400	{object}	Error

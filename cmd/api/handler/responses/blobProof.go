@@ -8,9 +8,9 @@ import (
 )
 
 type BlobProof struct {
-	Start int32    `example:"0"  format:"integer" json:"start" swaggertype:"integer"`
-	End   int32    `example:"16" format:"integer" json:"end"   swaggertype:"integer"`
-	Nodes [][]byte `json:"nodes"`
+	Start int32    `example:"0"  format:"integer"           json:"start" swaggertype:"integer"`
+	End   int32    `example:"16" format:"integer"           json:"end"   swaggertype:"integer"`
+	Nodes [][]byte `json:"nodes" swaggertype:"array,string"`
 }
 
 func NewProofs(proofs []*proof.NMTProof) []BlobProof {

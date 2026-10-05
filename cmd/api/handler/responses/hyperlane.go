@@ -18,11 +18,11 @@ type HyperlaneMailbox struct {
 	InternalId       uint64         `example:"321"                                                              format:"int64"     json:"hyperlane_id"            swaggertype:"integer"`
 	Height           pkgTypes.Level `example:"100"                                                              format:"int64"     json:"height"                  swaggertype:"integer"`
 	Time             time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"                    swaggertype:"string"`
-	TxHash           string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash,omitempty"       swaggertype:"string"`
-	Mailbox          string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"mailbox"                 swaggertype:"string"`
-	DefaultIsm       string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"default_ism,omitempty"   swaggertype:"string"`
-	DefaultHook      string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"default_hook,omitempty"  swaggertype:"string"`
-	RequiredHook     string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"required_hook,omitempty" swaggertype:"string"`
+	TxHash           string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"tx_hash,omitempty"       swaggertype:"string"`
+	Mailbox          string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"mailbox"                 swaggertype:"string"`
+	DefaultIsm       string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"default_ism,omitempty"   swaggertype:"string"`
+	DefaultHook      string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"default_hook,omitempty"  swaggertype:"string"`
+	RequiredHook     string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"required_hook,omitempty" swaggertype:"string"`
 	Domain           uint64         `example:"100"                                                              format:"int64"     json:"domain,omitempty"        swaggertype:"integer"`
 	SentMessages     uint64         `example:"100"                                                              format:"int64"     json:"sent_messages"           swaggertype:"integer"`
 	ReceivedMessages uint64         `example:"100"                                                              format:"int64"     json:"received_messages"       swaggertype:"integer"`
@@ -64,11 +64,11 @@ type HyperlaneToken struct {
 	Id               uint64         `example:"321"                                                              format:"int64"     json:"id"                 swaggertype:"integer"`
 	Height           pkgTypes.Level `example:"100"                                                              format:"int64"     json:"height"             swaggertype:"integer"`
 	Time             time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"               swaggertype:"string"`
-	Mailbox          string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"mailbox"            swaggertype:"string"`
-	TxHash           string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash,omitempty"  swaggertype:"string"`
+	Mailbox          string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"mailbox"            swaggertype:"string"`
+	TxHash           string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"tx_hash,omitempty"  swaggertype:"string"`
 	Type             string         `example:"collateral"                                                       format:"string"    json:"type"               swaggertype:"string"`
 	Denom            string         `example:"utia"                                                             format:"string"    json:"denom"              swaggertype:"string"`
-	TokenId          string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"token_id"           swaggertype:"string"`
+	TokenId          string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"token_id"           swaggertype:"string"`
 	SentTransfers    uint64         `example:"100"                                                              format:"int64"     json:"sent_transfers"     swaggertype:"integer"`
 	ReceiveTransfers uint64         `example:"100"                                                              format:"int64"     json:"received_transfers" swaggertype:"integer"`
 	Sent             string         `example:"123445"                                                           format:"string"    json:"sent"               swaggertype:"string"`
@@ -106,13 +106,13 @@ type HyperlaneTransfer struct {
 	Id        uint64         `example:"321"                                                              format:"int64"     json:"id"                   swaggertype:"integer"`
 	Height    pkgTypes.Level `example:"100"                                                              format:"int64"     json:"height"               swaggertype:"integer"`
 	Time      time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"                 swaggertype:"string"`
-	TxHash    string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"tx_hash,omitempty"    swaggertype:"string"`
-	Mailbox   string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"mailbox"              swaggertype:"string"`
-	TokenId   string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"token_id"             swaggertype:"string"`
+	TxHash    string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"tx_hash,omitempty"    swaggertype:"string"`
+	Mailbox   string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"mailbox"              swaggertype:"string"`
+	TokenId   string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"token_id"             swaggertype:"string"`
 	Type      string         `example:"collateral"                                                       format:"string"    json:"type"                 swaggertype:"string"`
 	Version   byte           `example:"1"                                                                format:"int64"     json:"version"              swaggertype:"integer"`
 	Nonce     uint32         `example:"10"                                                               format:"int64"     json:"nonce"                swaggertype:"integer"`
-	MessageId string         `example:"652452a670018d629cc116e510ba88c1cabe061336661b1f3d206d248bd558af" format:"binary"    json:"message_id,omitempty" swaggertype:"string"`
+	MessageId string         `example:"652452a670018d629cc116e510ba88c1cabe061336661b1f3d206d248bd558af" format:"hex"       json:"message_id,omitempty" swaggertype:"string"`
 	Body      []byte         `example:"AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0="                         format:"string"    json:"body,omitempty"       swaggertype:"string"`
 	Metadata  []byte         `example:"AAAAAAAAAAAAAAAAAAAAAAAAAAAAs2bWWU6FOB0="                         format:"string"    json:"metadata,omitempty"   swaggertype:"string"`
 	Amount    string         `example:"123445"                                                           format:"string"    json:"received"             swaggertype:"string"`
@@ -178,7 +178,7 @@ func NewHyperlaneTransfer(transfer storage.HLTransfer, store hyperlane.IChainSto
 type GasPayment struct {
 	Amount    string `example:"12345"                                                            format:"string" json:"amount"     swaggertype:"string"`
 	GasAmount string `example:"123"                                                              format:"string" json:"gas_amount" swaggertype:"string"`
-	IgpId     string `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary" json:"igp_id"     swaggertype:"string"`
+	IgpId     string `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"    json:"igp_id"     swaggertype:"string"`
 }
 
 type HyperlaneCounterparty struct {
@@ -227,8 +227,8 @@ func NewChainMetadata(domainId uint64, store hyperlane.IChainStore) *ChainMetada
 }
 
 type DomainMetadata struct {
-	Domain         uint64          `example:"1488"         json:"domain,omitempty" swaggertype:"integer"`
-	Name           string          `example:"name"         json:"name,omitempty"   swaggertype:"string"`
+	Domain         uint64          `example:"1488"         format:"int64"        json:"domain,omitempty" swaggertype:"integer"`
+	Name           string          `example:"name"         json:"name,omitempty" swaggertype:"string"`
 	BlockExplorers []BlockExplorer `json:"block_explorers"`
 	NativeToken    NativeToken     `json:"native_token"`
 }
@@ -251,9 +251,9 @@ func NewDomainMetadata(domainId uint64, metadata pkgHyperlane.ChainMetadata) *Do
 }
 
 type HlDomainStats struct {
-	Domain         uint64         `example:"123456"                format:"integer" json:"domain_id"       swaggertype:"integer"`
-	Amount         string         `example:"1234.5678"             format:"string"  json:"amount"          swaggertype:"string"`
-	TransfersCount uint64         `example:"123445"                format:"integer" json:"transfers_count" swaggertype:"integer"`
+	Domain         uint64         `example:"123456"                format:"int64"  json:"domain_id"       swaggertype:"integer"`
+	Amount         string         `example:"1234.5678"             format:"string" json:"amount"          swaggertype:"string"`
+	TransfersCount uint64         `example:"123445"                format:"int64"  json:"transfers_count" swaggertype:"integer"`
 	ChainMetadata  *ChainMetadata `json:"chain_metadata,omitempty"`
 }
 
@@ -275,7 +275,7 @@ type HyperlaneIgp struct {
 	Height pkgTypes.Level `example:"1488"                                                             format:"int64"     json:"height" swaggertype:"integer"`
 	Time   time.Time      `example:"2023-07-04T03:10:57+00:00"                                        format:"date-time" json:"time"   swaggertype:"string"`
 	Denom  string         `example:"utia"                                                             format:"string"    json:"denom"  swaggertype:"string"`
-	IgpId  string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"binary"    json:"igp_id" swaggertype:"string"`
+	IgpId  string         `example:"652452A670018D629CC116E510BA88C1CABE061336661B1F3D206D248BD558AF" format:"hex"       json:"igp_id" swaggertype:"string"`
 
 	Owner   *ShortAddress         `json:"owner,omitempty"`
 	Configs []*HyperlaneIgpConfig `json:"configs,omitempty"`

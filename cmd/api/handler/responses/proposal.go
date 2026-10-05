@@ -25,21 +25,21 @@ type Proposal struct {
 	Deposit        string         `example:"1000000000"                format:"string"    json:"deposit"                   swaggertype:"string"`
 	Metadata       string         `example:"metadata"                  format:"string"    json:"metadata,omitempty"        swaggertype:"string"`
 
-	VotesCount int64 `example:"12354" json:"votes_count"  swaggertype:"integer"`
-	Yes        int64 `example:"1234"  json:"yes"          swaggertype:"integer"`
-	No         int64 `example:"1234"  json:"no"           swaggertype:"integer"`
-	NoWithVeto int64 `example:"1234"  json:"no_with_veto" swaggertype:"integer"`
-	Abstain    int64 `example:"1234"  json:"abstain"      swaggertype:"integer"`
+	VotesCount int64 `example:"12354" format:"int64" json:"votes_count"  swaggertype:"integer"`
+	Yes        int64 `example:"1234"  format:"int64" json:"yes"          swaggertype:"integer"`
+	No         int64 `example:"1234"  format:"int64" json:"no"           swaggertype:"integer"`
+	NoWithVeto int64 `example:"1234"  format:"int64" json:"no_with_veto" swaggertype:"integer"`
+	Abstain    int64 `example:"1234"  format:"int64" json:"abstain"      swaggertype:"integer"`
 
-	YesVals        int64 `example:"1234" json:"yes_vals"          swaggertype:"integer"`
-	NoVals         int64 `example:"1234" json:"no_vals"           swaggertype:"integer"`
-	NoWithVetoVals int64 `example:"1234" json:"no_with_veto_vals" swaggertype:"integer"`
-	AbstainVals    int64 `example:"1234" json:"abstain_vals"      swaggertype:"integer"`
+	YesVals        int64 `example:"1234" format:"int64" json:"yes_vals"          swaggertype:"integer"`
+	NoVals         int64 `example:"1234" format:"int64" json:"no_vals"           swaggertype:"integer"`
+	NoWithVetoVals int64 `example:"1234" format:"int64" json:"no_with_veto_vals" swaggertype:"integer"`
+	AbstainVals    int64 `example:"1234" format:"int64" json:"abstain_vals"      swaggertype:"integer"`
 
-	YesAddr        int64 `example:"1234" json:"yes_addrs"          swaggertype:"integer"`
-	NoAddr         int64 `example:"1234" json:"no_addrs"           swaggertype:"integer"`
-	NoWithVetoAddr int64 `example:"1234" json:"no_with_veto_addrs" swaggertype:"integer"`
-	AbstainAddr    int64 `example:"1234" json:"abstain_addrs"      swaggertype:"integer"`
+	YesAddr        int64 `example:"1234" format:"int64" json:"yes_addrs"          swaggertype:"integer"`
+	NoAddr         int64 `example:"1234" format:"int64" json:"no_addrs"           swaggertype:"integer"`
+	NoWithVetoAddr int64 `example:"1234" format:"int64" json:"no_with_veto_addrs" swaggertype:"integer"`
+	AbstainAddr    int64 `example:"1234" format:"int64" json:"abstain_addrs"      swaggertype:"integer"`
 
 	TotalVotingPower      string `example:"1000000000" format:"string" json:"total_voting_power,omitempty" swaggertype:"string"`
 	VotingPower           string `example:"1000000000" format:"string" json:"voting_power"                 swaggertype:"string"`
