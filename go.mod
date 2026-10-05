@@ -14,8 +14,8 @@ require (
 	github.com/bcp-innovations/hyperlane-cosmos v1.2.0
 	github.com/bytedance/sonic v1.15.3
 	github.com/celenium-io/celestial-module v0.0.11
-	github.com/celestiaorg/celestia-app/v10 v10.1.0-mocha
-	github.com/celestiaorg/go-square/v4 v4.0.0
+	github.com/celestiaorg/celestia-app/v10 v10.4.0-mocha
+	github.com/celestiaorg/go-square/v4 v4.0.1
 	github.com/celestiaorg/rsmt2d v0.15.3
 	github.com/cometbft/cometbft v1.0.1
 	github.com/cosmos/btcutil v1.0.5
@@ -99,6 +99,7 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.55.0 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/ProjectZKM/Ziren/crates/go-runtime/zkvm_runtime v0.0.0-20260607022201-88e0521b82d3 // indirect
+	github.com/ProtonMail/go-crypto v1.4.1 // indirect
 	github.com/RaduBerinde/axisds v0.1.0 // indirect
 	github.com/RaduBerinde/btreemap v0.0.0-20250419174037-3d62b7205d54 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.47.0 // indirect
@@ -361,9 +362,8 @@ replace (
 	cosmossdk.io/log => github.com/celestiaorg/cosmos-sdk/log v1.3.0
 	cosmossdk.io/x/upgrade => github.com/celestiaorg/cosmos-sdk/x/upgrade v0.2.0
 	github.com/bcp-innovations/hyperlane-cosmos => github.com/celestiaorg/hyperlane-cosmos v1.3.0
-	github.com/cometbft/cometbft => github.com/celestiaorg/celestia-core v0.42.0
-	github.com/cosmos/cosmos-sdk => github.com/celenium-io/cosmos-sdk v0.0.0-20251126135125-32ef06e68ba6
-	// github.com/cosmos/cosmos-sdk => github.com/celestiaorg/cosmos-sdk v0.51.8
+	github.com/cometbft/cometbft => github.com/celestiaorg/celestia-core v0.42.3
+	github.com/cosmos/cosmos-sdk => github.com/celestiaorg/cosmos-sdk v0.52.12
 	github.com/cosmos/ibc-go/v8 => github.com/celestiaorg/ibc-go/v8 v8.7.2
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	// broken goleveldb needs to be replaced for the cosmos-sdk and celestia-app
