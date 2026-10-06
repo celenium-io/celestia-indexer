@@ -8,7 +8,8 @@ package types
 	ENUM(
 		processing,
 		applied,
-		waiting_upgrade
+		waiting_upgrade,
+		skipped
 	)
 */
 //go:generate go-enum --marshal --sql --values --names

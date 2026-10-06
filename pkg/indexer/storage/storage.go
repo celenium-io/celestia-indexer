@@ -407,6 +407,10 @@ func (module *Module) setUpgradeApplied(ctx context.Context, tx storage.GovTx, c
 		return nil
 	}
 
+	if err := tx.SkipUnfinishedUpgrades(ctx, block.VersionApp); err != nil {
+		return err
+	}
+
 	upgrade := storage.Upgrade{
 		Version:        block.VersionApp,
 		Status:         types.UpgradeStatusApplied,

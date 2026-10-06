@@ -75,6 +75,6 @@ func (s *ConstantTestSuite) TestEnums() {
 	s.Require().Len(enums.ProposalStatus, 7)
 	s.Require().Len(enums.HLTokenType, 2)
 	s.Require().Len(enums.HLTransferType, 2)
-	s.Require().Len(enums.UpgradeStatus, 3)
+	s.Require().Len(enums.UpgradeStatus, 4)
 	s.Require().Len(enums.BlobSource, 2)
 }

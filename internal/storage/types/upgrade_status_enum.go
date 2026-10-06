@@ -23,6 +23,8 @@ const (
 	UpgradeStatusApplied UpgradeStatus = "applied"
 	// UpgradeStatusWaitingUpgrade is a UpgradeStatus of type waiting_upgrade.
 	UpgradeStatusWaitingUpgrade UpgradeStatus = "waiting_upgrade"
+	// UpgradeStatusSkipped is a UpgradeStatus of type skipped.
+	UpgradeStatusSkipped UpgradeStatus = "skipped"
 )
 
 var ErrInvalidUpgradeStatus = fmt.Errorf("not a valid UpgradeStatus, try [%s]", strings.Join(_UpgradeStatusNames, ", "))
@@ -31,6 +33,7 @@ var _UpgradeStatusNames = []string{
 	string(UpgradeStatusProcessing),
 	string(UpgradeStatusApplied),
 	string(UpgradeStatusWaitingUpgrade),
+	string(UpgradeStatusSkipped),
 }
 
 // UpgradeStatusNames returns a list of possible string values of UpgradeStatus.
@@ -46,6 +49,7 @@ func UpgradeStatusValues() []UpgradeStatus {
 		UpgradeStatusProcessing,
 		UpgradeStatusApplied,
 		UpgradeStatusWaitingUpgrade,
+		UpgradeStatusSkipped,
 	}
 }
 
@@ -65,6 +69,7 @@ var _UpgradeStatusValue = map[string]UpgradeStatus{
 	"processing":      UpgradeStatusProcessing,
 	"applied":         UpgradeStatusApplied,
 	"waiting_upgrade": UpgradeStatusWaitingUpgrade,
+	"skipped":         UpgradeStatusSkipped,
 }
 
 // ParseUpgradeStatus attempts to convert a string to a UpgradeStatus.

@@ -132,7 +132,7 @@ func getFirstTxEvent(results []types.ResponseDeliverTx) *types.Event {
 		return nil
 	}
 
-	for i := 0; i < len(results)-1; i++ {
+	for i := 0; i < len(results); i++ {
 		if len(results[i].Events) > 0 {
 			return &results[i].Events[0]
 		}
