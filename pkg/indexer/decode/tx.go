@@ -14,6 +14,7 @@ import (
 	"github.com/cometbft/cometbft/crypto/tmhash"
 	blobTypes "github.com/cometbft/cometbft/proto/tendermint/types"
 	tmTypes "github.com/cometbft/cometbft/types"
+	codecTypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/signing"
 	"github.com/pkg/errors"
@@ -146,7 +147,11 @@ func getFeeInDenom(amount cosmosTypes.Coins, denom string) (decimal.Decimal, boo
 	}
 }
 
+// the sdk default (100) rejects txs with many nested Any, e.g. a large MsgExec
+const maxUnpackAnySubCalls = 2000
+
 func createConfig() encoding.Config {
+	codecTypes.MaxUnpackAnySubCalls = maxUnpackAnySubCalls
 	cfg := encoding.MakeConfig(app.ModuleEncodingRegisters...)
 	cfg.InterfaceRegistry.RegisterImplementations((*cosmosTypes.Msg)(nil), &legacy.MsgRegisterEVMAddress{})
 	return cfg
