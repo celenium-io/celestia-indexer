@@ -392,3 +392,13 @@ func (tx Transaction) UpdateUpgradeTally(ctx context.Context, version uint64, vo
 		Exec(ctx)
 	return err
 }
+
+func (tx Transaction) SkipUnfinishedUpgrades(ctx context.Context, version uint64) error {
+	_, err := tx.Tx().NewUpdate().
+		Model((*models.Upgrade)(nil)).
+		Set("status = ?", storageTypes.UpgradeStatusSkipped).
+		Where("version < ?", version).
+		Where("status != ?", storageTypes.UpgradeStatusApplied).
+		Exec(ctx)
+	return err
+}

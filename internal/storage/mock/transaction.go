@@ -2696,6 +2696,44 @@ func (c *MockTransactionSaveZkISMsCall) DoAndReturn(f func(context.Context, ...*
 	return c
 }
 
+// SkipUnfinishedUpgrades mocks base method.
+func (m *MockTransaction) SkipUnfinishedUpgrades(ctx context.Context, version uint64) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SkipUnfinishedUpgrades", ctx, version)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SkipUnfinishedUpgrades indicates an expected call of SkipUnfinishedUpgrades.
+func (mr *MockTransactionMockRecorder) SkipUnfinishedUpgrades(ctx, version any) *MockTransactionSkipUnfinishedUpgradesCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SkipUnfinishedUpgrades", reflect.TypeOf((*MockTransaction)(nil).SkipUnfinishedUpgrades), ctx, version)
+	return &MockTransactionSkipUnfinishedUpgradesCall{Call: call}
+}
+
+// MockTransactionSkipUnfinishedUpgradesCall wrap *gomock.Call
+type MockTransactionSkipUnfinishedUpgradesCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockTransactionSkipUnfinishedUpgradesCall) Return(arg0 error) *MockTransactionSkipUnfinishedUpgradesCall {
+	c.Call = c.Call.Return(arg0)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockTransactionSkipUnfinishedUpgradesCall) Do(f func(context.Context, uint64) error) *MockTransactionSkipUnfinishedUpgradesCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockTransactionSkipUnfinishedUpgradesCall) DoAndReturn(f func(context.Context, uint64) error) *MockTransactionSkipUnfinishedUpgradesCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Tx mocks base method.
 func (m *MockTransaction) Tx() *bun.Tx {
 	m.ctrl.T.Helper()

@@ -206,6 +206,95 @@ func (s *ModuleTestSuite) TestSignalInUpgradeBlockKeepsAppliedUpgrade() {
 	s.Require().Len(signals, 1)
 }
 
+func (s *ModuleTestSuite) TestAppliedUpgradeSkipsLowerVersions() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 10*time.Second)
+	defer ctxCancel()
+
+	db := s.storage.Connection().DB()
+	_, err := db.NewUpdate().Table("state").
+		Set("version = 2").
+		Set("last_height = 2000").
+		Where("name = ?", testIndexerName).
+		Exec(ctx)
+	s.Require().NoError(err)
+
+	tx, err := postgres.BeginTransaction(ctx, s.storage.Transactable)
+	s.Require().NoError(err)
+	s.Require().NoError(tx.SaveUpgrades(ctx,
+		// signalled, but the network went from v2 straight to v4
+		&storage.Upgrade{
+			Version:      3,
+			Height:       900,
+			Time:         time.Date(2023, 7, 4, 0, 0, 0, 0, time.UTC),
+			VotingPower:  types.NumericFromInt64(2),
+			SignalsCount: 1,
+		},
+		&storage.Upgrade{
+			Version:      4,
+			Height:       901,
+			Time:         time.Date(2023, 7, 4, 0, 0, 0, 0, time.UTC),
+			VotingPower:  types.NumericFromInt64(2),
+			VotedPower:   types.NumericFromInt64(2),
+			SignalsCount: 2,
+			Status:       types.UpgradeStatusWaitingUpgrade,
+		},
+		// a round for the next version is already open
+		&storage.Upgrade{
+			Version:      5,
+			Height:       902,
+			Time:         time.Date(2023, 7, 4, 0, 0, 0, 0, time.UTC),
+			SignalsCount: 1,
+		},
+	))
+	s.Require().NoError(tx.Flush(ctx))
+	s.Require().NoError(tx.Close(ctx))
+
+	state, err := s.storage.State.ByName(ctx, testIndexerName)
+	s.Require().NoError(err)
+
+	module := NewModule(s.storage.Transactable, s.storage.Notificator, indexerCfg.Indexer{Name: testIndexerName})
+	module.Start(ctx)
+	defer func() {
+		ctxCancel()
+		s.Require().NoError(module.Close())
+	}()
+
+	height := state.LastHeight + 1
+	dCtx := decodeContext.NewContext()
+	dCtx.Block = &storage.Block{
+		Height:          height,
+		Hash:            []byte{0x01, 0x02, 0x03},
+		VersionBlock:    11,
+		VersionApp:      4,
+		ProposerAddress: "81A24EE534DEFE1557A4C7C437E8E8FBC2F834E8",
+		Time:            state.LastTime.Add(time.Minute),
+		MessageTypes:    types.NewMsgTypeBitMask(),
+	}
+
+	_, err = module.saveBlock(ctx, dCtx)
+	s.Require().NoError(err)
+
+	want := map[uint64]types.UpgradeStatus{
+		3: types.UpgradeStatusSkipped,
+		4: types.UpgradeStatusApplied,
+		5: types.UpgradeStatusProcessing,
+	}
+	for version, status := range want {
+		upgrade, err := s.storage.Upgrade.ByVersion(ctx, version)
+		s.Require().NoError(err, version)
+		s.Require().Equal(status, upgrade.Status, version)
+	}
+
+	skipped, err := s.storage.Upgrade.ByVersion(ctx, 3)
+	s.Require().NoError(err)
+	s.Require().EqualValues(0, skipped.AppliedAtLevel)
+	s.Require().EqualValues(1, skipped.SignalsCount)
+
+	applied, err := s.storage.Upgrade.ByVersion(ctx, 4)
+	s.Require().NoError(err)
+	s.Require().EqualValues(height, applied.AppliedAtLevel)
+}
+
 func (s *ModuleTestSuite) TestWithdrawnSignalLowersQuorum() {
 	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 10*time.Second)
 	defer ctxCancel()

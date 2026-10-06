@@ -2677,6 +2677,85 @@ func (s *TransactionTestSuite) TestPendingUpgradeVersions() {
 	s.Require().Equal([]uint64{1600, 1601}, versions)
 }
 
+func (s *TransactionTestSuite) TestSkipUnfinishedUpgrades() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, rollback := s.beginRolledBack(ctx)
+	defer rollback()
+
+	s.Require().NoError(tx.SaveUpgrades(ctx,
+		// below the applied version: never reached the quorum
+		&storage.Upgrade{Version: 1590, Height: 1015, Time: time.Now().UTC(), SignalsCount: 3, VotingPower: types.NumericFromInt64(7)},
+		&storage.Upgrade{Version: 1595, Height: 1016, Time: time.Now().UTC(), Status: types.UpgradeStatusWaitingUpgrade},
+		// the applied version itself and a round above it
+		&storage.Upgrade{Version: 1600, Height: 1020, Time: time.Now().UTC(), Status: types.UpgradeStatusWaitingUpgrade},
+		&storage.Upgrade{Version: 1601, Height: 1021, Time: time.Now().UTC()},
+	))
+
+	s.Require().NoError(tx.SkipUnfinishedUpgrades(ctx, 1600))
+
+	want := map[uint64]types.UpgradeStatus{
+		// fixture upgrades stay applied
+		1499: types.UpgradeStatusApplied,
+		1500: types.UpgradeStatusApplied,
+		1590: types.UpgradeStatusSkipped,
+		1595: types.UpgradeStatusSkipped,
+		1600: types.UpgradeStatusWaitingUpgrade,
+		1601: types.UpgradeStatusProcessing,
+	}
+	upgrades := NewTxRepos(tx).Upgrades
+	for version, status := range want {
+		upgrade, err := upgrades.ByVersion(ctx, version)
+		s.Require().NoError(err, version)
+		s.Require().Equal(status, upgrade.Status, version)
+	}
+
+	// only the status changes
+	skipped, err := upgrades.ByVersion(ctx, 1590)
+	s.Require().NoError(err)
+	s.Require().EqualValues(3, skipped.SignalsCount)
+	s.Require().Equal("7", skipped.VotingPower.String())
+	s.Require().EqualValues(1015, skipped.Height)
+
+	// idempotent
+	s.Require().NoError(tx.SkipUnfinishedUpgrades(ctx, 1600))
+	skipped, err = upgrades.ByVersion(ctx, 1590)
+	s.Require().NoError(err)
+	s.Require().Equal(types.UpgradeStatusSkipped, skipped.Status)
+}
+
+// A rolled back upgrade block leaves the versions skipped; they are pending again and the next recount reopens them.
+func (s *TransactionTestSuite) TestSkippedUpgradeReopensAfterRollback() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	tx, rollback := s.beginRolledBack(ctx)
+	defer rollback()
+
+	s.Require().NoError(tx.SaveUpgrades(ctx,
+		&storage.Upgrade{Version: 1590, Height: 1015, Time: time.Now().UTC()},
+	))
+	s.Require().NoError(tx.SkipUnfinishedUpgrades(ctx, 1600))
+
+	upgrades := NewTxRepos(tx).Upgrades
+	// the current version is below the skipped one again
+	versions, err := upgrades.PendingVersions(ctx, 1580)
+	s.Require().NoError(err)
+	s.Require().Equal([]uint64{1590}, versions)
+
+	s.Require().NoError(tx.UpdateUpgradeTally(ctx, 1590, types.NumericFromInt64(7), types.NumericZero(), types.UpgradeStatusProcessing))
+	upgrade, err := upgrades.ByVersion(ctx, 1590)
+	s.Require().NoError(err)
+	s.Require().Equal(types.UpgradeStatusProcessing, upgrade.Status)
+
+	// while the current version is above it, the skipped upgrade is never recounted
+	s.Require().NoError(tx.SkipUnfinishedUpgrades(ctx, 1600))
+	versions, err = upgrades.PendingVersions(ctx, 1600)
+	s.Require().NoError(err)
+	s.Require().Empty(versions)
+}
+
 func (s *TransactionTestSuite) TestSaveHyperlaneIgps() {
 	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
 	defer ctxCancel()

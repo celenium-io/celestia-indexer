@@ -104,8 +104,8 @@ type GovTx interface {
 	SaveProposals(ctx context.Context, proposals ...*Proposal) (int64, error)
 	SaveVotes(ctx context.Context, votes ...*Vote) (map[uint64]*VotesCount, error)
 	SaveUpgrades(ctx context.Context, upgrades ...*Upgrade) error
+	SkipUnfinishedUpgrades(ctx context.Context, version uint64) error
 	UpdateUpgradeTally(ctx context.Context, version uint64, votingPower, votedPower types.Numeric, status types.UpgradeStatus) error
-	// FixSignalsPower closes the open round: counted signals get their power (by signal id), the rest 0.
 	FixSignalsPower(ctx context.Context, powers map[uint64]types.Numeric) error
 	RollbackUpgrades(ctx context.Context, height pkgTypes.Level) error
 }
