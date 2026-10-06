@@ -399,6 +399,7 @@ func (tx Transaction) SkipUnfinishedUpgrades(ctx context.Context, version uint64
 		Set("status = ?", storageTypes.UpgradeStatusSkipped).
 		Where("version < ?", version).
 		Where("status != ?", storageTypes.UpgradeStatusApplied).
+		Where("status != ?", storageTypes.UpgradeStatusSkipped).
 		Exec(ctx)
 	return err
 }
