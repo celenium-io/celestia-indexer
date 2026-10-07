@@ -272,12 +272,14 @@ func (module *Module) parseConstants(ctx *decodeContext.Context, appState types.
 		appState.Staking.Params.MinCommissionRate,
 	)
 
-	// minfee
-	ctx.AddConstant(
-		storageTypes.ModuleNameMinfee,
-		"network_min_gas_price",
-		appState.MinFee.GetNetworkMinGasPrice(),
-	)
+	// minfee: absent in genesis of chains launched before app version 2
+	if minGasPrice := appState.MinFee.GetNetworkMinGasPrice(); minGasPrice != "" {
+		ctx.AddConstant(
+			storageTypes.ModuleNameMinfee,
+			"network_min_gas_price",
+			minGasPrice,
+		)
+	}
 
 	// fibre: only chains launched at app version 10 or later carry it
 	if appState.Fibre != nil {

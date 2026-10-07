@@ -296,6 +296,18 @@ func TestParseConstants_MinFeeNewParamsFormatTakesPriority(t *testing.T) {
 	require.Equal(t, "0.00002", constantsMap(ctx)["minfee.network_min_gas_price"])
 }
 
+// A chain launched before app version 2 has no minfee module in genesis.
+func TestParseConstants_NoMinFee(t *testing.T) {
+	module := NewModule(postgres.Storage{}, config.Indexer{})
+	ctx := decodeContext.NewContext()
+	appState := testAppState()
+	appState.MinFee = types.MinFee{}
+
+	err := module.parseConstants(ctx, appState, testConsensusParams())
+	require.NoError(t, err)
+	require.NotContains(t, constantsMap(ctx), "minfee.network_min_gas_price")
+}
+
 func TestParseConstants_MissingGovParams(t *testing.T) {
 	module := NewModule(postgres.Storage{}, config.Indexer{})
 	ctx := decodeContext.NewContext()
