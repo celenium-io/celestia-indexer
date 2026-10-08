@@ -16,6 +16,9 @@ import (
 	"github.com/pkg/errors"
 )
 
+// LegacyDec form of appconsts.DefaultNetworkMinGasPrice
+const defaultNetworkMinGasPrice = "0.000001000000000000"
+
 func upgrade(
 	ctx context.Context, repos storage.TxRepos, decodeContext *decodeContext.Context, currentVersion, targetVersion uint64,
 ) error {
@@ -25,8 +28,15 @@ func upgrade(
 
 	for version := currentVersion + 1; version <= targetVersion; version++ {
 		switch version {
-		case 1, 2, 3, 5, 8, 9:
+		case 1, 3, 5, 8, 9:
 			// No upgrade logic needed for these versions
+		case 2:
+			// CIP-006: Minimum gas price enforcement (https://cips.celestia.org/cip-006.html)
+			if err := createConstantIfNotExists(
+				ctx, decodeContext, repos.Constants, types.ModuleNameMinfee, "network_min_gas_price", defaultNetworkMinGasPrice,
+			); err != nil {
+				return errors.Wrap(err, "failed to upgrade to version 2")
+			}
 		case 6:
 			// CIP-037 Reduce the validator unbonding period from 21 days to 14 days and 1 hour to improve capital
 			// efficiency while maintaining network security (https://cips.celestia.org/cip-037.html)

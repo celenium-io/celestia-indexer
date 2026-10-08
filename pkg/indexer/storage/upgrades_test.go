@@ -5,6 +5,7 @@ package storage
 
 import (
 	"context"
+	"database/sql"
 	"testing"
 	"time"
 
@@ -100,6 +101,42 @@ func TestUpgradeV7(t *testing.T) {
 		if value.Name == "max_commission_rate" {
 			require.Equal(t, "0.600000000000000000", value.Value)
 		}
+	}
+}
+
+func TestUpgrade_V2SeedsNetworkMinGasPrice(t *testing.T) {
+	for _, tc := range []struct {
+		name   string
+		getErr error
+		seeded bool
+	}{
+		{name: "absent in genesis", getErr: sql.ErrNoRows, seeded: true},
+		{name: "already set by genesis", seeded: false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			constants := mock.NewMockIConstant(ctrl)
+			constants.EXPECT().
+				Get(gomock.Any(), storageTypes.ModuleNameMinfee, "network_min_gas_price").
+				Return(storage.Constant{}, tc.getErr).
+				Times(1)
+
+			dCtx := decodeContext.NewContext()
+			err := upgrade(t.Context(), storage.TxRepos{Constants: constants}, dCtx, 1, 2)
+			require.NoError(t, err)
+
+			if !tc.seeded {
+				require.Zero(t, dCtx.Constants.Len())
+				return
+			}
+			require.Equal(t, 1, dCtx.Constants.Len())
+			for c := range dCtx.Constants.AllValues() {
+				require.Equal(t, storageTypes.ModuleNameMinfee, c.Module)
+				require.Equal(t, "0.000001000000000000", c.Value)
+			}
+		})
 	}
 }
 
