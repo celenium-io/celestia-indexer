@@ -15,12 +15,12 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          go-version: '1.27'
+          go-version-file: go.mod
           cache: false
       - name: golangci-lint
         uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
         with:
-          version: v2.13.1
+          version: v2.14.0
           args: --timeout=5m
   test:
     name: Test
@@ -32,7 +32,7 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          go-version: 1.27.x
+          go-version-file: go.mod
 
       - name: Golang tests
         env:
@@ -44,7 +44,7 @@ jobs:
       - name: Update coverage report
         uses: ncruces/go-coverage-report@dfc237255099f2d25066babde51253992175e365 # v0.3.2
         with:
-          report: 'true'
-          chart: 'true'
-          amend: 'true'
+          report: "true"
+          chart: "true"
+          amend: "true"
         continue-on-error: true
