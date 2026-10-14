@@ -45,7 +45,7 @@ require (
 	github.com/json-iterator/go v1.1.12
 	github.com/klauspost/compress v1.19.1
 	github.com/labstack/echo-contrib v0.50.1
-	github.com/labstack/echo/v4 v4.15.4
+	github.com/labstack/echo/v4 v4.16.0
 	github.com/opus-domini/fast-shot v1.1.4
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.24.1
