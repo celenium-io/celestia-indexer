@@ -32,4 +32,5 @@ type ApiConfig struct {
 	HyperlaneNodeUrl      string  `validate:"omitempty,url"          yaml:"hyperlane_node"`
 	WebscoketClientsPerIp int     `validate:"omitempty,min=1"        yaml:"websocket_clients_per_ip"`
 	TrustedProxies        string  `validate:"omitempty"              yaml:"trusted_proxies"`
+	GeoIpDir              string  `validate:"omitempty"              yaml:"geoip_dir"`
 }

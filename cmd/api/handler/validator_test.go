@@ -12,6 +12,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/celenium-io/celestia-indexer/cmd/api/geo"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
@@ -55,7 +56,7 @@ func (s *ValidatorTestSuite) SetupSuite() {
 	s.jails = mock.NewMockIJail(s.ctrl)
 	s.votes = mock.NewMockIVote(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
-	s.handler = NewValidatorHandler(s.validators, s.bondUpdates, s.blocks, s.blockSignatures, s.delegations, s.constants, s.jails, s.votes, s.state, testIndexerName)
+	s.handler = NewValidatorHandler(s.validators, s.bondUpdates, s.blocks, s.blockSignatures, s.delegations, s.constants, s.jails, s.votes, s.state, geo.Noop{}, testIndexerName)
 }
 
 // TearDownSuite -
@@ -88,6 +89,48 @@ func (s *ValidatorTestSuite) TestGet() {
 	s.Require().EqualValues(1, validator.Id)
 	s.Require().EqualValues("moniker", validator.Moniker)
 	s.Require().EqualValues("012345", validator.ConsAddress)
+}
+
+type fakeLocator struct {
+	geo.Noop
+	data map[string]*geo.Location
+}
+
+func (f fakeLocator) Locate(host string) *geo.Location { return f.data[host] }
+
+func (s *ValidatorTestSuite) TestGetWithFibreLocation() {
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/validators/:id")
+	c.SetParamNames("id")
+	c.SetParamValues("1")
+
+	s.handler.locator = fakeLocator{data: map[string]*geo.Location{
+		"fibre.example.com:7980": {IP: "65.21.15.43", CountryCode: "FI", ASN: 24940, ASOrg: "Hetzner Online GmbH"},
+	}}
+	// the handler is shared by the suite
+	defer func() { s.handler.locator = geo.Noop{} }()
+
+	val := testValidator
+	val.FibreHost = testsuite.Ptr("fibre.example.com:7980")
+	val.FibreHostHeight = testsuite.Ptr(types.Level(100))
+	s.validators.EXPECT().
+		GetByID(gomock.Any(), uint64(1)).
+		Return(&val, nil)
+
+	s.Require().NoError(s.handler.Get(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var validator responses.Validator
+	s.Require().NoError(json.NewDecoder(rec.Body).Decode(&validator))
+	s.Require().NotNil(validator.Fibre)
+	s.Require().Equal(&responses.FibreLocation{
+		IP:          "65.21.15.43",
+		CountryCode: "FI",
+		ASN:         24940,
+		ASOrg:       "Hetzner Online GmbH",
+	}, validator.Fibre.Location)
 }
 
 func (s *ValidatorTestSuite) TestList() {

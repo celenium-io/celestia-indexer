@@ -15,6 +15,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/cmd/api/bus"
 	"github.com/celenium-io/celestia-indexer/cmd/api/cache"
 	"github.com/celenium-io/celestia-indexer/cmd/api/gas"
+	"github.com/celenium-io/celestia-indexer/cmd/api/geo"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/websocket"
 	"github.com/celenium-io/celestia-indexer/cmd/api/hyperlane"
@@ -324,7 +325,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 	v1.GET("/constants", constantsHandler.Get, defaultMiddlewareCache)
 	v1.GET("/enums", constantsHandler.Enums, defaultMiddlewareCache)
 
-	searchHandler := handler.NewSearchHandler(db.Search, db.Address, db.Blocks, db.Tx, db.Namespace, db.Validator, db.Rollup, db.Celestials)
+	searchHandler := handler.NewSearchHandler(db.Search, db.Address, db.Blocks, db.Tx, db.Namespace, db.Validator, db.Rollup, db.Celestials, locator)
 	v1.GET("/search", searchHandler.Search)
 
 	addressHandlers := handler.NewAddressHandler(db.Address, db.Blocks, db.Tx, db.BlobLogs, db.Message, db.Delegation, db.Undelegation, db.Redelegation, db.VestingAccounts, db.Grants, db.Celestials, db.Votes, db.State, cfg.Indexer.Name)
@@ -429,7 +430,7 @@ func initHandlers(ctx context.Context, e *echo.Echo, cfg Config, db postgres.Sto
 		namespaceByHash.GET("/:hash/:height", namespaceHandlers.GetBlobs)
 	}
 
-	validatorsHandler := handler.NewValidatorHandler(db.Validator, db.ValidatorBondUpdates, db.Blocks, db.BlockSignatures, db.Delegation, db.Constants, db.Jails, db.Votes, db.State, cfg.Indexer.Name)
+	validatorsHandler := handler.NewValidatorHandler(db.Validator, db.ValidatorBondUpdates, db.Blocks, db.BlockSignatures, db.Delegation, db.Constants, db.Jails, db.Votes, db.State, locator, cfg.Indexer.Name)
 	validators := v1.Group("/validators")
 	{
 		validators.GET("", validatorsHandler.List)
@@ -721,6 +722,21 @@ func initBlobReceiver(_ context.Context, cfg Config) (node.DalApi, error) {
 			WithAuthToken(os.Getenv("CELESTIA_NODE_AUTH_TOKEN")).
 			WithRateLimit(datasource.RequestsPerSecond), nil
 	}
+}
+
+var locator geo.ILocator = geo.Noop{}
+
+func initLocator(ctx context.Context, dir string, validators storage.IValidator) {
+	if dir == "" {
+		return
+	}
+	l, err := geo.NewLocator(dir, validators)
+	if err != nil {
+		log.Warn().Err(err).Str("dir", dir).Msg("geo databases are unavailable, fibre locations are disabled")
+		return
+	}
+	l.Start(ctx)
+	locator = l
 }
 
 var chainStore *hyperlane.ChainStore

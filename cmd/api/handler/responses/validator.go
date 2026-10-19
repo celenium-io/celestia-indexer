@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/celenium-io/celestia-indexer/cmd/api/geo"
+
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
@@ -42,7 +44,7 @@ type Validator struct {
 
 	Address   *ShortAddress `json:"address"`
 	Delegator *ShortAddress `json:"delegator"`
-	Fibre     *Fibre        `json:"fibre"`
+	Fibre     *Fibre        `json:"fibre,omitempty"`
 }
 
 func NewValidator(val storage.Validator) *Validator {
@@ -245,8 +247,28 @@ func NewTopNMetrics(value storage.ValidatorMetrics) TopNMetrics {
 }
 
 type Fibre struct {
-	Host   string      `example:"100.100.100.100:12345" json:"host"    swaggertype:"string"`
-	Height types.Level `example:"100"                   format:"int64" json:"height"        swaggertype:"integer"`
+	Host     string         `example:"100.100.100.100:12345" json:"host"    swaggertype:"string"`
+	Height   types.Level    `example:"100"                   format:"int64" json:"height"        swaggertype:"integer"`
+	Location *FibreLocation `json:"location,omitempty"`
+}
+
+type FibreLocation struct {
+	IP          string `example:"100.100.100.100"     json:"ip"                     swaggertype:"string"`
+	CountryCode string `example:"DE"                  json:"country_code,omitempty" swaggertype:"string"`
+	ASN         uint32 `example:"24940"               json:"asn,omitempty"          swaggertype:"integer"`
+	ASOrg       string `example:"Hetzner Online GmbH" json:"as_org,omitempty"       swaggertype:"string"`
+}
+
+func NewFibreLocation(loc *geo.Location) *FibreLocation {
+	if loc == nil {
+		return nil
+	}
+	return &FibreLocation{
+		IP:          loc.IP,
+		CountryCode: loc.CountryCode,
+		ASN:         loc.ASN,
+		ASOrg:       loc.ASOrg,
+	}
 }
 
 func NewFibreForValidator(val storage.Validator) *Fibre {

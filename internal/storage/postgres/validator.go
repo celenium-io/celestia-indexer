@@ -153,3 +153,13 @@ func (v *Validator) BondedValidators(ctx context.Context) (validators []storage.
 		Scan(ctx)
 	return
 }
+
+func (v *Validator) FibreHosts(ctx context.Context) (hosts []string, err error) {
+	err = v.DB().NewSelect().
+		Model((*storage.Validator)(nil)).
+		Distinct().
+		Column("fibre_host").
+		Where("fibre_host IS NOT NULL").
+		Scan(ctx, &hosts)
+	return
+}

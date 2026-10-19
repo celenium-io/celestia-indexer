@@ -10088,6 +10088,30 @@
                 "host": {
                     "type": "string",
                     "example": "100.100.100.100:12345"
+                },
+                "location": {
+                    "$ref": "#/definitions/responses.FibreLocation"
+                }
+            }
+        },
+        "responses.FibreLocation": {
+            "type": "object",
+            "properties": {
+                "as_org": {
+                    "type": "string",
+                    "example": "Hetzner Online GmbH"
+                },
+                "asn": {
+                    "type": "integer",
+                    "example": 24940
+                },
+                "country_code": {
+                    "type": "string",
+                    "example": "DE"
+                },
+                "ip": {
+                    "type": "string",
+                    "example": "100.100.100.100"
                 }
             }
         },

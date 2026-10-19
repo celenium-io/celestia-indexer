@@ -53,6 +53,7 @@ type IValidator interface {
 	Metrics(ctx context.Context, id uint64) (ValidatorMetrics, error)
 	TopNMetrics(ctx context.Context, n int) (ValidatorMetrics, error)
 	BondedValidators(ctx context.Context) ([]Validator, error)
+	FibreHosts(ctx context.Context) ([]string, error)
 }
 
 type Validator struct {

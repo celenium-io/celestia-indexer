@@ -4,6 +4,7 @@
 package handler
 
 import (
+	"github.com/celenium-io/celestia-indexer/cmd/api/geo"
 	"net/http"
 	"time"
 
@@ -24,6 +25,7 @@ type ValidatorHandler struct {
 	jails           storage.IJail
 	votes           storage.IVote
 	state           storage.IState
+	locator         geo.ILocator
 	indexerName     string
 }
 
@@ -37,6 +39,7 @@ func NewValidatorHandler(
 	jails storage.IJail,
 	votes storage.IVote,
 	state storage.IState,
+	locator geo.ILocator,
 	indexerName string,
 ) *ValidatorHandler {
 	return &ValidatorHandler{
@@ -49,6 +52,7 @@ func NewValidatorHandler(
 		jails:           jails,
 		votes:           votes,
 		state:           state,
+		locator:         locator,
 		indexerName:     indexerName,
 	}
 }
@@ -81,7 +85,16 @@ func (handler *ValidatorHandler) Get(c echo.Context) error {
 		return handleError(c, err, handler.validators)
 	}
 
-	return c.JSON(http.StatusOK, responses.NewValidator(*validator))
+	return c.JSON(http.StatusOK, newValidatorResponse(*validator, handler.locator))
+}
+
+// newValidatorResponse is shared by every endpoint returning a validator, so fibre location is always set.
+func newValidatorResponse(val storage.Validator, locator geo.ILocator) *responses.Validator {
+	resp := responses.NewValidator(val)
+	if resp != nil && resp.Fibre != nil {
+		resp.Fibre.Location = responses.NewFibreLocation(locator.Locate(resp.Fibre.Host))
+	}
+	return resp
 }
 
 type validatorsPagination struct {
@@ -134,7 +147,7 @@ func (handler *ValidatorHandler) List(c echo.Context) error {
 
 	response := make([]responses.Validator, len(validators))
 	for i := range validators {
-		response[i] = *responses.NewValidator(validators[i])
+		response[i] = *newValidatorResponse(validators[i], handler.locator)
 	}
 
 	return returnArray(c, response)
