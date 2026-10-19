@@ -241,6 +241,45 @@ func (c *MockIValidatorCursorListCall) DoAndReturn(f func(context.Context, uint6
 	return c
 }
 
+// FibreHosts mocks base method.
+func (m *MockIValidator) FibreHosts(ctx context.Context) ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FibreHosts", ctx)
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FibreHosts indicates an expected call of FibreHosts.
+func (mr *MockIValidatorMockRecorder) FibreHosts(ctx any) *MockIValidatorFibreHostsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FibreHosts", reflect.TypeOf((*MockIValidator)(nil).FibreHosts), ctx)
+	return &MockIValidatorFibreHostsCall{Call: call}
+}
+
+// MockIValidatorFibreHostsCall wrap *gomock.Call
+type MockIValidatorFibreHostsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *MockIValidatorFibreHostsCall) Return(arg0 []string, arg1 error) *MockIValidatorFibreHostsCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *MockIValidatorFibreHostsCall) Do(f func(context.Context) ([]string, error)) *MockIValidatorFibreHostsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *MockIValidatorFibreHostsCall) DoAndReturn(f func(context.Context) ([]string, error)) *MockIValidatorFibreHostsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // GetByID mocks base method.
 func (m *MockIValidator) GetByID(ctx context.Context, id uint64) (*storage.Validator, error) {
 	m.ctrl.T.Helper()

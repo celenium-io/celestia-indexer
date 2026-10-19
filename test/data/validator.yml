@@ -44,3 +44,5 @@
   messages_count: 1
   bond_updates_count: 1
   creation_time: '2023-07-04T03:10:57+00:00'
+  fibre_host: fibre.example.com:7980
+  fibre_host_height: 1000

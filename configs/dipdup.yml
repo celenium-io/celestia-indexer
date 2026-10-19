@@ -68,6 +68,7 @@ api:
   hyperlane_node: ${HYPERLANE_NODE_URL}
   websocket_clients_per_ip: ${API_WEBSOCKET_CLIENTS_PER_IP:-10}
   trusted_proxies: ${API_TRUSTED_PROXIES}
+  geoip_dir: ${API_GEOIP_DIR:-geoip}
   
 private_api:
   bind: ${PRIVATE_API_HOST:-0.0.0.0}:${PRIVATE_API_PORT:-9877}

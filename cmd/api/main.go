@@ -64,6 +64,7 @@ func main() {
 	initDispatcher(ctx, db)
 	initGasTracker(ctx, db)
 	initChainStore(ctx, cfg.ApiConfig.HyperlaneNodeUrl)
+	initLocator(ctx, cfg.ApiConfig.GeoIpDir, db.Validator)
 	initHandlers(ctx, e, *cfg, db)
 
 	go func() {
@@ -98,6 +99,9 @@ func main() {
 		if err := prscp.Stop(); err != nil {
 			e.Logger.Fatal(err)
 		}
+	}
+	if err := locator.Close(); err != nil {
+		e.Logger.Fatal(err)
 	}
 	if err := db.Close(); err != nil {
 		e.Logger.Fatal(err)

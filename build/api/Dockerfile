@@ -22,6 +22,11 @@ COPY pkg pkg
 WORKDIR $GOPATH/src/github.com/celenium-io/celestia-indexer/cmd/api/
 RUN go build -a -installsuffix cgo -o /go/bin/api .
 
+# sapics/ip-location-db, PDDL: fibre host locations
+ADD https://github.com/sapics/ip-location-db/releases/download/latest/server-country.mmdb /geoip/
+ADD https://github.com/sapics/ip-location-db/releases/download/latest/origin-asn.mmdb /geoip/
+RUN chmod 755 /geoip && chmod 644 /geoip/*.mmdb
+
 # ---------------------------------------------------------------------
 #  The second stage container, for running the application
 # ---------------------------------------------------------------------
@@ -35,5 +40,6 @@ COPY ./configs/dipdup.yml ./
 COPY database database
 COPY cmd/api/docs docs
 COPY cmd/api/assets assets
+COPY --from=builder /geoip geoip
 
 ENTRYPOINT ["/go/bin/api", "-c", "dipdup.yml"]

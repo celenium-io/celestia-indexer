@@ -152,3 +152,12 @@ func (s *StorageTestSuite) TestValidatorByConsAddress() {
 	_, err = s.storage.Validator.ByConsAddress(ctx, "DEAD")
 	s.Require().True(s.storage.Validator.IsNoRows(err))
 }
+
+func (s *StorageTestSuite) TestValidatorFibreHosts() {
+	ctx, ctxCancel := context.WithTimeout(s.T().Context(), 5*time.Second)
+	defer ctxCancel()
+
+	hosts, err := s.storage.Validator.FibreHosts(ctx)
+	s.Require().NoError(err)
+	s.Require().Equal([]string{"fibre.example.com:7980"}, hosts)
+}
