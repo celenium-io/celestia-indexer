@@ -85,13 +85,14 @@ func (handler *ValidatorHandler) Get(c echo.Context) error {
 		return handleError(c, err, handler.validators)
 	}
 
-	return c.JSON(http.StatusOK, handler.newValidator(*validator))
+	return c.JSON(http.StatusOK, newValidatorResponse(*validator, handler.locator))
 }
 
-func (handler *ValidatorHandler) newValidator(val storage.Validator) *responses.Validator {
+// newValidatorResponse is shared by every endpoint returning a validator, so fibre location is always set.
+func newValidatorResponse(val storage.Validator, locator geo.ILocator) *responses.Validator {
 	resp := responses.NewValidator(val)
 	if resp != nil && resp.Fibre != nil {
-		resp.Fibre.Location = responses.NewFibreLocation(handler.locator.Locate(resp.Fibre.Host))
+		resp.Fibre.Location = responses.NewFibreLocation(locator.Locate(resp.Fibre.Host))
 	}
 	return resp
 }
@@ -146,7 +147,7 @@ func (handler *ValidatorHandler) List(c echo.Context) error {
 
 	response := make([]responses.Validator, len(validators))
 	for i := range validators {
-		response[i] = *handler.newValidator(validators[i])
+		response[i] = *newValidatorResponse(validators[i], handler.locator)
 	}
 
 	return returnArray(c, response)

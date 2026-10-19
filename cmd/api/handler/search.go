@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/celenium-io/celestia-indexer/cmd/api/geo"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
@@ -34,6 +35,7 @@ type SearchHandler struct {
 	validator  storage.IValidator
 	rollup     storage.IRollup
 	celestials celestials.ICelestial
+	locator    geo.ILocator
 }
 
 func NewSearchHandler(
@@ -45,6 +47,7 @@ func NewSearchHandler(
 	validator storage.IValidator,
 	rollup storage.IRollup,
 	celestials celestials.ICelestial,
+	locator geo.ILocator,
 ) SearchHandler {
 	return SearchHandler{
 		search:     search,
@@ -55,6 +58,7 @@ func NewSearchHandler(
 		validator:  validator,
 		rollup:     rollup,
 		celestials: celestials,
+		locator:    locator,
 	}
 }
 
@@ -160,7 +164,7 @@ func (handler SearchHandler) searchValoperAddress(ctx context.Context, search st
 	return []responses.SearchItem{
 		{
 			Type:   searchTypeValidator,
-			Result: responses.NewValidator(validator),
+			Result: newValidatorResponse(validator, handler.locator),
 		}, {
 			Type:   searchTypeAddress,
 			Result: responses.NewAddress(address),
@@ -254,7 +258,7 @@ func (handler SearchHandler) searchText(ctx context.Context, text string) ([]res
 			if err != nil {
 				return nil, err
 			}
-			response[i].Result = responses.NewValidator(*validator)
+			response[i].Result = newValidatorResponse(*validator, handler.locator)
 		case "rollup":
 			rollup, err := handler.rollup.GetByID(ctx, result[i].Id)
 			if err != nil {

@@ -6,6 +6,7 @@ package geo
 import (
 	"context"
 	"io"
+	"maps"
 	"net"
 	"net/netip"
 	"path/filepath"
@@ -29,6 +30,9 @@ const (
 const (
 	refreshInterval = time.Hour
 	resolveTimeout  = 3 * time.Second
+	retryInterval   = time.Minute
+	resolveWorkers  = 8
+	pendingSize     = 128
 )
 
 type Location struct {
@@ -58,10 +62,12 @@ type Locator struct {
 	hosts   HostsSource
 	lookup  lookupFunc
 
-	data map[string]*Location
-	mx   *sync.RWMutex
-	g    workerpool.Group
-	log  zerolog.Logger
+	data     map[string]*Location
+	attempts map[string]time.Time // last on-demand resolve per host, guarded by mx
+	pending  chan string
+	mx       *sync.RWMutex
+	g        workerpool.Group
+	log      zerolog.Logger
 }
 
 func NewLocator(dir string, hosts HostsSource) (*Locator, error) {
@@ -79,22 +85,25 @@ func NewLocator(dir string, hosts HostsSource) (*Locator, error) {
 
 func newLocator(country, asn *maxminddb.Reader, hosts HostsSource, lookup lookupFunc) *Locator {
 	return &Locator{
-		country: country,
-		asn:     asn,
-		hosts:   hosts,
-		lookup:  lookup,
-		data:    make(map[string]*Location),
-		mx:      new(sync.RWMutex),
-		g:       workerpool.NewGroup(),
-		log:     log.With().Str("module", "geo_locator").Logger(),
+		country:  country,
+		asn:      asn,
+		hosts:    hosts,
+		lookup:   lookup,
+		data:     make(map[string]*Location),
+		attempts: make(map[string]time.Time),
+		pending:  make(chan string, pendingSize),
+		mx:       new(sync.RWMutex),
+		g:        workerpool.NewGroup(),
+		log:      log.With().Str("module", "geo_locator").Logger(),
 	}
 }
 
 func (l *Locator) Start(ctx context.Context) {
 	l.g.GoCtx(ctx, l.sync)
+	l.g.GoCtx(ctx, l.resolvePending)
 }
 
-// Locate returns nil for unknown hosts: IP literals are looked up at once, DNS names wait for the next refresh.
+// Locate never blocks on DNS: an unknown name returns nil and is queued for resolving.
 func (l *Locator) Locate(host string) *Location {
 	l.mx.RLock()
 	loc, ok := l.data[host]
@@ -106,7 +115,45 @@ func (l *Locator) Locate(host string) *Location {
 	if addr, err := netip.ParseAddr(hostname(host)); err == nil {
 		return l.locateAddr(addr)
 	}
+	l.enqueue(host)
 	return nil
+}
+
+func (l *Locator) enqueue(host string) {
+	l.mx.Lock()
+	if last, ok := l.attempts[host]; ok && time.Since(last) < retryInterval {
+		l.mx.Unlock()
+		return
+	}
+	l.attempts[host] = time.Now()
+	l.mx.Unlock()
+
+	// a full queue drops the host; it is retried after retryInterval
+	select {
+	case l.pending <- host:
+	default:
+	}
+}
+
+func (l *Locator) resolvePending(ctx context.Context) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case host := <-l.pending:
+			addr, err := l.resolve(ctx, host)
+			if err != nil {
+				if ctx.Err() == nil {
+					l.log.Warn().Err(err).Str("host", host).Msg("resolving fibre host")
+				}
+				continue
+			}
+			loc := l.locateAddr(addr)
+			l.mx.Lock()
+			l.data[host] = loc
+			l.mx.Unlock()
+		}
+	}
 }
 
 func (l *Locator) sync(ctx context.Context) {
@@ -126,37 +173,71 @@ func (l *Locator) sync(ctx context.Context) {
 }
 
 func (l *Locator) refresh(ctx context.Context) {
+	start := time.Now()
 	hosts, err := l.hosts.FibreHosts(ctx)
 	if err != nil {
 		l.log.Error().Err(err).Msg("receiving fibre hosts")
 		return
 	}
 
+	// resolvePending writes into l.data in place, so workers read a copy
 	l.mx.RLock()
-	prev := l.data
+	prev := maps.Clone(l.data)
 	l.mx.RUnlock()
 
-	data := make(map[string]*Location, len(hosts))
+	var (
+		data   = make(map[string]*Location, len(hosts))
+		dataMx sync.Mutex
+		sem    = make(chan struct{}, resolveWorkers)
+		wg     sync.WaitGroup
+	)
 	for _, host := range hosts {
-		addr, err := l.resolve(ctx, host)
-		if err != nil {
-			if ctx.Err() != nil {
+		sem <- struct{}{}
+		wg.Go(func() {
+			defer func() { <-sem }()
+
+			addr, err := l.resolve(ctx, host)
+			if err != nil {
+				if ctx.Err() == nil {
+					l.log.Warn().Err(err).Str("host", host).Msg("resolving fibre host")
+				}
+				if loc, ok := prev[host]; ok {
+					dataMx.Lock()
+					data[host] = loc
+					dataMx.Unlock()
+				}
 				return
 			}
-			l.log.Warn().Err(err).Str("host", host).Msg("resolving fibre host")
-			if loc, ok := prev[host]; ok {
-				data[host] = loc
-			}
-			continue
-		}
-		data[host] = l.locateAddr(addr)
+			loc := l.locateAddr(addr)
+			dataMx.Lock()
+			data[host] = loc
+			dataMx.Unlock()
+		})
+	}
+	wg.Wait()
+	if ctx.Err() != nil {
+		return
 	}
 
 	l.mx.Lock()
+	for host, at := range l.attempts {
+		switch {
+		case at.After(start):
+			// resolved on demand after the snapshot was read
+			if _, ok := data[host]; !ok {
+				if loc, ok := l.data[host]; ok {
+					data[host] = loc
+				}
+			}
+		case time.Since(at) >= retryInterval:
+			delete(l.attempts, host)
+		}
+	}
 	l.data = data
+	count := len(data)
 	l.mx.Unlock()
 
-	l.log.Info().Int("hosts", len(data)).Msg("fibre hosts located")
+	l.log.Info().Int("hosts", count).Msg("fibre hosts located")
 }
 
 func (l *Locator) resolve(ctx context.Context, host string) (netip.Addr, error) {
@@ -175,7 +256,24 @@ func (l *Locator) resolve(ctx context.Context, host string) (netip.Addr, error) 
 	if len(addrs) == 0 {
 		return netip.Addr{}, errors.Errorf("no addresses for %s", name)
 	}
-	return addrs[0], nil
+	return pickAddr(addrs), nil
+}
+
+// pickAddr makes the choice independent of resolver order: IPv4 first, then the lowest address.
+func pickAddr(addrs []netip.Addr) netip.Addr {
+	best := addrs[0].Unmap()
+	for _, addr := range addrs[1:] {
+		addr = addr.Unmap()
+		switch {
+		case addr.Is4() != best.Is4():
+			if addr.Is4() {
+				best = addr
+			}
+		case addr.Compare(best) < 0:
+			best = addr
+		}
+	}
+	return best
 }
 
 func (l *Locator) locateAddr(addr netip.Addr) *Location {

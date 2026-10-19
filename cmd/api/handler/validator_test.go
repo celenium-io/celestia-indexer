@@ -109,6 +109,8 @@ func (s *ValidatorTestSuite) TestGetWithFibreLocation() {
 	s.handler.locator = fakeLocator{data: map[string]*geo.Location{
 		"fibre.example.com:7980": {IP: "65.21.15.43", CountryCode: "FI", ASN: 24940, ASOrg: "Hetzner Online GmbH"},
 	}}
+	// the handler is shared by the suite
+	defer func() { s.handler.locator = geo.Noop{} }()
 
 	val := testValidator
 	val.FibreHost = testsuite.Ptr("fibre.example.com:7980")

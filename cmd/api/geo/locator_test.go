@@ -9,7 +9,9 @@ import (
 	"net/netip"
 	"os"
 	"path/filepath"
+	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/maxmind/mmdbwriter"
 	"github.com/maxmind/mmdbwriter/mmdbtype"
@@ -87,6 +89,34 @@ func TestHostname(t *testing.T) {
 	}
 }
 
+func TestPickAddr(t *testing.T) {
+	parse := func(addrs ...string) []netip.Addr {
+		res := make([]netip.Addr, len(addrs))
+		for i := range addrs {
+			res[i] = netip.MustParseAddr(addrs[i])
+		}
+		return res
+	}
+	tests := []struct {
+		name  string
+		addrs []netip.Addr
+		want  string
+	}{
+		{"single v4", parse("65.21.15.43"), "65.21.15.43"},
+		{"single v6", parse("2a01:4f9::1"), "2a01:4f9::1"},
+		{"v6 first", parse("2a01:4f9::1", "65.21.15.43"), "65.21.15.43"},
+		{"v4 first", parse("65.21.15.43", "2a01:4f9::1"), "65.21.15.43"},
+		{"lowest v4", parse("195.154.212.12", "65.21.15.43", "2a01:4f9::1"), "65.21.15.43"},
+		{"lowest v6", parse("2a01:4f9::2", "2a01:4f9::1"), "2a01:4f9::1"},
+		{"v4-mapped", parse("2a01:4f9::1", "::ffff:65.21.15.43"), "65.21.15.43"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			require.Equal(t, tt.want, pickAddr(tt.addrs).String())
+		})
+	}
+}
+
 func TestLocateIP(t *testing.T) {
 	l := newTestLocator(t, hostsSource{}, nil)
 
@@ -133,6 +163,46 @@ func TestLocateDNS(t *testing.T) {
 	fail = true
 	l.refresh(t.Context())
 	require.Equal(t, want, l.Locate(host), "keeps the last known location")
+}
+
+func TestLocateResolvesOnMiss(t *testing.T) {
+	const host = "new.example.com:7980"
+	var calls atomic.Int32
+	lookup := func(_ context.Context, _, name string) ([]netip.Addr, error) {
+		calls.Add(1)
+		return []netip.Addr{netip.MustParseAddr("65.21.15.43")}, nil
+	}
+	// the host is not in the hourly snapshot yet, as after a fresh MsgSetFibreProviderInfo
+	l := newTestLocator(t, hostsSource{}, lookup)
+	l.Start(t.Context())
+
+	require.Nil(t, l.Locate(host))
+	require.Eventually(t, func() bool {
+		return l.Locate(host) != nil
+	}, time.Second, 10*time.Millisecond)
+	require.Equal(t, "FI", l.Locate(host).CountryCode)
+	require.EqualValues(t, 1, calls.Load())
+}
+
+func TestLocateMissRetryInterval(t *testing.T) {
+	const host = "broken.example.com:7980"
+	var calls atomic.Int32
+	lookup := func(context.Context, string, string) ([]netip.Addr, error) {
+		calls.Add(1)
+		return nil, errors.New("no such host")
+	}
+	l := newTestLocator(t, hostsSource{}, lookup)
+	l.Start(t.Context())
+
+	for range 10 {
+		require.Nil(t, l.Locate(host))
+	}
+	require.Eventually(t, func() bool { return calls.Load() == 1 }, time.Second, 10*time.Millisecond)
+	for range 10 {
+		require.Nil(t, l.Locate(host))
+	}
+	time.Sleep(50 * time.Millisecond)
+	require.EqualValues(t, 1, calls.Load(), "failed host is not retried before retryInterval")
 }
 
 func TestNewLocatorMissingFiles(t *testing.T) {

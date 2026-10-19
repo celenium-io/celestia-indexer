@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/celenium-io/celestia-indexer/cmd/api/geo"
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/mock"
@@ -55,7 +56,7 @@ func (s *SearchTestSuite) SetupSuite() {
 	s.validator = mock.NewMockIValidator(s.ctrl)
 	s.rollup = mock.NewMockIRollup(s.ctrl)
 	s.celestial = celestialMock.NewMockICelestial(s.ctrl)
-	s.handler = NewSearchHandler(s.search, s.address, s.block, s.tx, s.namespace, s.validator, s.rollup, s.celestial)
+	s.handler = NewSearchHandler(s.search, s.address, s.block, s.tx, s.namespace, s.validator, s.rollup, s.celestial, geo.Noop{})
 }
 
 // TearDownSuite -
@@ -364,6 +365,62 @@ func (s *SearchTestSuite) TestSearchValidator() {
 	response := items[0]
 	s.Require().Equal("validator", response.Type)
 	s.Require().NotNil(response.Result)
+}
+
+func (s *SearchTestSuite) TestSearchValidatorWithFibreLocation() {
+	q := make(url.Values)
+	q.Set("query", "name")
+
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/search")
+
+	s.handler.locator = fakeLocator{data: map[string]*geo.Location{
+		"fibre.example.com:7980": {IP: "65.21.15.43", CountryCode: "FI", ASN: 24940, ASOrg: "Hetzner Online GmbH"},
+	}}
+	// the handler is shared by the suite
+	defer func() { s.handler.locator = geo.Noop{} }()
+
+	s.search.EXPECT().
+		SearchText(gomock.Any(), "name").
+		Return([]storage.SearchResult{
+			{
+				Id:    1,
+				Type:  "validator",
+				Value: "name",
+			},
+		}, nil).
+		Times(1)
+
+	s.validator.EXPECT().
+		GetByID(gomock.Any(), uint64(1)).
+		Return(&storage.Validator{
+			Moniker:         "name 1",
+			Id:              1,
+			Jailed:          testsuite.Ptr(false),
+			FibreHost:       testsuite.Ptr("fibre.example.com:7980"),
+			FibreHostHeight: testsuite.Ptr(types.Level(100)),
+		}, nil).
+		Times(1)
+
+	s.Require().NoError(s.handler.Search(c))
+	s.Require().Equal(http.StatusOK, rec.Code)
+
+	var items []struct {
+		Type   string              `json:"type"`
+		Result responses.Validator `json:"result"`
+	}
+	s.Require().NoError(json.NewDecoder(rec.Body).Decode(&items))
+	s.Require().Len(items, 1)
+	s.Require().Equal("validator", items[0].Type)
+	s.Require().NotNil(items[0].Result.Fibre)
+	s.Require().Equal(&responses.FibreLocation{
+		IP:          "65.21.15.43",
+		CountryCode: "FI",
+		ASN:         24940,
+		ASOrg:       "Hetzner Online GmbH",
+	}, items[0].Result.Fibre.Location)
 }
 
 func (s *SearchTestSuite) TestSearchRollup() {
