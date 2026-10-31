@@ -45,7 +45,7 @@ require (
 	github.com/json-iterator/go v1.1.12
 	github.com/klauspost/compress v1.19.1
 	github.com/labstack/echo-contrib v0.50.1
-	github.com/labstack/echo/v4 v4.16.0
+	github.com/labstack/echo/v4 v4.16.3
 	github.com/maxmind/mmdbwriter v1.2.0
 	github.com/opus-domini/fast-shot v1.1.4
 	github.com/oschwald/maxminddb-golang/v2 v2.8.0
