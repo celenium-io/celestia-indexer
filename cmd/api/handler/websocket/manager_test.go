@@ -326,7 +326,7 @@ func TestHandleRejectionDoesNotDecrement(t *testing.T) {
 	require.NoError(t, manager.ips.CheckAndSet(testIp))
 
 	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/", nil)
-	req.Header.Set(echo.HeaderXRealIP, testIp)
+	req.RemoteAddr = testIp + ":12345"
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
@@ -344,7 +344,7 @@ func TestHandleDecrementsAfterFailedUpgrade(t *testing.T) {
 
 	// plain GET without websocket headers: passes the ip limit check, fails on upgrade
 	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/", nil)
-	req.Header.Set(echo.HeaderXRealIP, testIp)
+	req.RemoteAddr = testIp + ":12345"
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
