@@ -90,7 +90,7 @@ func (module *Module) Start(ctx context.Context) {
 
 func (module *Module) init(ctx context.Context, repos storage.TxRepos) error {
 	paginate := sdkSync.Paginate(ctx, 100, func(ctx context.Context, limit, offset int) ([]*storage.Validator, error) {
-		return repos.Validators.List(ctx, uint64(limit), uint64(offset), sdk.SortOrderDesc)
+		return repos.Validators.List(ctx, int64(limit), int64(offset), sdk.SortOrderDesc)
 	})
 
 	for validator, err := range paginate {

@@ -572,7 +572,7 @@ func (s *TxTestSuite) TestGetMessage() {
 		Return(testTx.Id, testTx.Time, nil)
 
 	s.messages.EXPECT().
-		ByTxId(gomock.Any(), uint64(1), 2, 0).
+		ByTxId(gomock.Any(), uint64(1), int64(2), int64(0)).
 		Return([]storage.Message{
 			{
 				Id:       1,
@@ -628,7 +628,7 @@ func (s *TxTestSuite) TestGenesis() {
 	c.SetPath("/tx/genesis")
 
 	s.tx.EXPECT().
-		Genesis(gomock.Any(), 10, 0, gomock.Any()).
+		Genesis(gomock.Any(), int64(10), int64(0), gomock.Any()).
 		Return([]storage.Tx{
 			{
 				Id:            1,

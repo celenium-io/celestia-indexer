@@ -203,7 +203,7 @@ func (c *MockIValidatorCountByStatusCall) DoAndReturn(f func(context.Context) (s
 }
 
 // CursorList mocks base method.
-func (m *MockIValidator) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Validator, error) {
+func (m *MockIValidator) CursorList(ctx context.Context, id uint64, limit int64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Validator, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CursorList", ctx, id, limit, order, cmp)
 	ret0, _ := ret[0].([]*storage.Validator)
@@ -230,13 +230,13 @@ func (c *MockIValidatorCursorListCall) Return(arg0 []*storage.Validator, arg1 er
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIValidatorCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Validator, error)) *MockIValidatorCursorListCall {
+func (c *MockIValidatorCursorListCall) Do(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.Validator, error)) *MockIValidatorCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIValidatorCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Validator, error)) *MockIValidatorCursorListCall {
+func (c *MockIValidatorCursorListCall) DoAndReturn(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.Validator, error)) *MockIValidatorCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -397,7 +397,7 @@ func (c *MockIValidatorLastIDCall) DoAndReturn(f func(context.Context) (uint64, 
 }
 
 // List mocks base method.
-func (m *MockIValidator) List(ctx context.Context, limit, offset uint64, order storage0.SortOrder) ([]*storage.Validator, error) {
+func (m *MockIValidator) List(ctx context.Context, limit, offset int64, order storage0.SortOrder) ([]*storage.Validator, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, limit, offset, order)
 	ret0, _ := ret[0].([]*storage.Validator)
@@ -424,13 +424,13 @@ func (c *MockIValidatorListCall) Return(arg0 []*storage.Validator, arg1 error) *
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIValidatorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Validator, error)) *MockIValidatorListCall {
+func (c *MockIValidatorListCall) Do(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Validator, error)) *MockIValidatorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIValidatorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Validator, error)) *MockIValidatorListCall {
+func (c *MockIValidatorListCall) DoAndReturn(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Validator, error)) *MockIValidatorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -591,7 +591,7 @@ func (c *MockIValidatorSaveCall) DoAndReturn(f func(context.Context, *storage.Va
 }
 
 // TopNMetrics mocks base method.
-func (m *MockIValidator) TopNMetrics(ctx context.Context, n int) (storage.ValidatorMetrics, error) {
+func (m *MockIValidator) TopNMetrics(ctx context.Context, n int64) (storage.ValidatorMetrics, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "TopNMetrics", ctx, n)
 	ret0, _ := ret[0].(storage.ValidatorMetrics)
@@ -618,13 +618,13 @@ func (c *MockIValidatorTopNMetricsCall) Return(arg0 storage.ValidatorMetrics, ar
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIValidatorTopNMetricsCall) Do(f func(context.Context, int) (storage.ValidatorMetrics, error)) *MockIValidatorTopNMetricsCall {
+func (c *MockIValidatorTopNMetricsCall) Do(f func(context.Context, int64) (storage.ValidatorMetrics, error)) *MockIValidatorTopNMetricsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIValidatorTopNMetricsCall) DoAndReturn(f func(context.Context, int) (storage.ValidatorMetrics, error)) *MockIValidatorTopNMetricsCall {
+func (c *MockIValidatorTopNMetricsCall) DoAndReturn(f func(context.Context, int64) (storage.ValidatorMetrics, error)) *MockIValidatorTopNMetricsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

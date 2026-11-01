@@ -405,7 +405,7 @@ func (s *TransactionTestSuite) TestSaveBlobLogsSource() {
 		}
 	}
 
-	for _, count := range []int{2, copyThreshold + 1} {
+	for _, count := range []int64{2, copyThreshold + 1} {
 		s.Run(fmt.Sprintf("%d logs", count), func() {
 			logs := make([]*storage.BlobLog, count)
 			for i := range logs {

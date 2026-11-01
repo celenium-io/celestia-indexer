@@ -98,8 +98,8 @@ func (p Proposal) IsExpedited() bool {
 }
 
 type ListProposalFilters struct {
-	Limit      int
-	Offset     int
+	Limit      int64
+	Offset     int64
 	ProposerId uint64
 	Sort       sdk.SortOrder
 	Status     []types.ProposalStatus

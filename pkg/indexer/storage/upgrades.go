@@ -102,7 +102,7 @@ func upgradeV7(
 	paginate := sdkSync.Paginate(
 		ctx, 100,
 		func(ctx context.Context, limit, offset int) ([]*storage.Validator, error) {
-			return repos.Validators.List(ctx, uint64(limit), uint64(offset), sdkStorage.SortOrderAsc)
+			return repos.Validators.List(ctx, int64(limit), int64(offset), sdkStorage.SortOrderAsc)
 		},
 	)
 

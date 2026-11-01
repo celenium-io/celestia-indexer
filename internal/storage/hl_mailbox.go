@@ -14,7 +14,7 @@ import (
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IHLMailbox interface {
-	List(ctx context.Context, limit, offset int) ([]HLMailbox, error)
+	List(ctx context.Context, limit, offset int64) ([]HLMailbox, error)
 	ByHash(ctx context.Context, hash []byte) (HLMailbox, error)
 	ByInternalId(ctx context.Context, internalId uint64) (HLMailbox, error)
 }

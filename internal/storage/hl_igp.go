@@ -14,7 +14,7 @@ import (
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IHLIGP interface {
-	List(ctx context.Context, limit, offset int) ([]HLIGP, error)
+	List(ctx context.Context, limit, offset int64) ([]HLIGP, error)
 	ByHash(ctx context.Context, hash []byte) (HLIGP, error)
 	IdByHash(ctx context.Context, hash []byte) (uint64, error)
 }

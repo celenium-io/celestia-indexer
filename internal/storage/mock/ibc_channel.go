@@ -162,7 +162,7 @@ func (c *MockIIbcChannelListCall) DoAndReturn(f func(context.Context, storage.Li
 }
 
 // StatsByChain mocks base method.
-func (m *MockIIbcChannel) StatsByChain(ctx context.Context, limit, offset int) ([]storage.ChainStats, error) {
+func (m *MockIIbcChannel) StatsByChain(ctx context.Context, limit, offset int64) ([]storage.ChainStats, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "StatsByChain", ctx, limit, offset)
 	ret0, _ := ret[0].([]storage.ChainStats)
@@ -189,13 +189,13 @@ func (c *MockIIbcChannelStatsByChainCall) Return(arg0 []storage.ChainStats, arg1
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIIbcChannelStatsByChainCall) Do(f func(context.Context, int, int) ([]storage.ChainStats, error)) *MockIIbcChannelStatsByChainCall {
+func (c *MockIIbcChannelStatsByChainCall) Do(f func(context.Context, int64, int64) ([]storage.ChainStats, error)) *MockIIbcChannelStatsByChainCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIIbcChannelStatsByChainCall) DoAndReturn(f func(context.Context, int, int) ([]storage.ChainStats, error)) *MockIIbcChannelStatsByChainCall {
+func (c *MockIIbcChannelStatsByChainCall) DoAndReturn(f func(context.Context, int64, int64) ([]storage.ChainStats, error)) *MockIIbcChannelStatsByChainCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

@@ -20,8 +20,8 @@ type ForwardingFilter struct {
 	From      time.Time
 	To        time.Time
 	Sort      storage.SortOrder
-	Limit     int
-	Offset    int
+	Limit     int64
+	Offset    int64
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed

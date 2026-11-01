@@ -14,7 +14,7 @@ import (
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IHLIGPConfig interface {
-	List(ctx context.Context, limit, offset int) ([]HLIGPConfig, error)
+	List(ctx context.Context, limit, offset int64) ([]HLIGPConfig, error)
 }
 
 type HLIGPConfig struct {

@@ -17,7 +17,7 @@ import (
 type IRedelegation interface {
 	storage.Table[*Redelegation]
 
-	ByAddress(ctx context.Context, addressId uint64, limit, offset int) ([]Redelegation, error)
+	ByAddress(ctx context.Context, addressId uint64, limit, offset int64) ([]Redelegation, error)
 }
 
 // Redelegation -

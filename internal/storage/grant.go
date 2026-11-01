@@ -17,8 +17,8 @@ import (
 type IGrant interface {
 	storage.Table[*Grant]
 
-	ByGranter(ctx context.Context, id uint64, limit, offset int) ([]Grant, error)
-	ByGrantee(ctx context.Context, id uint64, limit, offset int) ([]Grant, error)
+	ByGranter(ctx context.Context, id uint64, limit, offset int64) ([]Grant, error)
+	ByGrantee(ctx context.Context, id uint64, limit, offset int64) ([]Grant, error)
 }
 
 type Grant struct {

@@ -8,6 +8,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	cosmosStakingTypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -55,11 +56,11 @@ func MsgCreateValidator(ctx *context.Context, status storageTypes.Status, msgId 
 		Delegator:         addr.String(),
 		Address:           m.ValidatorAddress,
 		ConsAddress:       consAddress,
-		Moniker:           m.Description.Moniker,
-		Identity:          m.Description.Identity,
-		Website:           m.Description.Website,
-		Details:           m.Description.Details,
-		Contacts:          m.Description.SecurityContact,
+		Moniker:           decoder.CleanString(m.Description.Moniker),
+		Identity:          decoder.CleanString(m.Description.Identity),
+		Website:           decoder.CleanString(m.Description.Website),
+		Details:           decoder.CleanString(m.Description.Details),
+		Contacts:          decoder.CleanString(m.Description.SecurityContact),
 		Height:            ctx.Block.Height,
 		Rate:              storageTypes.NumericZero(),
 		MaxRate:           storageTypes.NumericZero(),
@@ -154,11 +155,11 @@ func MsgEditValidator(ctx *context.Context, status storageTypes.Status, msgId ui
 	validators := []string{m.ValidatorAddress}
 	validator := storage.Validator{
 		Address:           m.ValidatorAddress,
-		Moniker:           m.Description.Moniker,
-		Identity:          m.Description.Identity,
-		Website:           m.Description.Website,
-		Details:           m.Description.Details,
-		Contacts:          m.Description.SecurityContact,
+		Moniker:           decoder.CleanString(m.Description.Moniker),
+		Identity:          decoder.CleanString(m.Description.Identity),
+		Website:           decoder.CleanString(m.Description.Website),
+		Details:           decoder.CleanString(m.Description.Details),
+		Contacts:          decoder.CleanString(m.Description.SecurityContact),
 		Height:            ctx.Block.Height,
 		Rate:              storageTypes.NumericZero(),
 		MinSelfDelegation: storageTypes.NumericZero(),

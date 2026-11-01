@@ -100,8 +100,8 @@ func (handler *BlockHandler) Get(c echo.Context) error {
 }
 
 type blockListRequest struct {
-	Limit  uint64 `query:"limit"  validate:"omitempty,min=1,max=100"`
-	Offset uint64 `query:"offset" validate:"omitempty,min=0"`
+	Limit  int64  `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset int64  `query:"offset" validate:"omitempty,min=0"`
 	Sort   string `query:"sort"   validate:"omitempty,oneof=asc desc"`
 	Stats  bool   `query:"stats"  validate:"omitempty"`
 }
@@ -158,8 +158,8 @@ func (handler *BlockHandler) List(c echo.Context) error {
 
 type getBlockEvents struct {
 	Height types.Level `param:"height" validate:"min=0"`
-	Limit  int         `query:"limit"  validate:"omitempty,min=1,max=100"`
-	Offset int         `query:"offset" validate:"omitempty,min=0"`
+	Limit  int64       `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset int64       `query:"offset" validate:"omitempty,min=0"`
 }
 
 func (p *getBlockEvents) SetDefault() {
@@ -305,8 +305,8 @@ func (handler *BlockHandler) GetMessages(c echo.Context) error {
 
 type getBlobsForBlock struct {
 	Height types.Level `param:"height"  validate:"min=0"`
-	Limit  int         `query:"limit"   validate:"omitempty,min=1,max=100"`
-	Offset int         `query:"offset"  validate:"omitempty,min=0"`
+	Limit  int64       `query:"limit"   validate:"omitempty,min=1,max=100"`
+	Offset int64       `query:"offset"  validate:"omitempty,min=0"`
 	Sort   string      `query:"sort"    validate:"omitempty,oneof=asc desc"`
 	SortBy string      `query:"sort_by" validate:"omitempty,oneof=time size"`
 	Source string      `query:"source"  validate:"omitempty,blob_source"`

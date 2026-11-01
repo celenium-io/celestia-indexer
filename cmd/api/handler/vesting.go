@@ -21,8 +21,8 @@ func NewVestingHandler(vestings storage.IVestingPeriod) *VestingHandler {
 
 type getVestingPeriodsRequest struct {
 	Id     uint64 `param:"id"     validate:"required,min=1"`
-	Limit  int    `query:"limit"  validate:"omitempty,min=1,max=100"`
-	Offset int    `query:"offset" validate:"omitempty,min=0"`
+	Limit  int64  `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset int64  `query:"offset" validate:"omitempty,min=0"`
 }
 
 // Periods godoc

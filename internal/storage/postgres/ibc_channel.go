@@ -80,7 +80,7 @@ func (c *IbcChannel) List(ctx context.Context, fltrs storage.ListChannelFilters)
 	return
 }
 
-func (c *IbcChannel) StatsByChain(ctx context.Context, limit, offset int) (stats []storage.ChainStats, err error) {
+func (c *IbcChannel) StatsByChain(ctx context.Context, limit, offset int64) (stats []storage.ChainStats, err error) {
 	query := c.db.NewSelect().
 		Model((*storage.IbcChannel)(nil)).
 		ColumnExpr("ibc_client.chain_id as chain_id").

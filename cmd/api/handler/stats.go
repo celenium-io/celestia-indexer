@@ -141,7 +141,7 @@ func (sh StatsHandler) Change24hBlockStats(c echo.Context) error {
 }
 
 type namespaceUsageRequest struct {
-	Top *int `example:"100" query:"top" validate:"omitempty,min=1,max=100"`
+	Top *int64 `example:"100" query:"top" validate:"omitempty,min=1,max=100"`
 }
 
 // NamespaceUsage godoc
@@ -161,7 +161,7 @@ func (sh StatsHandler) NamespaceUsage(c echo.Context) error {
 		return badRequestError(c, err)
 	}
 	if req.Top == nil {
-		top := 10
+		top := int64(10)
 		req.Top = &top
 	}
 
@@ -477,8 +477,8 @@ func (sh StatsHandler) IbcSeries(c echo.Context) error {
 }
 
 type limitOffsetRequest struct {
-	Limit  int `query:"limit"  validate:"omitempty,min=1,max=100"`
-	Offset int `query:"offset" validate:"omitempty,min=0"`
+	Limit  int64 `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset int64 `query:"offset" validate:"omitempty,min=0"`
 }
 
 func (req *limitOffsetRequest) SetDefault() {

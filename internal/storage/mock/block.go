@@ -204,7 +204,7 @@ func (c *MockIBlockByIdWithRelationsCall) DoAndReturn(f func(context.Context, ui
 }
 
 // ByProposer mocks base method.
-func (m *MockIBlock) ByProposer(ctx context.Context, proposerId uint64, limit, offset int) ([]storage.Block, error) {
+func (m *MockIBlock) ByProposer(ctx context.Context, proposerId uint64, limit, offset int64) ([]storage.Block, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ByProposer", ctx, proposerId, limit, offset)
 	ret0, _ := ret[0].([]storage.Block)
@@ -231,19 +231,19 @@ func (c *MockIBlockByProposerCall) Return(arg0 []storage.Block, arg1 error) *Moc
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIBlockByProposerCall) Do(f func(context.Context, uint64, int, int) ([]storage.Block, error)) *MockIBlockByProposerCall {
+func (c *MockIBlockByProposerCall) Do(f func(context.Context, uint64, int64, int64) ([]storage.Block, error)) *MockIBlockByProposerCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIBlockByProposerCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.Block, error)) *MockIBlockByProposerCall {
+func (c *MockIBlockByProposerCall) DoAndReturn(f func(context.Context, uint64, int64, int64) ([]storage.Block, error)) *MockIBlockByProposerCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // CursorList mocks base method.
-func (m *MockIBlock) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Block, error) {
+func (m *MockIBlock) CursorList(ctx context.Context, id uint64, limit int64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Block, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CursorList", ctx, id, limit, order, cmp)
 	ret0, _ := ret[0].([]*storage.Block)
@@ -270,13 +270,13 @@ func (c *MockIBlockCursorListCall) Return(arg0 []*storage.Block, arg1 error) *Mo
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIBlockCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Block, error)) *MockIBlockCursorListCall {
+func (c *MockIBlockCursorListCall) Do(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.Block, error)) *MockIBlockCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIBlockCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Block, error)) *MockIBlockCursorListCall {
+func (c *MockIBlockCursorListCall) DoAndReturn(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.Block, error)) *MockIBlockCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -437,7 +437,7 @@ func (c *MockIBlockLastIDCall) DoAndReturn(f func(context.Context) (uint64, erro
 }
 
 // List mocks base method.
-func (m *MockIBlock) List(ctx context.Context, limit, offset uint64, order storage0.SortOrder) ([]*storage.Block, error) {
+func (m *MockIBlock) List(ctx context.Context, limit, offset int64, order storage0.SortOrder) ([]*storage.Block, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, limit, offset, order)
 	ret0, _ := ret[0].([]*storage.Block)
@@ -464,19 +464,19 @@ func (c *MockIBlockListCall) Return(arg0 []*storage.Block, arg1 error) *MockIBlo
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIBlockListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Block, error)) *MockIBlockListCall {
+func (c *MockIBlockListCall) Do(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Block, error)) *MockIBlockListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIBlockListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Block, error)) *MockIBlockListCall {
+func (c *MockIBlockListCall) DoAndReturn(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Block, error)) *MockIBlockListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // ListWithStats mocks base method.
-func (m *MockIBlock) ListWithStats(ctx context.Context, limit, offset uint64, order storage0.SortOrder) ([]*storage.Block, error) {
+func (m *MockIBlock) ListWithStats(ctx context.Context, limit, offset int64, order storage0.SortOrder) ([]*storage.Block, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListWithStats", ctx, limit, offset, order)
 	ret0, _ := ret[0].([]*storage.Block)
@@ -503,13 +503,13 @@ func (c *MockIBlockListWithStatsCall) Return(arg0 []*storage.Block, arg1 error) 
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIBlockListWithStatsCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Block, error)) *MockIBlockListWithStatsCall {
+func (c *MockIBlockListWithStatsCall) Do(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Block, error)) *MockIBlockListWithStatsCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIBlockListWithStatsCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Block, error)) *MockIBlockListWithStatsCall {
+func (c *MockIBlockListWithStatsCall) DoAndReturn(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Block, error)) *MockIBlockListWithStatsCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

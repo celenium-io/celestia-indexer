@@ -18,8 +18,8 @@ type ZkISMFilter struct {
 	CreatorId *uint64
 	TxId      *uint64
 	Sort      sdk.SortOrder
-	Limit     int
-	Offset    int
+	Limit     int64
+	Offset    int64
 }
 
 // ZkISMUpdatesFilter holds query filters for listing ZK ISM updates and messages.
@@ -29,8 +29,8 @@ type ZkISMUpdatesFilter struct {
 	From     time.Time
 	To       time.Time
 	Sort     sdk.SortOrder
-	Limit    int
-	Offset   int
+	Limit    int64
+	Offset   int64
 }
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed

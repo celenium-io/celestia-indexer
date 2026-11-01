@@ -23,7 +23,7 @@ func NewJail(db bun.IDB) storage.IJail {
 	}
 }
 
-func (j *Jail) ByValidator(ctx context.Context, id uint64, limit, offset int) (jails []storage.Jail, err error) {
+func (j *Jail) ByValidator(ctx context.Context, id uint64, limit, offset int64) (jails []storage.Jail, err error) {
 	query := j.DB().NewSelect().Model(&jails).
 		Where("validator_id = ?", id).
 		Order("time desc")

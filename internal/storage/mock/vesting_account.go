@@ -46,7 +46,7 @@ func (m *MockIVestingAccount) EXPECT() *MockIVestingAccountMockRecorder {
 }
 
 // ByAddress mocks base method.
-func (m *MockIVestingAccount) ByAddress(ctx context.Context, addressId uint64, limit, offset int, showEnded bool) ([]storage.VestingAccount, error) {
+func (m *MockIVestingAccount) ByAddress(ctx context.Context, addressId uint64, limit, offset int64, showEnded bool) ([]storage.VestingAccount, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ByAddress", ctx, addressId, limit, offset, showEnded)
 	ret0, _ := ret[0].([]storage.VestingAccount)
@@ -73,19 +73,19 @@ func (c *MockIVestingAccountByAddressCall) Return(arg0 []storage.VestingAccount,
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIVestingAccountByAddressCall) Do(f func(context.Context, uint64, int, int, bool) ([]storage.VestingAccount, error)) *MockIVestingAccountByAddressCall {
+func (c *MockIVestingAccountByAddressCall) Do(f func(context.Context, uint64, int64, int64, bool) ([]storage.VestingAccount, error)) *MockIVestingAccountByAddressCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIVestingAccountByAddressCall) DoAndReturn(f func(context.Context, uint64, int, int, bool) ([]storage.VestingAccount, error)) *MockIVestingAccountByAddressCall {
+func (c *MockIVestingAccountByAddressCall) DoAndReturn(f func(context.Context, uint64, int64, int64, bool) ([]storage.VestingAccount, error)) *MockIVestingAccountByAddressCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // CursorList mocks base method.
-func (m *MockIVestingAccount) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.VestingAccount, error) {
+func (m *MockIVestingAccount) CursorList(ctx context.Context, id uint64, limit int64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.VestingAccount, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CursorList", ctx, id, limit, order, cmp)
 	ret0, _ := ret[0].([]*storage.VestingAccount)
@@ -112,13 +112,13 @@ func (c *MockIVestingAccountCursorListCall) Return(arg0 []*storage.VestingAccoun
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIVestingAccountCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.VestingAccount, error)) *MockIVestingAccountCursorListCall {
+func (c *MockIVestingAccountCursorListCall) Do(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.VestingAccount, error)) *MockIVestingAccountCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIVestingAccountCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.VestingAccount, error)) *MockIVestingAccountCursorListCall {
+func (c *MockIVestingAccountCursorListCall) DoAndReturn(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.VestingAccount, error)) *MockIVestingAccountCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -240,7 +240,7 @@ func (c *MockIVestingAccountLastIDCall) DoAndReturn(f func(context.Context) (uin
 }
 
 // List mocks base method.
-func (m *MockIVestingAccount) List(ctx context.Context, limit, offset uint64, order storage0.SortOrder) ([]*storage.VestingAccount, error) {
+func (m *MockIVestingAccount) List(ctx context.Context, limit, offset int64, order storage0.SortOrder) ([]*storage.VestingAccount, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, limit, offset, order)
 	ret0, _ := ret[0].([]*storage.VestingAccount)
@@ -267,13 +267,13 @@ func (c *MockIVestingAccountListCall) Return(arg0 []*storage.VestingAccount, arg
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIVestingAccountListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.VestingAccount, error)) *MockIVestingAccountListCall {
+func (c *MockIVestingAccountListCall) Do(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.VestingAccount, error)) *MockIVestingAccountListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIVestingAccountListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.VestingAccount, error)) *MockIVestingAccountListCall {
+func (c *MockIVestingAccountListCall) DoAndReturn(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.VestingAccount, error)) *MockIVestingAccountListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

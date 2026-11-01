@@ -15,7 +15,7 @@ import (
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IBlockStats interface {
 	ByHeight(ctx context.Context, height pkgTypes.Level) (BlockStats, error)
-	LastFrom(ctx context.Context, head pkgTypes.Level, limit int) ([]BlockStats, error)
+	LastFrom(ctx context.Context, head pkgTypes.Level, limit int64) ([]BlockStats, error)
 }
 
 type BlockStats struct {

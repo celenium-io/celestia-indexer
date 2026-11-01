@@ -23,7 +23,7 @@ type ITx interface {
 	Filter(ctx context.Context, fltrs TxFilter) ([]Tx, error)
 	ByIdWithRelations(ctx context.Context, id uint64) (Tx, error)
 	ByAddress(ctx context.Context, addressId uint64, fltrs TxFilter) ([]Tx, error)
-	Genesis(ctx context.Context, limit, offset int, sortOrder storage.SortOrder) ([]Tx, error)
+	Genesis(ctx context.Context, limit, offset int64, sortOrder storage.SortOrder) ([]Tx, error)
 	Gas(ctx context.Context, height pkgTypes.Level, ts time.Time) ([]Gas, error)
 }
 
@@ -43,8 +43,8 @@ func (gp ByGasPrice) Less(i, j int) bool {
 func (gp ByGasPrice) Swap(i, j int) { gp[i], gp[j] = gp[j], gp[i] }
 
 type TxFilter struct {
-	Limit                int
-	Offset               int
+	Limit                int64
+	Offset               int64
 	Sort                 storage.SortOrder
 	Status               []string
 	MessageTypes         types.MsgTypeBits

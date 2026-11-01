@@ -184,7 +184,7 @@ func (t *HLTransfer) TotalSeries(ctx context.Context, timeframe storage.Timefram
 	return
 }
 
-func (t *HLTransfer) StatsByDomain(ctx context.Context, limit, offset int) (stats []storage.DomainStats, err error) {
+func (t *HLTransfer) StatsByDomain(ctx context.Context, limit, offset int64) (stats []storage.DomainStats, err error) {
 	query := t.db.NewSelect().
 		Table(storage.ViewHlTransfersByMonth).
 		ColumnExpr("counterparty as domain_id, sum(count) as tx_count, sum(amount) as amount").

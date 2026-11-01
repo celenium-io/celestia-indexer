@@ -18,6 +18,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	blobTypes "github.com/celestiaorg/celestia-app/v10/x/blob/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
@@ -156,9 +157,9 @@ func MsgSubmitProposalV1(ctx *context.Context, codec codec.Codec, status storage
 		CreatedAt:   ctx.Block.Time,
 		Status:      storageTypes.ProposalStatusInactive,
 		Type:        storageTypes.ProposalTypeText,
-		Title:       msg.Title,
-		Description: msg.Summary,
-		Metadata:    msg.Metadata,
+		Title:       decoder.CleanString(msg.Title),
+		Description: decoder.CleanString(msg.Summary),
+		Metadata:    decoder.CleanString(msg.Metadata),
 		Expedited:   &msg.Expedited,
 	}
 
@@ -305,8 +306,8 @@ func MsgSubmitProposalV1Beta(ctx *context.Context, codec codec.Codec, status sto
 		if err := proposal.Unmarshal(msg.Content.Value); err != nil {
 			return msgType, nil, nil, errors.Wrap(err, "unmarshalling text proposal for submit proposal content")
 		}
-		prpsl.Title = proposal.Title
-		prpsl.Description = proposal.Description
+		prpsl.Title = decoder.CleanString(proposal.Title)
+		prpsl.Description = decoder.CleanString(proposal.Description)
 		prpsl.Type = storageTypes.ProposalTypeText
 		return msgType, proposal, prpsl, nil
 	case "/cosmos.params.v1beta1.ParameterChangeProposal":
@@ -314,8 +315,8 @@ func MsgSubmitProposalV1Beta(ctx *context.Context, codec codec.Codec, status sto
 		if err := proposal.Unmarshal(msg.Content.Value); err != nil {
 			return msgType, nil, nil, errors.Wrap(err, "unmarshalling param change proposal for submit proposal content")
 		}
-		prpsl.Title = proposal.Title
-		prpsl.Description = proposal.Description
+		prpsl.Title = decoder.CleanString(proposal.Title)
+		prpsl.Description = decoder.CleanString(proposal.Description)
 		prpsl.Type = storageTypes.ProposalTypeParamChanged
 		changes := make([]paramsV1Beta.ParamChange, 0, len(proposal.Changes))
 		for i := range proposal.Changes {
@@ -388,8 +389,8 @@ func MsgSubmitProposalV1Beta(ctx *context.Context, codec codec.Codec, status sto
 		if err := proposal.Unmarshal(msg.Content.Value); err != nil {
 			return msgType, nil, nil, errors.Wrap(err, "unmarshalling client update proposal for submit proposal content")
 		}
-		prpsl.Title = proposal.Title
-		prpsl.Description = proposal.Description
+		prpsl.Title = decoder.CleanString(proposal.Title)
+		prpsl.Description = decoder.CleanString(proposal.Description)
 		prpsl.Type = storageTypes.ProposalTypeClientUpdate
 		// a list, like v1 MsgRecoverClient proposals
 		prpsl.Changes, err = json.Marshal([]map[string]any{{
@@ -406,8 +407,8 @@ func MsgSubmitProposalV1Beta(ctx *context.Context, codec codec.Codec, status sto
 		if err := proposal.Unmarshal(msg.Content.Value); err != nil {
 			return msgType, nil, nil, errors.Wrap(err, "unmarshalling community pool spend proposal for submit proposal content")
 		}
-		prpsl.Title = proposal.Title
-		prpsl.Description = proposal.Description
+		prpsl.Title = decoder.CleanString(proposal.Title)
+		prpsl.Description = decoder.CleanString(proposal.Description)
 		prpsl.Type = storageTypes.ProposalTypeCommunityPoolSpend
 		prpsl.Changes, err = json.Marshal(map[string]any{
 			"Recipient": proposal.Recipient,

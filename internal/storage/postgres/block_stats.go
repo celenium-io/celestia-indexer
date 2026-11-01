@@ -34,7 +34,7 @@ func (b *BlockStats) ByHeight(ctx context.Context, height pkgTypes.Level) (stats
 	return
 }
 
-func (b *BlockStats) LastFrom(ctx context.Context, head pkgTypes.Level, limit int) (stats []storage.BlockStats, err error) {
+func (b *BlockStats) LastFrom(ctx context.Context, head pkgTypes.Level, limit int64) (stats []storage.BlockStats, err error) {
 	err = b.db.NewSelect().Model(&stats).
 		Where("height <= ?", head).
 		Limit(limit).

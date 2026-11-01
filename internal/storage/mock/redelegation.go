@@ -46,7 +46,7 @@ func (m *MockIRedelegation) EXPECT() *MockIRedelegationMockRecorder {
 }
 
 // ByAddress mocks base method.
-func (m *MockIRedelegation) ByAddress(ctx context.Context, addressId uint64, limit, offset int) ([]storage.Redelegation, error) {
+func (m *MockIRedelegation) ByAddress(ctx context.Context, addressId uint64, limit, offset int64) ([]storage.Redelegation, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ByAddress", ctx, addressId, limit, offset)
 	ret0, _ := ret[0].([]storage.Redelegation)
@@ -73,19 +73,19 @@ func (c *MockIRedelegationByAddressCall) Return(arg0 []storage.Redelegation, arg
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIRedelegationByAddressCall) Do(f func(context.Context, uint64, int, int) ([]storage.Redelegation, error)) *MockIRedelegationByAddressCall {
+func (c *MockIRedelegationByAddressCall) Do(f func(context.Context, uint64, int64, int64) ([]storage.Redelegation, error)) *MockIRedelegationByAddressCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIRedelegationByAddressCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.Redelegation, error)) *MockIRedelegationByAddressCall {
+func (c *MockIRedelegationByAddressCall) DoAndReturn(f func(context.Context, uint64, int64, int64) ([]storage.Redelegation, error)) *MockIRedelegationByAddressCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // CursorList mocks base method.
-func (m *MockIRedelegation) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Redelegation, error) {
+func (m *MockIRedelegation) CursorList(ctx context.Context, id uint64, limit int64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Redelegation, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CursorList", ctx, id, limit, order, cmp)
 	ret0, _ := ret[0].([]*storage.Redelegation)
@@ -112,13 +112,13 @@ func (c *MockIRedelegationCursorListCall) Return(arg0 []*storage.Redelegation, a
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIRedelegationCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Redelegation, error)) *MockIRedelegationCursorListCall {
+func (c *MockIRedelegationCursorListCall) Do(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.Redelegation, error)) *MockIRedelegationCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIRedelegationCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Redelegation, error)) *MockIRedelegationCursorListCall {
+func (c *MockIRedelegationCursorListCall) DoAndReturn(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.Redelegation, error)) *MockIRedelegationCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -240,7 +240,7 @@ func (c *MockIRedelegationLastIDCall) DoAndReturn(f func(context.Context) (uint6
 }
 
 // List mocks base method.
-func (m *MockIRedelegation) List(ctx context.Context, limit, offset uint64, order storage0.SortOrder) ([]*storage.Redelegation, error) {
+func (m *MockIRedelegation) List(ctx context.Context, limit, offset int64, order storage0.SortOrder) ([]*storage.Redelegation, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, limit, offset, order)
 	ret0, _ := ret[0].([]*storage.Redelegation)
@@ -267,13 +267,13 @@ func (c *MockIRedelegationListCall) Return(arg0 []*storage.Redelegation, arg1 er
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIRedelegationListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Redelegation, error)) *MockIRedelegationListCall {
+func (c *MockIRedelegationListCall) Do(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Redelegation, error)) *MockIRedelegationListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIRedelegationListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Redelegation, error)) *MockIRedelegationListCall {
+func (c *MockIRedelegationListCall) DoAndReturn(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Redelegation, error)) *MockIRedelegationListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

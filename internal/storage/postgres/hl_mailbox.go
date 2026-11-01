@@ -18,7 +18,7 @@ func NewHLMailbox(db bun.IDB) storage.IHLMailbox {
 	return &HLMailbox{db}
 }
 
-func (hl *HLMailbox) List(ctx context.Context, limit, offset int) (mailbox []storage.HLMailbox, err error) {
+func (hl *HLMailbox) List(ctx context.Context, limit, offset int64) (mailbox []storage.HLMailbox, err error) {
 	query := hl.db.NewSelect().
 		Model((*storage.HLMailbox)(nil))
 

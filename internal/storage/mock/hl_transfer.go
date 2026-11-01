@@ -162,7 +162,7 @@ func (c *MockIHLTransferSeriesCall) DoAndReturn(f func(context.Context, uint64, 
 }
 
 // StatsByDomain mocks base method.
-func (m *MockIHLTransfer) StatsByDomain(ctx context.Context, limit, offset int) ([]storage.DomainStats, error) {
+func (m *MockIHLTransfer) StatsByDomain(ctx context.Context, limit, offset int64) ([]storage.DomainStats, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "StatsByDomain", ctx, limit, offset)
 	ret0, _ := ret[0].([]storage.DomainStats)
@@ -189,13 +189,13 @@ func (c *MockIHLTransferStatsByDomainCall) Return(arg0 []storage.DomainStats, ar
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIHLTransferStatsByDomainCall) Do(f func(context.Context, int, int) ([]storage.DomainStats, error)) *MockIHLTransferStatsByDomainCall {
+func (c *MockIHLTransferStatsByDomainCall) Do(f func(context.Context, int64, int64) ([]storage.DomainStats, error)) *MockIHLTransferStatsByDomainCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIHLTransferStatsByDomainCall) DoAndReturn(f func(context.Context, int, int) ([]storage.DomainStats, error)) *MockIHLTransferStatsByDomainCall {
+func (c *MockIHLTransferStatsByDomainCall) DoAndReturn(f func(context.Context, int64, int64) ([]storage.DomainStats, error)) *MockIHLTransferStatsByDomainCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

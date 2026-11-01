@@ -46,7 +46,7 @@ func (m *MockIGrant) EXPECT() *MockIGrantMockRecorder {
 }
 
 // ByGrantee mocks base method.
-func (m *MockIGrant) ByGrantee(ctx context.Context, id uint64, limit, offset int) ([]storage.Grant, error) {
+func (m *MockIGrant) ByGrantee(ctx context.Context, id uint64, limit, offset int64) ([]storage.Grant, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ByGrantee", ctx, id, limit, offset)
 	ret0, _ := ret[0].([]storage.Grant)
@@ -73,19 +73,19 @@ func (c *MockIGrantByGranteeCall) Return(arg0 []storage.Grant, arg1 error) *Mock
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIGrantByGranteeCall) Do(f func(context.Context, uint64, int, int) ([]storage.Grant, error)) *MockIGrantByGranteeCall {
+func (c *MockIGrantByGranteeCall) Do(f func(context.Context, uint64, int64, int64) ([]storage.Grant, error)) *MockIGrantByGranteeCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIGrantByGranteeCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.Grant, error)) *MockIGrantByGranteeCall {
+func (c *MockIGrantByGranteeCall) DoAndReturn(f func(context.Context, uint64, int64, int64) ([]storage.Grant, error)) *MockIGrantByGranteeCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // ByGranter mocks base method.
-func (m *MockIGrant) ByGranter(ctx context.Context, id uint64, limit, offset int) ([]storage.Grant, error) {
+func (m *MockIGrant) ByGranter(ctx context.Context, id uint64, limit, offset int64) ([]storage.Grant, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ByGranter", ctx, id, limit, offset)
 	ret0, _ := ret[0].([]storage.Grant)
@@ -112,19 +112,19 @@ func (c *MockIGrantByGranterCall) Return(arg0 []storage.Grant, arg1 error) *Mock
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIGrantByGranterCall) Do(f func(context.Context, uint64, int, int) ([]storage.Grant, error)) *MockIGrantByGranterCall {
+func (c *MockIGrantByGranterCall) Do(f func(context.Context, uint64, int64, int64) ([]storage.Grant, error)) *MockIGrantByGranterCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIGrantByGranterCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.Grant, error)) *MockIGrantByGranterCall {
+func (c *MockIGrantByGranterCall) DoAndReturn(f func(context.Context, uint64, int64, int64) ([]storage.Grant, error)) *MockIGrantByGranterCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // CursorList mocks base method.
-func (m *MockIGrant) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Grant, error) {
+func (m *MockIGrant) CursorList(ctx context.Context, id uint64, limit int64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Grant, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CursorList", ctx, id, limit, order, cmp)
 	ret0, _ := ret[0].([]*storage.Grant)
@@ -151,13 +151,13 @@ func (c *MockIGrantCursorListCall) Return(arg0 []*storage.Grant, arg1 error) *Mo
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIGrantCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Grant, error)) *MockIGrantCursorListCall {
+func (c *MockIGrantCursorListCall) Do(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.Grant, error)) *MockIGrantCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIGrantCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Grant, error)) *MockIGrantCursorListCall {
+func (c *MockIGrantCursorListCall) DoAndReturn(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.Grant, error)) *MockIGrantCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -279,7 +279,7 @@ func (c *MockIGrantLastIDCall) DoAndReturn(f func(context.Context) (uint64, erro
 }
 
 // List mocks base method.
-func (m *MockIGrant) List(ctx context.Context, limit, offset uint64, order storage0.SortOrder) ([]*storage.Grant, error) {
+func (m *MockIGrant) List(ctx context.Context, limit, offset int64, order storage0.SortOrder) ([]*storage.Grant, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, limit, offset, order)
 	ret0, _ := ret[0].([]*storage.Grant)
@@ -306,13 +306,13 @@ func (c *MockIGrantListCall) Return(arg0 []*storage.Grant, arg1 error) *MockIGra
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIGrantListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Grant, error)) *MockIGrantListCall {
+func (c *MockIGrantListCall) Do(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Grant, error)) *MockIGrantListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIGrantListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Grant, error)) *MockIGrantListCall {
+func (c *MockIGrantListCall) DoAndReturn(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Grant, error)) *MockIGrantListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

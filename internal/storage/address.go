@@ -15,8 +15,8 @@ import (
 )
 
 type AddressListFilter struct {
-	Limit     int
-	Offset    int
+	Limit     int64
+	Offset    int64
 	Sort      storage.SortOrder
 	SortField string
 }
@@ -30,7 +30,7 @@ type IAddress interface {
 	Series(ctx context.Context, addressId uint64, timeframe Timeframe, column string, req SeriesRequest) (items []HistogramItem, err error)
 	IdByHash(ctx context.Context, hash ...[]byte) ([]uint64, error)
 	IdByAddress(ctx context.Context, address string, ids ...uint64) (uint64, error)
-	Balances(ctx context.Context, addressId uint64, limit, offset int) ([]Balance, error)
+	Balances(ctx context.Context, addressId uint64, limit, offset int64) ([]Balance, error)
 	AddressByString(ctx context.Context, readableHash string) (Address, error)
 	LastAddressAction(ctx context.Context, address []byte) (uint64, error)
 }

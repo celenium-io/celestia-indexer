@@ -14,7 +14,7 @@ import (
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock -typed
 type IHLGasPayment interface {
-	List(ctx context.Context, limit, offset int) ([]HLGasPayment, error)
+	List(ctx context.Context, limit, offset int64) ([]HLGasPayment, error)
 }
 
 type HLGasPayment struct {

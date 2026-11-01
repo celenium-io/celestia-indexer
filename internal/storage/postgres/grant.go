@@ -23,7 +23,7 @@ func NewGrant(db bun.IDB) storage.IGrant {
 	}
 }
 
-func (g *Grant) ByGrantee(ctx context.Context, id uint64, limit, offset int) (grants []storage.Grant, err error) {
+func (g *Grant) ByGrantee(ctx context.Context, id uint64, limit, offset int64) (grants []storage.Grant, err error) {
 	query := g.DB().NewSelect().
 		Model((*storage.Grant)(nil)).
 		Where("grantee_id = ?", id).
@@ -45,7 +45,7 @@ func (g *Grant) ByGrantee(ctx context.Context, id uint64, limit, offset int) (gr
 	return
 }
 
-func (g *Grant) ByGranter(ctx context.Context, id uint64, limit, offset int) (grants []storage.Grant, err error) {
+func (g *Grant) ByGranter(ctx context.Context, id uint64, limit, offset int64) (grants []storage.Grant, err error) {
 	query := g.DB().NewSelect().
 		Model((*storage.Grant)(nil)).
 		Where("granter_id = ?", id).

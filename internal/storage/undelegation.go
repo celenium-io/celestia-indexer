@@ -17,7 +17,7 @@ import (
 type IUndelegation interface {
 	storage.Table[*Undelegation]
 
-	ByAddress(ctx context.Context, addressId uint64, limit, offset int) ([]Undelegation, error)
+	ByAddress(ctx context.Context, addressId uint64, limit, offset int64) ([]Undelegation, error)
 }
 
 // Undelegation -

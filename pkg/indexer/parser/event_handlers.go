@@ -12,6 +12,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
 )
@@ -255,7 +256,7 @@ func parseProposal(ctx *context.Context, data map[string]string) error {
 			proposal.Status = types.ProposalStatusRemoved
 		case "proposal_failed":
 			proposal.Status = types.ProposalStatusFailed
-			proposal.Error = status.Log
+			proposal.Error = decoder.CleanString(status.Log)
 		case "expedited_proposal_rejected":
 			proposal.Status = types.ProposalStatusActive
 			proposal.ExpeditedProposalRejected = true

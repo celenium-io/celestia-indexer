@@ -267,7 +267,7 @@ func (s *HyperlaneTestSuite) TestListMailboxes() {
 	c.SetPath("/hyperlane/mailbox")
 
 	s.mailbox.EXPECT().
-		List(gomock.Any(), 10, 0).
+		List(gomock.Any(), int64(10), int64(0)).
 		Return([]storage.HLMailbox{testMailbox}, nil).
 		Times(1)
 
@@ -769,7 +769,7 @@ func (s *HyperlaneTestSuite) TestListIgps() {
 		Times(1)
 
 	s.igp.EXPECT().
-		List(gomock.Any(), 10, 0).
+		List(gomock.Any(), int64(10), int64(0)).
 		Return([]storage.HLIGP{testIgp}, nil).
 		Times(1)
 

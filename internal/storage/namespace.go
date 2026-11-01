@@ -21,8 +21,8 @@ type INamespace interface {
 
 	ByNamespaceId(ctx context.Context, namespaceId []byte) ([]Namespace, error)
 	ByNamespaceIdAndVersion(ctx context.Context, namespaceId []byte, version byte) (Namespace, error)
-	Messages(ctx context.Context, id uint64, limit, offset int) ([]NamespaceMessage, error)
-	ListWithSort(ctx context.Context, sortField string, sort sdk.SortOrder, limit, offset int) (ns []Namespace, err error)
+	Messages(ctx context.Context, id uint64, limit, offset int64) ([]NamespaceMessage, error)
+	ListWithSort(ctx context.Context, sortField string, sort sdk.SortOrder, limit, offset int64) (ns []Namespace, err error)
 	GetByIds(ctx context.Context, ids ...uint64) (ns []Namespace, err error)
 	LastNamespaceMessage(ctx context.Context, nsId uint64) (msg NamespaceMessage, err error)
 }

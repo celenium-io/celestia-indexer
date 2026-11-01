@@ -17,15 +17,15 @@ import (
 
 type MessageListWithTxFilters struct {
 	Height               pkgTypes.Level
-	Limit                int
-	Offset               int
+	Limit                int64
+	Offset               int64
 	ExcludedMessageTypes []string
 	MessageTypes         []string
 }
 
 type AddressMsgsFilter struct {
-	Limit        int
-	Offset       int
+	Limit        int64
+	Offset       int64
 	Sort         storage.SortOrder
 	MessageTypes []string
 }
@@ -49,7 +49,7 @@ type AddressMessageWithTx struct {
 type IMessage interface {
 	storage.Table[*Message]
 
-	ByTxId(ctx context.Context, txId uint64, limit, offset int) ([]Message, error)
+	ByTxId(ctx context.Context, txId uint64, limit, offset int64) ([]Message, error)
 	ListWithTx(ctx context.Context, filters MessageListWithTxFilters) ([]MessageWithTx, error)
 	ByAddress(ctx context.Context, id uint64, filters AddressMsgsFilter) ([]AddressMessageWithTx, error)
 }

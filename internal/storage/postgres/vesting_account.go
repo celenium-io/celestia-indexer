@@ -24,7 +24,7 @@ func NewVestingAccount(db bun.IDB) storage.IVestingAccount {
 	}
 }
 
-func (v *VestingAccount) ByAddress(ctx context.Context, addressId uint64, limit, offset int, showEnded bool) (accs []storage.VestingAccount, err error) {
+func (v *VestingAccount) ByAddress(ctx context.Context, addressId uint64, limit, offset int64, showEnded bool) (accs []storage.VestingAccount, err error) {
 	query := v.DB().NewSelect().
 		Model((*storage.VestingAccount)(nil)).
 		Where("address_id = ?", addressId).

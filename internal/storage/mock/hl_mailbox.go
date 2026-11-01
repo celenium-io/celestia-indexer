@@ -123,7 +123,7 @@ func (c *MockIHLMailboxByInternalIdCall) DoAndReturn(f func(context.Context, uin
 }
 
 // List mocks base method.
-func (m *MockIHLMailbox) List(ctx context.Context, limit, offset int) ([]storage.HLMailbox, error) {
+func (m *MockIHLMailbox) List(ctx context.Context, limit, offset int64) ([]storage.HLMailbox, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, limit, offset)
 	ret0, _ := ret[0].([]storage.HLMailbox)
@@ -150,13 +150,13 @@ func (c *MockIHLMailboxListCall) Return(arg0 []storage.HLMailbox, arg1 error) *M
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIHLMailboxListCall) Do(f func(context.Context, int, int) ([]storage.HLMailbox, error)) *MockIHLMailboxListCall {
+func (c *MockIHLMailboxListCall) Do(f func(context.Context, int64, int64) ([]storage.HLMailbox, error)) *MockIHLMailboxListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIHLMailboxListCall) DoAndReturn(f func(context.Context, int, int) ([]storage.HLMailbox, error)) *MockIHLMailboxListCall {
+func (c *MockIHLMailboxListCall) DoAndReturn(f func(context.Context, int64, int64) ([]storage.HLMailbox, error)) *MockIHLMailboxListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

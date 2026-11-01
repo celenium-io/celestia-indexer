@@ -18,7 +18,7 @@ func NewHLIGP(db bun.IDB) storage.IHLIGP {
 	return &HLIGP{db}
 }
 
-func (hl *HLIGP) List(ctx context.Context, limit, offset int) (igp []storage.HLIGP, err error) {
+func (hl *HLIGP) List(ctx context.Context, limit, offset int64) (igp []storage.HLIGP, err error) {
 	query := hl.db.NewSelect().
 		Model(&igp)
 

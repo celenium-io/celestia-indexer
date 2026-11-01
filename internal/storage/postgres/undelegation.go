@@ -23,7 +23,7 @@ func NewUndelegation(db bun.IDB) storage.IUndelegation {
 	}
 }
 
-func (d *Undelegation) ByAddress(ctx context.Context, addressId uint64, limit, offset int) (undelegations []storage.Undelegation, err error) {
+func (d *Undelegation) ByAddress(ctx context.Context, addressId uint64, limit, offset int64) (undelegations []storage.Undelegation, err error) {
 	subQuery := d.DB().NewSelect().Model((*storage.Undelegation)(nil)).
 		Where("address_id = ?", addressId).
 		Order("amount desc")

@@ -266,7 +266,7 @@ func (s *RollupTestSuite) TestGetNamespaces() {
 	c.SetParamValues("1")
 
 	s.rollups.EXPECT().
-		Namespaces(gomock.Any(), uint64(1), 10, 0).
+		Namespaces(gomock.Any(), uint64(1), int64(10), int64(0)).
 		Return([]uint64{1}, nil)
 
 	s.namespace.EXPECT().

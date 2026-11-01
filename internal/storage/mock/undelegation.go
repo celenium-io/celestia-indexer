@@ -46,7 +46,7 @@ func (m *MockIUndelegation) EXPECT() *MockIUndelegationMockRecorder {
 }
 
 // ByAddress mocks base method.
-func (m *MockIUndelegation) ByAddress(ctx context.Context, addressId uint64, limit, offset int) ([]storage.Undelegation, error) {
+func (m *MockIUndelegation) ByAddress(ctx context.Context, addressId uint64, limit, offset int64) ([]storage.Undelegation, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ByAddress", ctx, addressId, limit, offset)
 	ret0, _ := ret[0].([]storage.Undelegation)
@@ -73,19 +73,19 @@ func (c *MockIUndelegationByAddressCall) Return(arg0 []storage.Undelegation, arg
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIUndelegationByAddressCall) Do(f func(context.Context, uint64, int, int) ([]storage.Undelegation, error)) *MockIUndelegationByAddressCall {
+func (c *MockIUndelegationByAddressCall) Do(f func(context.Context, uint64, int64, int64) ([]storage.Undelegation, error)) *MockIUndelegationByAddressCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIUndelegationByAddressCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.Undelegation, error)) *MockIUndelegationByAddressCall {
+func (c *MockIUndelegationByAddressCall) DoAndReturn(f func(context.Context, uint64, int64, int64) ([]storage.Undelegation, error)) *MockIUndelegationByAddressCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // CursorList mocks base method.
-func (m *MockIUndelegation) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Undelegation, error) {
+func (m *MockIUndelegation) CursorList(ctx context.Context, id uint64, limit int64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Undelegation, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CursorList", ctx, id, limit, order, cmp)
 	ret0, _ := ret[0].([]*storage.Undelegation)
@@ -112,13 +112,13 @@ func (c *MockIUndelegationCursorListCall) Return(arg0 []*storage.Undelegation, a
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIUndelegationCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Undelegation, error)) *MockIUndelegationCursorListCall {
+func (c *MockIUndelegationCursorListCall) Do(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.Undelegation, error)) *MockIUndelegationCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIUndelegationCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Undelegation, error)) *MockIUndelegationCursorListCall {
+func (c *MockIUndelegationCursorListCall) DoAndReturn(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.Undelegation, error)) *MockIUndelegationCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -240,7 +240,7 @@ func (c *MockIUndelegationLastIDCall) DoAndReturn(f func(context.Context) (uint6
 }
 
 // List mocks base method.
-func (m *MockIUndelegation) List(ctx context.Context, limit, offset uint64, order storage0.SortOrder) ([]*storage.Undelegation, error) {
+func (m *MockIUndelegation) List(ctx context.Context, limit, offset int64, order storage0.SortOrder) ([]*storage.Undelegation, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, limit, offset, order)
 	ret0, _ := ret[0].([]*storage.Undelegation)
@@ -267,13 +267,13 @@ func (c *MockIUndelegationListCall) Return(arg0 []*storage.Undelegation, arg1 er
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIUndelegationListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Undelegation, error)) *MockIUndelegationListCall {
+func (c *MockIUndelegationListCall) Do(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Undelegation, error)) *MockIUndelegationListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIUndelegationListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Undelegation, error)) *MockIUndelegationListCall {
+func (c *MockIUndelegationListCall) DoAndReturn(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Undelegation, error)) *MockIUndelegationListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

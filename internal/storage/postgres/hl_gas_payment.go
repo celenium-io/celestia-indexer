@@ -18,7 +18,7 @@ func NewHLGasPayment(db bun.IDB) storage.IHLGasPayment {
 	return &HLGasPayment{db}
 }
 
-func (hl *HLGasPayment) List(ctx context.Context, limit, offset int) (payments []storage.HLGasPayment, err error) {
+func (hl *HLGasPayment) List(ctx context.Context, limit, offset int64) (payments []storage.HLGasPayment, err error) {
 	query := hl.db.NewSelect().
 		Model((*storage.HLGasPayment)(nil))
 

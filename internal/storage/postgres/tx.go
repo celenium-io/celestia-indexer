@@ -162,7 +162,7 @@ func (tx *Tx) ByAddress(ctx context.Context, addressId uint64, fltrs storage.TxF
 	return txs, nil
 }
 
-func (tx *Tx) Genesis(ctx context.Context, limit, offset int, sortOrder sdk.SortOrder) (txs []storage.Tx, err error) {
+func (tx *Tx) Genesis(ctx context.Context, limit, offset int64, sortOrder sdk.SortOrder) (txs []storage.Tx, err error) {
 	query := tx.DB().NewSelect().Model(&txs).Offset(offset).Where("hash IS NULL")
 	query = limitScope(query, limit)
 	query = sortScope(query, "id", sortOrder)

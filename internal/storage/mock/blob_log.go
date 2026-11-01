@@ -283,10 +283,10 @@ func (c *MockIBlobLogByTxIdCall) DoAndReturn(f func(context.Context, uint64, sto
 }
 
 // CountByTxId mocks base method.
-func (m *MockIBlobLog) CountByTxId(ctx context.Context, txId uint64) (int, error) {
+func (m *MockIBlobLog) CountByTxId(ctx context.Context, txId uint64) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CountByTxId", ctx, txId)
-	ret0, _ := ret[0].(int)
+	ret0, _ := ret[0].(int64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -304,25 +304,25 @@ type MockIBlobLogCountByTxIdCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockIBlobLogCountByTxIdCall) Return(arg0 int, arg1 error) *MockIBlobLogCountByTxIdCall {
+func (c *MockIBlobLogCountByTxIdCall) Return(arg0 int64, arg1 error) *MockIBlobLogCountByTxIdCall {
 	c.Call = c.Call.Return(arg0, arg1)
 	return c
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIBlobLogCountByTxIdCall) Do(f func(context.Context, uint64) (int, error)) *MockIBlobLogCountByTxIdCall {
+func (c *MockIBlobLogCountByTxIdCall) Do(f func(context.Context, uint64) (int64, error)) *MockIBlobLogCountByTxIdCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIBlobLogCountByTxIdCall) DoAndReturn(f func(context.Context, uint64) (int, error)) *MockIBlobLogCountByTxIdCall {
+func (c *MockIBlobLogCountByTxIdCall) DoAndReturn(f func(context.Context, uint64) (int64, error)) *MockIBlobLogCountByTxIdCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // CursorList mocks base method.
-func (m *MockIBlobLog) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.BlobLog, error) {
+func (m *MockIBlobLog) CursorList(ctx context.Context, id uint64, limit int64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.BlobLog, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CursorList", ctx, id, limit, order, cmp)
 	ret0, _ := ret[0].([]*storage.BlobLog)
@@ -349,13 +349,13 @@ func (c *MockIBlobLogCursorListCall) Return(arg0 []*storage.BlobLog, arg1 error)
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIBlobLogCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.BlobLog, error)) *MockIBlobLogCursorListCall {
+func (c *MockIBlobLogCursorListCall) Do(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.BlobLog, error)) *MockIBlobLogCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIBlobLogCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.BlobLog, error)) *MockIBlobLogCursorListCall {
+func (c *MockIBlobLogCursorListCall) DoAndReturn(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.BlobLog, error)) *MockIBlobLogCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -515,7 +515,7 @@ func (c *MockIBlobLogLastIDCall) DoAndReturn(f func(context.Context) (uint64, er
 }
 
 // List mocks base method.
-func (m *MockIBlobLog) List(ctx context.Context, limit, offset uint64, order storage0.SortOrder) ([]*storage.BlobLog, error) {
+func (m *MockIBlobLog) List(ctx context.Context, limit, offset int64, order storage0.SortOrder) ([]*storage.BlobLog, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, limit, offset, order)
 	ret0, _ := ret[0].([]*storage.BlobLog)
@@ -542,13 +542,13 @@ func (c *MockIBlobLogListCall) Return(arg0 []*storage.BlobLog, arg1 error) *Mock
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIBlobLogListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.BlobLog, error)) *MockIBlobLogListCall {
+func (c *MockIBlobLogListCall) Do(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.BlobLog, error)) *MockIBlobLogListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIBlobLogListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.BlobLog, error)) *MockIBlobLogListCall {
+func (c *MockIBlobLogListCall) DoAndReturn(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.BlobLog, error)) *MockIBlobLogListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

@@ -17,7 +17,7 @@ import (
 type IVestingAccount interface {
 	storage.Table[*VestingAccount]
 
-	ByAddress(ctx context.Context, addressId uint64, limit, offset int, showEnded bool) ([]VestingAccount, error)
+	ByAddress(ctx context.Context, addressId uint64, limit, offset int64, showEnded bool) ([]VestingAccount, error)
 }
 
 type VestingAccount struct {

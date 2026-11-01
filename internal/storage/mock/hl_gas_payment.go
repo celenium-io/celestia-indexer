@@ -45,7 +45,7 @@ func (m *MockIHLGasPayment) EXPECT() *MockIHLGasPaymentMockRecorder {
 }
 
 // List mocks base method.
-func (m *MockIHLGasPayment) List(ctx context.Context, limit, offset int) ([]storage.HLGasPayment, error) {
+func (m *MockIHLGasPayment) List(ctx context.Context, limit, offset int64) ([]storage.HLGasPayment, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, limit, offset)
 	ret0, _ := ret[0].([]storage.HLGasPayment)
@@ -72,13 +72,13 @@ func (c *MockIHLGasPaymentListCall) Return(arg0 []storage.HLGasPayment, arg1 err
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIHLGasPaymentListCall) Do(f func(context.Context, int, int) ([]storage.HLGasPayment, error)) *MockIHLGasPaymentListCall {
+func (c *MockIHLGasPaymentListCall) Do(f func(context.Context, int64, int64) ([]storage.HLGasPayment, error)) *MockIHLGasPaymentListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIHLGasPaymentListCall) DoAndReturn(f func(context.Context, int, int) ([]storage.HLGasPayment, error)) *MockIHLGasPaymentListCall {
+func (c *MockIHLGasPaymentListCall) DoAndReturn(f func(context.Context, int64, int64) ([]storage.HLGasPayment, error)) *MockIHLGasPaymentListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

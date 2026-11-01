@@ -14,8 +14,8 @@ import (
 )
 
 type FilterBondUpdatesListByValidator struct {
-	Offset int
-	Limit  int
+	Offset int64
+	Limit  int64
 	Sort   storage.SortOrder
 }
 

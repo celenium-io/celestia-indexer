@@ -124,7 +124,7 @@ func (c *MockINamespaceByNamespaceIdAndVersionCall) DoAndReturn(f func(context.C
 }
 
 // CursorList mocks base method.
-func (m *MockINamespace) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Namespace, error) {
+func (m *MockINamespace) CursorList(ctx context.Context, id uint64, limit int64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Namespace, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CursorList", ctx, id, limit, order, cmp)
 	ret0, _ := ret[0].([]*storage.Namespace)
@@ -151,13 +151,13 @@ func (c *MockINamespaceCursorListCall) Return(arg0 []*storage.Namespace, arg1 er
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockINamespaceCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Namespace, error)) *MockINamespaceCursorListCall {
+func (c *MockINamespaceCursorListCall) Do(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.Namespace, error)) *MockINamespaceCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockINamespaceCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Namespace, error)) *MockINamespaceCursorListCall {
+func (c *MockINamespaceCursorListCall) DoAndReturn(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.Namespace, error)) *MockINamespaceCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -362,7 +362,7 @@ func (c *MockINamespaceLastNamespaceMessageCall) DoAndReturn(f func(context.Cont
 }
 
 // List mocks base method.
-func (m *MockINamespace) List(ctx context.Context, limit, offset uint64, order storage0.SortOrder) ([]*storage.Namespace, error) {
+func (m *MockINamespace) List(ctx context.Context, limit, offset int64, order storage0.SortOrder) ([]*storage.Namespace, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, limit, offset, order)
 	ret0, _ := ret[0].([]*storage.Namespace)
@@ -389,19 +389,19 @@ func (c *MockINamespaceListCall) Return(arg0 []*storage.Namespace, arg1 error) *
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockINamespaceListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Namespace, error)) *MockINamespaceListCall {
+func (c *MockINamespaceListCall) Do(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Namespace, error)) *MockINamespaceListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockINamespaceListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Namespace, error)) *MockINamespaceListCall {
+func (c *MockINamespaceListCall) DoAndReturn(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Namespace, error)) *MockINamespaceListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // ListWithSort mocks base method.
-func (m *MockINamespace) ListWithSort(ctx context.Context, sortField string, sort storage0.SortOrder, limit, offset int) ([]storage.Namespace, error) {
+func (m *MockINamespace) ListWithSort(ctx context.Context, sortField string, sort storage0.SortOrder, limit, offset int64) ([]storage.Namespace, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListWithSort", ctx, sortField, sort, limit, offset)
 	ret0, _ := ret[0].([]storage.Namespace)
@@ -428,19 +428,19 @@ func (c *MockINamespaceListWithSortCall) Return(ns []storage.Namespace, err erro
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockINamespaceListWithSortCall) Do(f func(context.Context, string, storage0.SortOrder, int, int) ([]storage.Namespace, error)) *MockINamespaceListWithSortCall {
+func (c *MockINamespaceListWithSortCall) Do(f func(context.Context, string, storage0.SortOrder, int64, int64) ([]storage.Namespace, error)) *MockINamespaceListWithSortCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockINamespaceListWithSortCall) DoAndReturn(f func(context.Context, string, storage0.SortOrder, int, int) ([]storage.Namespace, error)) *MockINamespaceListWithSortCall {
+func (c *MockINamespaceListWithSortCall) DoAndReturn(f func(context.Context, string, storage0.SortOrder, int64, int64) ([]storage.Namespace, error)) *MockINamespaceListWithSortCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // Messages mocks base method.
-func (m *MockINamespace) Messages(ctx context.Context, id uint64, limit, offset int) ([]storage.NamespaceMessage, error) {
+func (m *MockINamespace) Messages(ctx context.Context, id uint64, limit, offset int64) ([]storage.NamespaceMessage, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Messages", ctx, id, limit, offset)
 	ret0, _ := ret[0].([]storage.NamespaceMessage)
@@ -467,13 +467,13 @@ func (c *MockINamespaceMessagesCall) Return(arg0 []storage.NamespaceMessage, arg
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockINamespaceMessagesCall) Do(f func(context.Context, uint64, int, int) ([]storage.NamespaceMessage, error)) *MockINamespaceMessagesCall {
+func (c *MockINamespaceMessagesCall) Do(f func(context.Context, uint64, int64, int64) ([]storage.NamespaceMessage, error)) *MockINamespaceMessagesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockINamespaceMessagesCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.NamespaceMessage, error)) *MockINamespaceMessagesCall {
+func (c *MockINamespaceMessagesCall) DoAndReturn(f func(context.Context, uint64, int64, int64) ([]storage.NamespaceMessage, error)) *MockINamespaceMessagesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
