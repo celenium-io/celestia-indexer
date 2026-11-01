@@ -12,6 +12,7 @@ import (
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
@@ -87,7 +88,7 @@ func (module *Module) parse(genesis types.GenesisOutput) (*context.Context, erro
 		tx.MessagesCount = int64(len(txDecoded.GetMsgs()))
 		tx.Fee = storageTypes.NumericZero()
 		tx.Status = storageTypes.StatusSuccess
-		tx.Memo = memoTx.GetMemo()
+		tx.Memo = decoder.CleanString(memoTx.GetMemo())
 		tx.MessageTypes = storageTypes.NewMsgTypeBitMask()
 		tx.Messages = make([]storage.Message, len(txDecoded.GetMsgs()))
 		tx.Events = nil

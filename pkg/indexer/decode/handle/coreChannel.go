@@ -12,6 +12,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
@@ -242,7 +243,7 @@ func handleTransferPacketData(
 	}
 	transfer := &storage.IbcTransfer{
 		Amount:    amount,
-		Memo:      data.Memo,
+		Memo:      decoder.CleanString(data.Memo),
 		ChannelId: channel,
 		Port:      port,
 		Sequence:  packet.Sequence,

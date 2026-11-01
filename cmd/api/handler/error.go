@@ -19,6 +19,7 @@ var (
 	errInvalidHashLength   = errors.New("invalid hash: should be 32 bytes length")
 	errInvalidAddress      = errors.New("invalid address")
 	errUnknownAddress      = errors.New("unknown address")
+	errNulInQuery          = errors.New("query contains NUL byte")
 	errInternalServerError = "Internal Server Error"
 )
 

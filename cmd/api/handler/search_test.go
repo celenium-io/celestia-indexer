@@ -234,6 +234,19 @@ func (s *SearchTestSuite) TestSearchBlockWithInvalidHash() {
 	s.Require().Equal(http.StatusOK, rec.Code)
 }
 
+func (s *SearchTestSuite) TestSearchNulByte() {
+	q := make(url.Values)
+	q.Set("query", "cele\x00stia")
+
+	req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := s.echo.NewContext(req, rec)
+	c.SetPath("/search")
+
+	s.Require().NoError(s.handler.Search(c))
+	s.Require().Equal(http.StatusBadRequest, rec.Code)
+}
+
 func (s *SearchTestSuite) TestSearchTx() {
 	q := make(url.Values)
 	q.Set("query", testTxHash)

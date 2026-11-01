@@ -8602,6 +8602,8 @@
                 "operationId": "validators-metrics",
                 "parameters": [
                     {
+                        "maximum": 100,
+                        "minimum": 1,
                         "type": "integer",
                         "example": 10,
                         "description": "Count of aggregated entities",

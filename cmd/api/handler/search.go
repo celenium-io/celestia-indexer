@@ -89,6 +89,9 @@ func (handler SearchHandler) Search(c echo.Context) error {
 	if err != nil {
 		return badRequestError(c, err)
 	}
+	if strings.ContainsRune(req.Search, 0) {
+		return badRequestError(c, errNulInQuery)
+	}
 
 	data := make([]responses.SearchItem, 0)
 

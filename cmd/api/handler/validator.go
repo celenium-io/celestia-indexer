@@ -500,7 +500,7 @@ func (handler *ValidatorHandler) Metrics(c echo.Context) error {
 }
 
 type getTopNValidatorMetrics struct {
-	Count int64 `query:"count" validate:"omitempty,min=1"`
+	Count int64 `query:"count" validate:"omitempty,min=1,max=100"`
 }
 
 func (req *getTopNValidatorMetrics) SetDefault() {
@@ -515,7 +515,7 @@ func (req *getTopNValidatorMetrics) SetDefault() {
 //	@Description	Returns aggregated performance metrics for the top N validators by voting power, useful for comparing signing efficiency across the active set.
 //	@Tags			validator
 //	@ID				validators-metrics
-//	@Param			count		query	integer	false	"Count of aggregated entities"	example(10)
+//	@Param			count		query	integer	false	"Count of aggregated entities"	minimum(1)	maximum(100)	example(10)
 //	@Produce		json
 //	@Success		200	{object}	responses.TopNMetrics
 //	@Failure		400	{object}	Error

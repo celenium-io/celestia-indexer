@@ -11,6 +11,7 @@ import (
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
+	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/parser/events"
 	"github.com/celenium-io/celestia-indexer/pkg/types"
 	"github.com/pkg/errors"
@@ -47,7 +48,7 @@ func (p *Module) parseTx(ctx *context.Context, b *types.BlockData, index int, tx
 	t.Status = storageTypes.StatusSuccess
 	t.Codespace = txRes.Codespace
 	t.Hash = d.Hash
-	t.Memo = d.Memo
+	t.Memo = decoder.CleanString(d.Memo)
 	t.MessageTypes = storageTypes.NewMsgTypeBitMask()
 	t.Messages = make([]storage.Message, len(d.Messages))
 	t.Events = nil
@@ -78,6 +79,7 @@ func (p *Module) parseTx(ctx *context.Context, b *types.BlockData, index int, tx
 		if err := json.Unmarshal(txRes.Log, &t.Error); err != nil {
 			t.Error = string(txRes.Log)
 		}
+		t.Error = decoder.CleanString(t.Error)
 	}
 
 	txEvents, err := parseEvents(ctx, b, txRes.Events, t.Id)
