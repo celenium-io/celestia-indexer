@@ -46,7 +46,7 @@ func (m *MockIVestingPeriod) EXPECT() *MockIVestingPeriodMockRecorder {
 }
 
 // ByVesting mocks base method.
-func (m *MockIVestingPeriod) ByVesting(ctx context.Context, id uint64, limit, offset int) ([]storage.VestingPeriod, error) {
+func (m *MockIVestingPeriod) ByVesting(ctx context.Context, id uint64, limit, offset int64) ([]storage.VestingPeriod, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ByVesting", ctx, id, limit, offset)
 	ret0, _ := ret[0].([]storage.VestingPeriod)
@@ -73,19 +73,19 @@ func (c *MockIVestingPeriodByVestingCall) Return(arg0 []storage.VestingPeriod, a
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIVestingPeriodByVestingCall) Do(f func(context.Context, uint64, int, int) ([]storage.VestingPeriod, error)) *MockIVestingPeriodByVestingCall {
+func (c *MockIVestingPeriodByVestingCall) Do(f func(context.Context, uint64, int64, int64) ([]storage.VestingPeriod, error)) *MockIVestingPeriodByVestingCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIVestingPeriodByVestingCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.VestingPeriod, error)) *MockIVestingPeriodByVestingCall {
+func (c *MockIVestingPeriodByVestingCall) DoAndReturn(f func(context.Context, uint64, int64, int64) ([]storage.VestingPeriod, error)) *MockIVestingPeriodByVestingCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // CursorList mocks base method.
-func (m *MockIVestingPeriod) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.VestingPeriod, error) {
+func (m *MockIVestingPeriod) CursorList(ctx context.Context, id uint64, limit int64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.VestingPeriod, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CursorList", ctx, id, limit, order, cmp)
 	ret0, _ := ret[0].([]*storage.VestingPeriod)
@@ -112,13 +112,13 @@ func (c *MockIVestingPeriodCursorListCall) Return(arg0 []*storage.VestingPeriod,
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIVestingPeriodCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.VestingPeriod, error)) *MockIVestingPeriodCursorListCall {
+func (c *MockIVestingPeriodCursorListCall) Do(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.VestingPeriod, error)) *MockIVestingPeriodCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIVestingPeriodCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.VestingPeriod, error)) *MockIVestingPeriodCursorListCall {
+func (c *MockIVestingPeriodCursorListCall) DoAndReturn(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.VestingPeriod, error)) *MockIVestingPeriodCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -240,7 +240,7 @@ func (c *MockIVestingPeriodLastIDCall) DoAndReturn(f func(context.Context) (uint
 }
 
 // List mocks base method.
-func (m *MockIVestingPeriod) List(ctx context.Context, limit, offset uint64, order storage0.SortOrder) ([]*storage.VestingPeriod, error) {
+func (m *MockIVestingPeriod) List(ctx context.Context, limit, offset int64, order storage0.SortOrder) ([]*storage.VestingPeriod, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, limit, offset, order)
 	ret0, _ := ret[0].([]*storage.VestingPeriod)
@@ -267,13 +267,13 @@ func (c *MockIVestingPeriodListCall) Return(arg0 []*storage.VestingPeriod, arg1 
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIVestingPeriodListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.VestingPeriod, error)) *MockIVestingPeriodListCall {
+func (c *MockIVestingPeriodListCall) Do(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.VestingPeriod, error)) *MockIVestingPeriodListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIVestingPeriodListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.VestingPeriod, error)) *MockIVestingPeriodListCall {
+func (c *MockIVestingPeriodListCall) DoAndReturn(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.VestingPeriod, error)) *MockIVestingPeriodListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

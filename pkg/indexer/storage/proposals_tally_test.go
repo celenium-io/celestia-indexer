@@ -47,7 +47,7 @@ func TestTallyProposal(t *testing.T) {
 		repos := mock.NewTxRepos(ctrl)
 
 		repos.Votes.EXPECT().
-			ListByProposal(gomock.Any(), uint64(1), votesPageSize, 0).
+			ListByProposal(gomock.Any(), uint64(1), int64(votesPageSize), int64(0)).
 			Return([]storage.Vote{
 				{VoterId: 10, Option: types.VoteOptionYes, Weight: weight(t, "0.7")},
 				{VoterId: 10, Option: types.VoteOptionNo, Weight: weight(t, "0.3")},
@@ -68,7 +68,7 @@ func TestTallyProposal(t *testing.T) {
 		repos := mock.NewTxRepos(ctrl)
 
 		repos.Votes.EXPECT().
-			ListByProposal(gomock.Any(), uint64(1), votesPageSize, 0).
+			ListByProposal(gomock.Any(), uint64(1), int64(votesPageSize), int64(0)).
 			Return([]storage.Vote{
 				{VoterId: 10, Option: types.VoteOptionYes, Weight: weight(t, "0.7")},
 				{VoterId: 10, Option: types.VoteOptionNo, Weight: weight(t, "0.3")},
@@ -90,7 +90,7 @@ func TestTallyProposal(t *testing.T) {
 		repos := mock.NewTxRepos(ctrl)
 
 		repos.Votes.EXPECT().
-			ListByProposal(gomock.Any(), uint64(1), votesPageSize, 0).
+			ListByProposal(gomock.Any(), uint64(1), int64(votesPageSize), int64(0)).
 			Return([]storage.Vote{
 				{VoterId: 20, ValidatorId: testsuite.Ptr(uint64(1)), Option: types.VoteOptionYes, Weight: weight(t, "0.5")},
 				{VoterId: 20, ValidatorId: testsuite.Ptr(uint64(1)), Option: types.VoteOptionNo, Weight: weight(t, "0.5")},
@@ -111,7 +111,7 @@ func TestTallyProposal(t *testing.T) {
 		repos := mock.NewTxRepos(ctrl)
 
 		repos.Votes.EXPECT().
-			ListByProposal(gomock.Any(), uint64(1), votesPageSize, 0).
+			ListByProposal(gomock.Any(), uint64(1), int64(votesPageSize), int64(0)).
 			Return([]storage.Vote{
 				{VoterId: 10, Option: types.VoteOptionNoWithVeto, Weight: weight(t, "1")},
 			}, nil)
@@ -133,7 +133,7 @@ func TestTallyProposal(t *testing.T) {
 
 		third := weight(t, "0.333333333333333333")
 		repos.Votes.EXPECT().
-			ListByProposal(gomock.Any(), uint64(1), votesPageSize, 0).
+			ListByProposal(gomock.Any(), uint64(1), int64(votesPageSize), int64(0)).
 			Return([]storage.Vote{
 				{VoterId: 10, Option: types.VoteOptionYes, Weight: third},
 				{VoterId: 10, Option: types.VoteOptionNo, Weight: third},
@@ -168,7 +168,7 @@ func TestTallyProposal(t *testing.T) {
 			)
 		}
 		repos.Votes.EXPECT().
-			ListByProposal(gomock.Any(), uint64(1), votesPageSize, 0).
+			ListByProposal(gomock.Any(), uint64(1), int64(votesPageSize), int64(0)).
 			Return(votes, nil)
 
 		delegationsOf := func(ids []uint64) []storage.Delegation {
@@ -201,7 +201,7 @@ func TestTallyProposal(t *testing.T) {
 		repos := mock.NewTxRepos(ctrl)
 
 		repos.Votes.EXPECT().
-			ListByProposal(gomock.Any(), uint64(1), votesPageSize, 0).
+			ListByProposal(gomock.Any(), uint64(1), int64(votesPageSize), int64(0)).
 			Return([]storage.Vote{}, nil)
 
 		proposal := &storage.Proposal{Id: 1}

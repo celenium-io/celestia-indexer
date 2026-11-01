@@ -13,8 +13,8 @@ import (
 )
 
 type ListConnectionFilters struct {
-	Limit    int
-	Offset   int
+	Limit    int64
+	Offset   int64
 	Sort     sdk.SortOrder
 	ClientId string
 }

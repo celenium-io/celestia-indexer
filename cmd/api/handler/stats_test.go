@@ -193,13 +193,13 @@ func (s *StatsTestSuite) TestNamespaceUsage() {
 	c.SetPath("/v1/stats/namespace/usage")
 
 	s.ns.EXPECT().
-		ListWithSort(gomock.Any(), "size", sdk.SortOrderDesc, 1, 0).
+		ListWithSort(gomock.Any(), "size", sdk.SortOrderDesc, int64(1), int64(0)).
 		Return([]storage.Namespace{
 			testNamespace,
 		}, nil)
 
 	s.state.EXPECT().
-		List(gomock.Any(), uint64(1), uint64(0), sdk.SortOrderAsc).
+		List(gomock.Any(), int64(1), int64(0), sdk.SortOrderAsc).
 		Return([]*storage.State{
 			&testState,
 		}, nil)
@@ -600,7 +600,7 @@ func (s *StatsTestSuite) TestIbcChainStats() {
 	c.SetPath("/v1/stats/ibc/chains")
 
 	s.channels.EXPECT().
-		StatsByChain(gomock.Any(), 10, 0).
+		StatsByChain(gomock.Any(), int64(10), int64(0)).
 		Return([]storage.ChainStats{
 			{
 				Chain:    "test",
@@ -697,7 +697,7 @@ func (s *StatsTestSuite) TestHlDomainStats() {
 		Times(len(testChainStore))
 
 	s.hyperlane.EXPECT().
-		StatsByDomain(gomock.Any(), 10, 0).
+		StatsByDomain(gomock.Any(), int64(10), int64(0)).
 		Return([]storage.DomainStats{
 			{
 				Domain:  1,
@@ -781,7 +781,7 @@ func (s *StatsTestSuite) TestHlDomainStatsWithoutChainStore() {
 	c.SetPath("/v1/stats/hyperlane/chains")
 
 	s.hyperlane.EXPECT().
-		StatsByDomain(gomock.Any(), 10, 0).
+		StatsByDomain(gomock.Any(), int64(10), int64(0)).
 		Return([]storage.DomainStats{
 			{
 				Domain:  1,

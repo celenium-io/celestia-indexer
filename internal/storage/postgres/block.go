@@ -108,13 +108,13 @@ func (b *Blocks) ByHash(ctx context.Context, hash []byte) (block storage.Block, 
 }
 
 // ListWithStats -
-func (b *Blocks) ListWithStats(ctx context.Context, limit, offset uint64, order sdk.SortOrder) (blocks []*storage.Block, err error) {
+func (b *Blocks) ListWithStats(ctx context.Context, limit, offset int64, order sdk.SortOrder) (blocks []*storage.Block, err error) {
 	subQuery := b.DB().NewSelect().
 		Model(&blocks)
 
-	subQuery = limitScope(subQuery, int(limit))
+	subQuery = limitScope(subQuery, limit)
 	if offset > 0 {
-		subQuery = subQuery.Offset(int(offset))
+		subQuery = subQuery.Offset(offset)
 	}
 
 	subQuery = sortScope(subQuery, "time", order)
@@ -134,7 +134,7 @@ func (b *Blocks) ListWithStats(ctx context.Context, limit, offset uint64, order 
 	return
 }
 
-func (b *Blocks) ByProposer(ctx context.Context, proposerId uint64, limit, offset int) (blocks []storage.Block, err error) {
+func (b *Blocks) ByProposer(ctx context.Context, proposerId uint64, limit, offset int64) (blocks []storage.Block, err error) {
 	blocksQuery := b.DB().NewSelect().Model(&blocks).
 		Where("proposer_id = ?", proposerId).
 		Order("time desc")

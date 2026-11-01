@@ -85,7 +85,7 @@ func (c *MockIAddressAddressByStringCall) DoAndReturn(f func(context.Context, st
 }
 
 // Balances mocks base method.
-func (m *MockIAddress) Balances(ctx context.Context, addressId uint64, limit, offset int) ([]storage.Balance, error) {
+func (m *MockIAddress) Balances(ctx context.Context, addressId uint64, limit, offset int64) ([]storage.Balance, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Balances", ctx, addressId, limit, offset)
 	ret0, _ := ret[0].([]storage.Balance)
@@ -112,13 +112,13 @@ func (c *MockIAddressBalancesCall) Return(arg0 []storage.Balance, arg1 error) *M
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIAddressBalancesCall) Do(f func(context.Context, uint64, int, int) ([]storage.Balance, error)) *MockIAddressBalancesCall {
+func (c *MockIAddressBalancesCall) Do(f func(context.Context, uint64, int64, int64) ([]storage.Balance, error)) *MockIAddressBalancesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIAddressBalancesCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.Balance, error)) *MockIAddressBalancesCall {
+func (c *MockIAddressBalancesCall) DoAndReturn(f func(context.Context, uint64, int64, int64) ([]storage.Balance, error)) *MockIAddressBalancesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -163,7 +163,7 @@ func (c *MockIAddressByHashCall) DoAndReturn(f func(context.Context, []byte) (st
 }
 
 // CursorList mocks base method.
-func (m *MockIAddress) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Address, error) {
+func (m *MockIAddress) CursorList(ctx context.Context, id uint64, limit int64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Address, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CursorList", ctx, id, limit, order, cmp)
 	ret0, _ := ret[0].([]*storage.Address)
@@ -190,13 +190,13 @@ func (c *MockIAddressCursorListCall) Return(arg0 []*storage.Address, arg1 error)
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIAddressCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Address, error)) *MockIAddressCursorListCall {
+func (c *MockIAddressCursorListCall) Do(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.Address, error)) *MockIAddressCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIAddressCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Address, error)) *MockIAddressCursorListCall {
+func (c *MockIAddressCursorListCall) DoAndReturn(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.Address, error)) *MockIAddressCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -445,7 +445,7 @@ func (c *MockIAddressLastIDCall) DoAndReturn(f func(context.Context) (uint64, er
 }
 
 // List mocks base method.
-func (m *MockIAddress) List(ctx context.Context, limit, offset uint64, order storage0.SortOrder) ([]*storage.Address, error) {
+func (m *MockIAddress) List(ctx context.Context, limit, offset int64, order storage0.SortOrder) ([]*storage.Address, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, limit, offset, order)
 	ret0, _ := ret[0].([]*storage.Address)
@@ -472,13 +472,13 @@ func (c *MockIAddressListCall) Return(arg0 []*storage.Address, arg1 error) *Mock
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIAddressListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Address, error)) *MockIAddressListCall {
+func (c *MockIAddressListCall) Do(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Address, error)) *MockIAddressListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIAddressListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Address, error)) *MockIAddressListCall {
+func (c *MockIAddressListCall) DoAndReturn(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Address, error)) *MockIAddressListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

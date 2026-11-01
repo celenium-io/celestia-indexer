@@ -58,7 +58,7 @@ func (s *VestingTestSuite) TestPeriods() {
 	c.SetParamValues("1")
 
 	s.vestingPeriod.EXPECT().
-		ByVesting(gomock.Any(), uint64(1), 5, 0).
+		ByVesting(gomock.Any(), uint64(1), int64(5), int64(0)).
 		Return([]storage.VestingPeriod{
 			{
 				Time:   testTime,

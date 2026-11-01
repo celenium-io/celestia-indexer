@@ -24,7 +24,7 @@ func NewMessage(db bun.IDB) storage.IMessage {
 }
 
 // ByTxId -
-func (m *Message) ByTxId(ctx context.Context, txId uint64, limit, offset int) (messages []storage.Message, err error) {
+func (m *Message) ByTxId(ctx context.Context, txId uint64, limit, offset int64) (messages []storage.Message, err error) {
 	query := m.DB().NewSelect().Model(&messages).
 		Where("tx_id = ?", txId).
 		Order("id asc")

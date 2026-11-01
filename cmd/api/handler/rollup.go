@@ -36,8 +36,8 @@ func NewRollupHandler(
 }
 
 type rollupList struct {
-	Limit    int         `query:"limit"     validate:"omitempty,min=1,max=100"`
-	Offset   int         `query:"offset"    validate:"omitempty,min=0"`
+	Limit    int64       `query:"limit"     validate:"omitempty,min=1,max=100"`
+	Offset   int64       `query:"offset"    validate:"omitempty,min=0"`
 	Sort     string      `query:"sort"      validate:"omitempty,oneof=asc desc"`
 	SortBy   string      `query:"sort_by"   validate:"omitempty,oneof=time blobs_count size fee"`
 	Tags     StringArray `query:"tags"      validate:"omitempty"`
@@ -121,8 +121,8 @@ func (handler RollupHandler) Leaderboard(c echo.Context) error {
 }
 
 type rollupDayList struct {
-	Limit    int         `query:"limit"    validate:"omitempty,min=1,max=100"`
-	Offset   int         `query:"offset"   validate:"omitempty,min=0"`
+	Limit    int64       `query:"limit"    validate:"omitempty,min=1,max=100"`
+	Offset   int64       `query:"offset"   validate:"omitempty,min=0"`
 	Sort     string      `query:"sort"     validate:"omitempty,oneof=asc desc"`
 	SortBy   string      `query:"sort_by"  validate:"omitempty,oneof=avg_size blobs_count fibre_blobs_count total_size total_fee throughput namespace_count pfb_count pff_count mb_price"`
 	Stack    StringArray `query:"stack"    validate:"omitempty"`
@@ -231,8 +231,8 @@ func (handler RollupHandler) Get(c echo.Context) error {
 
 type getRollupPages struct {
 	Id     uint64 `param:"id"     validate:"required,min=1"`
-	Limit  int    `query:"limit"  validate:"omitempty,min=1,max=100"`
-	Offset int    `query:"offset" validate:"omitempty,min=0"`
+	Limit  int64  `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset int64  `query:"offset" validate:"omitempty,min=0"`
 }
 
 func (req *getRollupPages) SetDefault() {
@@ -316,8 +316,8 @@ func (handler RollupHandler) GetProviders(c echo.Context) error {
 
 type getRollupPagesWithSort struct {
 	Id     uint64 `param:"id"      validate:"required,min=1"`
-	Limit  int    `query:"limit"   validate:"omitempty,min=1,max=100"`
-	Offset int    `query:"offset"  validate:"omitempty,min=0"`
+	Limit  int64  `query:"limit"   validate:"omitempty,min=1,max=100"`
+	Offset int64  `query:"offset"  validate:"omitempty,min=0"`
 	Sort   string `query:"sort"    validate:"omitempty,oneof=asc desc"`
 	SortBy string `query:"sort_by" validate:"omitempty,oneof=time size"`
 	Joins  *bool  `query:"joins"   validate:"omitempty"`

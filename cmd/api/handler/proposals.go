@@ -36,8 +36,8 @@ func NewProposalsHandler(
 }
 
 type listProposalsRequest struct {
-	Limit    int         `query:"limit"    validate:"omitempty,min=1,max=100"`
-	Offset   int         `query:"offset"   validate:"omitempty,min=0"`
+	Limit    int64       `query:"limit"    validate:"omitempty,min=1,max=100"`
+	Offset   int64       `query:"offset"   validate:"omitempty,min=0"`
 	Sort     string      `query:"sort"     validate:"omitempty,oneof=asc desc"`
 	Status   StringArray `query:"status"   validate:"omitempty,dive,proposal_status"`
 	Type     StringArray `query:"type"     validate:"omitempty,dive,proposal_type"`
@@ -154,8 +154,8 @@ func (handler *ProposalsHandler) Get(c echo.Context) error {
 
 type listVotesRequest struct {
 	Id        uint64      `param:"id"        validate:"required,min=1"`
-	Limit     int         `query:"limit"     validate:"omitempty,min=1,max=100"`
-	Offset    int         `query:"offset"    validate:"omitempty,min=0"`
+	Limit     int64       `query:"limit"     validate:"omitempty,min=1,max=100"`
+	Offset    int64       `query:"offset"    validate:"omitempty,min=0"`
 	Option    StringArray `query:"option"    validate:"omitempty,dive,vote_option"`
 	Voter     string      `query:"voter"     validate:"omitempty,voter_type"`
 	Address   string      `query:"address"   validate:"omitempty,address"`

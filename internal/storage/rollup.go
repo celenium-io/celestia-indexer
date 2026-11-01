@@ -15,8 +15,8 @@ import (
 type LeaderboardFilters struct {
 	SortField string
 	Sort      sdk.SortOrder
-	Limit     int
-	Offset    int
+	Limit     int64
+	Offset    int64
 	Category  []types.RollupCategory
 	Tags      []string
 	Type      []types.RollupType
@@ -36,9 +36,9 @@ type IRollup interface {
 
 	Leaderboard(ctx context.Context, fltrs LeaderboardFilters) ([]RollupWithStats, error)
 	LeaderboardDay(ctx context.Context, fltrs LeaderboardFilters) ([]RollupWithDayStats, error)
-	Namespaces(ctx context.Context, rollupId uint64, limit, offset int) (namespaceIds []uint64, err error)
+	Namespaces(ctx context.Context, rollupId uint64, limit, offset int64) (namespaceIds []uint64, err error)
 	Providers(ctx context.Context, rollupId uint64) (providers []RollupProvider, err error)
-	RollupsByNamespace(ctx context.Context, namespaceId uint64, limit, offset int) (rollups []Rollup, err error)
+	RollupsByNamespace(ctx context.Context, namespaceId uint64, limit, offset int64) (rollups []Rollup, err error)
 	ById(ctx context.Context, rollupId uint64) (RollupWithStats, error)
 	Series(ctx context.Context, rollupId uint64, timeframe Timeframe, column string, req SeriesRequest) (items []HistogramItem, err error)
 	AllSeries(ctx context.Context, timeframe Timeframe) ([]RollupHistogramItem, error)

@@ -90,7 +90,7 @@ func (c *MockIDelegationAddressDelegationsCall) DoAndReturn(f func(context.Conte
 }
 
 // ByAddress mocks base method.
-func (m *MockIDelegation) ByAddress(ctx context.Context, addressId uint64, limit, offset int, showZero bool) ([]storage.Delegation, error) {
+func (m *MockIDelegation) ByAddress(ctx context.Context, addressId uint64, limit, offset int64, showZero bool) ([]storage.Delegation, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ByAddress", ctx, addressId, limit, offset, showZero)
 	ret0, _ := ret[0].([]storage.Delegation)
@@ -117,19 +117,19 @@ func (c *MockIDelegationByAddressCall) Return(arg0 []storage.Delegation, arg1 er
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIDelegationByAddressCall) Do(f func(context.Context, uint64, int, int, bool) ([]storage.Delegation, error)) *MockIDelegationByAddressCall {
+func (c *MockIDelegationByAddressCall) Do(f func(context.Context, uint64, int64, int64, bool) ([]storage.Delegation, error)) *MockIDelegationByAddressCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIDelegationByAddressCall) DoAndReturn(f func(context.Context, uint64, int, int, bool) ([]storage.Delegation, error)) *MockIDelegationByAddressCall {
+func (c *MockIDelegationByAddressCall) DoAndReturn(f func(context.Context, uint64, int64, int64, bool) ([]storage.Delegation, error)) *MockIDelegationByAddressCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // ByValidator mocks base method.
-func (m *MockIDelegation) ByValidator(ctx context.Context, validatorId uint64, limit, offset int, showZero bool) ([]storage.Delegation, error) {
+func (m *MockIDelegation) ByValidator(ctx context.Context, validatorId uint64, limit, offset int64, showZero bool) ([]storage.Delegation, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ByValidator", ctx, validatorId, limit, offset, showZero)
 	ret0, _ := ret[0].([]storage.Delegation)
@@ -156,19 +156,19 @@ func (c *MockIDelegationByValidatorCall) Return(arg0 []storage.Delegation, arg1 
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIDelegationByValidatorCall) Do(f func(context.Context, uint64, int, int, bool) ([]storage.Delegation, error)) *MockIDelegationByValidatorCall {
+func (c *MockIDelegationByValidatorCall) Do(f func(context.Context, uint64, int64, int64, bool) ([]storage.Delegation, error)) *MockIDelegationByValidatorCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIDelegationByValidatorCall) DoAndReturn(f func(context.Context, uint64, int, int, bool) ([]storage.Delegation, error)) *MockIDelegationByValidatorCall {
+func (c *MockIDelegationByValidatorCall) DoAndReturn(f func(context.Context, uint64, int64, int64, bool) ([]storage.Delegation, error)) *MockIDelegationByValidatorCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // CursorList mocks base method.
-func (m *MockIDelegation) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Delegation, error) {
+func (m *MockIDelegation) CursorList(ctx context.Context, id uint64, limit int64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Delegation, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CursorList", ctx, id, limit, order, cmp)
 	ret0, _ := ret[0].([]*storage.Delegation)
@@ -195,13 +195,13 @@ func (c *MockIDelegationCursorListCall) Return(arg0 []*storage.Delegation, arg1 
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIDelegationCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Delegation, error)) *MockIDelegationCursorListCall {
+func (c *MockIDelegationCursorListCall) Do(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.Delegation, error)) *MockIDelegationCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIDelegationCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Delegation, error)) *MockIDelegationCursorListCall {
+func (c *MockIDelegationCursorListCall) DoAndReturn(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.Delegation, error)) *MockIDelegationCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -323,7 +323,7 @@ func (c *MockIDelegationLastIDCall) DoAndReturn(f func(context.Context) (uint64,
 }
 
 // List mocks base method.
-func (m *MockIDelegation) List(ctx context.Context, limit, offset uint64, order storage0.SortOrder) ([]*storage.Delegation, error) {
+func (m *MockIDelegation) List(ctx context.Context, limit, offset int64, order storage0.SortOrder) ([]*storage.Delegation, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, limit, offset, order)
 	ret0, _ := ret[0].([]*storage.Delegation)
@@ -350,13 +350,13 @@ func (c *MockIDelegationListCall) Return(arg0 []*storage.Delegation, arg1 error)
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIDelegationListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Delegation, error)) *MockIDelegationListCall {
+func (c *MockIDelegationListCall) Do(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Delegation, error)) *MockIDelegationListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIDelegationListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Delegation, error)) *MockIDelegationListCall {
+func (c *MockIDelegationListCall) DoAndReturn(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Delegation, error)) *MockIDelegationListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

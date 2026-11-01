@@ -123,7 +123,7 @@ func (c *MockIHLIGPIdByHashCall) DoAndReturn(f func(context.Context, []byte) (ui
 }
 
 // List mocks base method.
-func (m *MockIHLIGP) List(ctx context.Context, limit, offset int) ([]storage.HLIGP, error) {
+func (m *MockIHLIGP) List(ctx context.Context, limit, offset int64) ([]storage.HLIGP, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, limit, offset)
 	ret0, _ := ret[0].([]storage.HLIGP)
@@ -150,13 +150,13 @@ func (c *MockIHLIGPListCall) Return(arg0 []storage.HLIGP, arg1 error) *MockIHLIG
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIHLIGPListCall) Do(f func(context.Context, int, int) ([]storage.HLIGP, error)) *MockIHLIGPListCall {
+func (c *MockIHLIGPListCall) Do(f func(context.Context, int64, int64) ([]storage.HLIGP, error)) *MockIHLIGPListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIHLIGPListCall) DoAndReturn(f func(context.Context, int, int) ([]storage.HLIGP, error)) *MockIHLIGPListCall {
+func (c *MockIHLIGPListCall) DoAndReturn(f func(context.Context, int64, int64) ([]storage.HLIGP, error)) *MockIHLIGPListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

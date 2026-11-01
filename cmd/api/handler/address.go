@@ -106,8 +106,8 @@ func (handler *AddressHandler) Get(c echo.Context) error {
 }
 
 type addressListRequest struct {
-	Limit  int    `query:"limit"   validate:"omitempty,min=1,max=100"`
-	Offset int    `query:"offset"  validate:"omitempty,min=0"`
+	Limit  int64  `query:"limit"   validate:"omitempty,min=1,max=100"`
+	Offset int64  `query:"offset"  validate:"omitempty,min=0"`
 	Sort   string `query:"sort"    validate:"omitempty,oneof=asc desc"`
 	SortBy string `query:"sort_by" validate:"omitempty,oneof=id spendable delegated unbonding first_height last_height"`
 }
@@ -243,8 +243,8 @@ func (handler *AddressHandler) Transactions(c echo.Context) error {
 
 type getAddressMessages struct {
 	Hash    string      `param:"hash"     validate:"required,address"`
-	Limit   int         `query:"limit"    validate:"omitempty,min=1,max=100"`
-	Offset  int         `query:"offset"   validate:"omitempty,min=0"`
+	Limit   int64       `query:"limit"    validate:"omitempty,min=1,max=100"`
+	Offset  int64       `query:"offset"   validate:"omitempty,min=0"`
 	Sort    string      `query:"sort"     validate:"omitempty,oneof=asc desc"`
 	MsgType StringArray `query:"msg_type" validate:"omitempty,dive,msg_type"`
 }
@@ -320,8 +320,8 @@ func (handler *AddressHandler) Messages(c echo.Context) error {
 
 type getBlobLogsForAddress struct {
 	Hash   string `param:"hash"    validate:"required,address"`
-	Limit  int    `query:"limit"   validate:"omitempty,min=1,max=100"`
-	Offset int    `query:"offset"  validate:"omitempty,min=0"`
+	Limit  int64  `query:"limit"   validate:"omitempty,min=1,max=100"`
+	Offset int64  `query:"offset"  validate:"omitempty,min=0"`
 	Sort   string `query:"sort"    validate:"omitempty,oneof=asc desc"`
 	SortBy string `query:"sort_by" validate:"omitempty,oneof=time size"`
 	Joins  *bool  `query:"joins"   validate:"omitempty"`
@@ -419,8 +419,8 @@ func (handler *AddressHandler) Count(c echo.Context) error {
 
 type getAddressDelegations struct {
 	Hash     string `param:"hash"      validate:"required,address"`
-	Limit    int    `query:"limit"     validate:"omitempty,min=1,max=100"`
-	Offset   int    `query:"offset"    validate:"omitempty,min=0"`
+	Limit    int64  `query:"limit"     validate:"omitempty,min=1,max=100"`
+	Offset   int64  `query:"offset"    validate:"omitempty,min=0"`
 	ShowZero bool   `query:"show_zero" validate:"omitempty"`
 }
 
@@ -483,8 +483,8 @@ func (handler *AddressHandler) Delegations(c echo.Context) error {
 
 type getAddressPageable struct {
 	Hash   string `param:"hash"   validate:"required,address"`
-	Limit  int    `query:"limit"  validate:"omitempty,min=1,max=100"`
-	Offset int    `query:"offset" validate:"omitempty,min=0"`
+	Limit  int64  `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset int64  `query:"offset" validate:"omitempty,min=0"`
 }
 
 func (req *getAddressPageable) SetDefault() {
@@ -593,8 +593,8 @@ func (handler *AddressHandler) Redelegations(c echo.Context) error {
 
 type getAddressVestings struct {
 	Hash      string `param:"hash"       validate:"required,address"`
-	Limit     int    `query:"limit"      validate:"omitempty,min=1,max=100"`
-	Offset    int    `query:"offset"     validate:"omitempty,min=0"`
+	Limit     int64  `query:"limit"      validate:"omitempty,min=1,max=100"`
+	Offset    int64  `query:"offset"     validate:"omitempty,min=0"`
 	ShowEnded bool   `query:"show_ended" validate:"omitempty"`
 }
 

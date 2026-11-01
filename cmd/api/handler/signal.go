@@ -38,8 +38,8 @@ func NewSignalHandler(
 }
 
 type signalsRequest struct {
-	Limit       int    `example:"10"                                                               query:"limit"        swaggertype:"integer" validate:"omitempty,min=1,max=100"`
-	Offset      int    `example:"0"                                                                query:"offset"       swaggertype:"integer" validate:"omitempty,min=0"`
+	Limit       int64  `example:"10"                                                               query:"limit"        swaggertype:"integer" validate:"omitempty,min=1,max=100"`
+	Offset      int64  `example:"0"                                                                query:"offset"       swaggertype:"integer" validate:"omitempty,min=0"`
 	Version     uint64 `example:"7"                                                                query:"version"      swaggertype:"integer" validate:"omitempty"`
 	ValidatorId uint64 `example:"1488"                                                             query:"validator_id" swaggertype:"string"  validate:"omitempty"`
 	TxHash      string `example:"97589d917f13c7d1d5b01dcc0a3df84c8b4337e47dae492e03c274cc77ded173" query:"tx_hash"      swaggertype:"string"  validate:"omitempty"`
@@ -127,8 +127,8 @@ func (handler *SignalHandler) List(c echo.Context) error {
 }
 
 type upgradesRequest struct {
-	Limit  int    `example:"10"                                                               query:"limit"   swaggertype:"integer" validate:"omitempty,min=1,max=100"`
-	Offset int    `example:"0"                                                                query:"offset"  swaggertype:"integer" validate:"omitempty,min=0"`
+	Limit  int64  `example:"10"                                                               query:"limit"   swaggertype:"integer" validate:"omitempty,min=1,max=100"`
+	Offset int64  `example:"0"                                                                query:"offset"  swaggertype:"integer" validate:"omitempty,min=0"`
 	Height uint64 `example:"12345678"                                                         query:"height"  swaggertype:"integer" validate:"omitempty"`
 	TxHash string `example:"97589d917f13c7d1d5b01dcc0a3df84c8b4337e47dae492e03c274cc77ded173" query:"tx_hash" swaggertype:"string"  validate:"omitempty"`
 	Signer string `example:"celestia1ps2778x42p833xesk7jh6vy0qu8485e3pz8g72"                  query:"signer"  swaggertype:"string"  validate:"omitempty"`

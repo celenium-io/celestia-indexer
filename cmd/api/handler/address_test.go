@@ -434,7 +434,7 @@ func (s *AddressTestSuite) TestDelegations() {
 		Times(1)
 
 	s.delegations.EXPECT().
-		ByAddress(gomock.Any(), uint64(1), 10, 0, true).
+		ByAddress(gomock.Any(), uint64(1), int64(10), int64(0), true).
 		Return([]storage.Delegation{
 			{
 				AddressId:   1,
@@ -481,7 +481,7 @@ func (s *AddressTestSuite) TestUndelegations() {
 		Times(1)
 
 	s.undelegations.EXPECT().
-		ByAddress(gomock.Any(), uint64(1), 10, 0).
+		ByAddress(gomock.Any(), uint64(1), int64(10), int64(0)).
 		Return([]storage.Undelegation{
 			{
 				Time:        testTime,
@@ -534,7 +534,7 @@ func (s *AddressTestSuite) TestRedelegations() {
 		Times(1)
 
 	s.redelegations.EXPECT().
-		ByAddress(gomock.Any(), uint64(1), 10, 0).
+		ByAddress(gomock.Any(), uint64(1), int64(10), int64(0)).
 		Return([]storage.Redelegation{
 			{
 				Time:        testTime,
@@ -591,7 +591,7 @@ func (s *AddressTestSuite) TestVestings() {
 		Times(1)
 
 	s.vestings.EXPECT().
-		ByAddress(gomock.Any(), uint64(1), 10, 0, false).
+		ByAddress(gomock.Any(), uint64(1), int64(10), int64(0), false).
 		Return([]storage.VestingAccount{
 			{
 				Time:      testTime,
@@ -643,7 +643,7 @@ func (s *AddressTestSuite) TestGrants() {
 		Times(1)
 
 	s.grants.EXPECT().
-		ByGranter(gomock.Any(), uint64(1), 10, 0).
+		ByGranter(gomock.Any(), uint64(1), int64(10), int64(0)).
 		Return([]storage.Grant{
 			{
 				Time:   testTime,
@@ -695,7 +695,7 @@ func (s *AddressTestSuite) TestGrantee() {
 		Times(1)
 
 	s.grants.EXPECT().
-		ByGrantee(gomock.Any(), uint64(1), 10, 0).
+		ByGrantee(gomock.Any(), uint64(1), int64(10), int64(0)).
 		Return([]storage.Grant{
 			{
 				Time:   testTime,
@@ -796,7 +796,7 @@ func (s *AddressTestSuite) TestCelestials() {
 	}
 
 	s.celestials.EXPECT().
-		ByAddressId(gomock.Any(), uint64(1), 10, 0).
+		ByAddressId(gomock.Any(), uint64(1), int64(10), int64(0)).
 		Return(storageResponse, nil)
 
 	s.Require().NoError(s.handler.Celestials(c))
@@ -898,7 +898,7 @@ func (s *AddressTestSuite) TestBalances() {
 		Times(1)
 
 	s.address.EXPECT().
-		Balances(gomock.Any(), uint64(1), 10, 0).
+		Balances(gomock.Any(), uint64(1), int64(10), int64(0)).
 		Return([]storage.Balance{
 			{
 				Currency:  "utia",

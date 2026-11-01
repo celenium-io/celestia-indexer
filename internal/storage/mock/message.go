@@ -85,7 +85,7 @@ func (c *MockIMessageByAddressCall) DoAndReturn(f func(context.Context, uint64, 
 }
 
 // ByTxId mocks base method.
-func (m *MockIMessage) ByTxId(ctx context.Context, txId uint64, limit, offset int) ([]storage.Message, error) {
+func (m *MockIMessage) ByTxId(ctx context.Context, txId uint64, limit, offset int64) ([]storage.Message, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ByTxId", ctx, txId, limit, offset)
 	ret0, _ := ret[0].([]storage.Message)
@@ -112,19 +112,19 @@ func (c *MockIMessageByTxIdCall) Return(arg0 []storage.Message, arg1 error) *Moc
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIMessageByTxIdCall) Do(f func(context.Context, uint64, int, int) ([]storage.Message, error)) *MockIMessageByTxIdCall {
+func (c *MockIMessageByTxIdCall) Do(f func(context.Context, uint64, int64, int64) ([]storage.Message, error)) *MockIMessageByTxIdCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIMessageByTxIdCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.Message, error)) *MockIMessageByTxIdCall {
+func (c *MockIMessageByTxIdCall) DoAndReturn(f func(context.Context, uint64, int64, int64) ([]storage.Message, error)) *MockIMessageByTxIdCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // CursorList mocks base method.
-func (m *MockIMessage) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Message, error) {
+func (m *MockIMessage) CursorList(ctx context.Context, id uint64, limit int64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Message, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CursorList", ctx, id, limit, order, cmp)
 	ret0, _ := ret[0].([]*storage.Message)
@@ -151,13 +151,13 @@ func (c *MockIMessageCursorListCall) Return(arg0 []*storage.Message, arg1 error)
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIMessageCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Message, error)) *MockIMessageCursorListCall {
+func (c *MockIMessageCursorListCall) Do(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.Message, error)) *MockIMessageCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIMessageCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Message, error)) *MockIMessageCursorListCall {
+func (c *MockIMessageCursorListCall) DoAndReturn(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.Message, error)) *MockIMessageCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -279,7 +279,7 @@ func (c *MockIMessageLastIDCall) DoAndReturn(f func(context.Context) (uint64, er
 }
 
 // List mocks base method.
-func (m *MockIMessage) List(ctx context.Context, limit, offset uint64, order storage0.SortOrder) ([]*storage.Message, error) {
+func (m *MockIMessage) List(ctx context.Context, limit, offset int64, order storage0.SortOrder) ([]*storage.Message, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, limit, offset, order)
 	ret0, _ := ret[0].([]*storage.Message)
@@ -306,13 +306,13 @@ func (c *MockIMessageListCall) Return(arg0 []*storage.Message, arg1 error) *Mock
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIMessageListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Message, error)) *MockIMessageListCall {
+func (c *MockIMessageListCall) Do(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Message, error)) *MockIMessageListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIMessageListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Message, error)) *MockIMessageListCall {
+func (c *MockIMessageListCall) DoAndReturn(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Message, error)) *MockIMessageListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

@@ -18,8 +18,8 @@ const (
 )
 
 type limitOffsetPagination struct {
-	Limit  int    `json:"limit"  param:"limit"  query:"limit"  validate:"omitempty,min=1,max=100"`
-	Offset int    `json:"offset" param:"offset" query:"offset" validate:"omitempty,min=0"`
+	Limit  int64  `json:"limit"  param:"limit"  query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset int64  `json:"offset" param:"offset" query:"offset" validate:"omitempty,min=0"`
 	Sort   string `json:"sort"   param:"sort"   query:"sort"   validate:"omitempty,oneof=asc desc"`
 }
 
@@ -44,8 +44,8 @@ func pgSort(sort string) storage.SortOrder {
 }
 
 type txListRequest struct {
-	Limit           int         `query:"limit"             validate:"omitempty,min=1,max=100"`
-	Offset          int         `query:"offset"            validate:"omitempty,min=0"`
+	Limit           int64       `query:"limit"             validate:"omitempty,min=1,max=100"`
+	Offset          int64       `query:"offset"            validate:"omitempty,min=0"`
 	Sort            string      `query:"sort"              validate:"omitempty,oneof=asc desc"`
 	Height          *uint64     `query:"height"            validate:"omitempty,min=0"`
 	Status          StringArray `query:"status"            validate:"omitempty,dive,status"`
@@ -90,8 +90,8 @@ func bindAndValidate[T any](c echo.Context) (*T, error) {
 
 type addressTxRequest struct {
 	Hash    string      `param:"hash"     validate:"required,address"`
-	Limit   int         `query:"limit"    validate:"omitempty,min=1,max=100"`
-	Offset  int         `query:"offset"   validate:"omitempty,min=0"`
+	Limit   int64       `query:"limit"    validate:"omitempty,min=1,max=100"`
+	Offset  int64       `query:"offset"   validate:"omitempty,min=0"`
 	Sort    string      `query:"sort"     validate:"omitempty,oneof=asc desc"`
 	Height  *uint64     `query:"height"   validate:"omitempty,min=0"`
 	Status  StringArray `query:"status"   validate:"omitempty,dive,status"`
@@ -112,8 +112,8 @@ func (p *addressTxRequest) SetDefault() {
 
 type listMessageByBlockRequest struct {
 	Height          pkgTypes.Level `param:"height"            validate:"required,min=1"`
-	Limit           int            `query:"limit"             validate:"omitempty,min=1,max=100"`
-	Offset          int            `query:"offset"            validate:"omitempty,min=0"`
+	Limit           int64          `query:"limit"             validate:"omitempty,min=1,max=100"`
+	Offset          int64          `query:"offset"            validate:"omitempty,min=0"`
 	MsgType         StringArray    `query:"msg_type"          validate:"omitempty,dive,msg_type"`
 	ExcludedMsgType StringArray    `query:"excluded_msg_type" validate:"omitempty,dive,msg_type"`
 }

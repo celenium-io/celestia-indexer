@@ -4,9 +4,10 @@
 package handler
 
 import (
-	"github.com/celenium-io/celestia-indexer/cmd/api/geo"
 	"net/http"
 	"time"
+
+	"github.com/celenium-io/celestia-indexer/cmd/api/geo"
 
 	"github.com/celenium-io/celestia-indexer/cmd/api/handler/responses"
 	"github.com/celenium-io/celestia-indexer/internal/storage"
@@ -98,8 +99,8 @@ func newValidatorResponse(val storage.Validator, locator geo.ILocator) *response
 }
 
 type validatorsPagination struct {
-	Limit   int                          `query:"limit"   validate:"omitempty,min=1,max=100"`
-	Offset  int                          `query:"offset"  validate:"omitempty,min=0"`
+	Limit   int64                        `query:"limit"   validate:"omitempty,min=1,max=100"`
+	Offset  int64                        `query:"offset"  validate:"omitempty,min=0"`
 	Jailed  *bool                        `query:"jailed"  validate:"omitempty"`
 	Version *int                         `query:"version" validate:"omitempty,min=0"`
 	Status  storageTypes.ValidatorStatus `query:"status"  validate:"omitempty,validator_status"`
@@ -155,8 +156,8 @@ func (handler *ValidatorHandler) List(c echo.Context) error {
 
 type validatorPageableRequest struct {
 	Id     uint64 `param:"id"     validate:"required,min=1"`
-	Limit  int    `query:"limit"  validate:"omitempty,min=1,max=100"`
-	Offset int    `query:"offset" validate:"omitempty,min=0"`
+	Limit  int64  `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset int64  `query:"offset" validate:"omitempty,min=0"`
 }
 
 func (p *validatorPageableRequest) SetDefault() {
@@ -248,8 +249,8 @@ func (handler *ValidatorHandler) Uptime(c echo.Context) error {
 
 type validatorDelegationsRequest struct {
 	Id       uint64 `param:"id"        validate:"required,min=1"`
-	Limit    int    `query:"limit"     validate:"omitempty,min=1,max=100"`
-	Offset   int    `query:"offset"    validate:"omitempty,min=0"`
+	Limit    int64  `query:"limit"     validate:"omitempty,min=1,max=100"`
+	Offset   int64  `query:"offset"    validate:"omitempty,min=0"`
 	ShowZero bool   `query:"show_zero" validate:"omitempty"`
 }
 
@@ -405,8 +406,8 @@ func (handler *ValidatorHandler) Votes(c echo.Context) error {
 
 type getValidatorMessages struct {
 	Id     uint64 `param:"id"     validate:"required,min=1"`
-	Limit  int    `query:"limit"  validate:"omitempty,min=1,max=100"`
-	Offset int    `query:"offset" validate:"omitempty,min=0"`
+	Limit  int64  `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset int64  `query:"offset" validate:"omitempty,min=0"`
 	Sort   string `query:"sort"   validate:"omitempty,oneof=asc desc"`
 	From   int64  `query:"from"   validate:"omitempty,min=1"`
 	To     int64  `query:"to"     validate:"omitempty,min=1"`
@@ -499,7 +500,7 @@ func (handler *ValidatorHandler) Metrics(c echo.Context) error {
 }
 
 type getTopNValidatorMetrics struct {
-	Count int `query:"count" validate:"omitempty,min=1"`
+	Count int64 `query:"count" validate:"omitempty,min=1"`
 }
 
 func (req *getTopNValidatorMetrics) SetDefault() {
@@ -537,8 +538,8 @@ func (handler *ValidatorHandler) TopNMetrics(c echo.Context) error {
 
 type bondUpdatesRequest struct {
 	Id     uint64 `param:"id"     validate:"required,min=1"`
-	Limit  int    `query:"limit"  validate:"omitempty,min=1,max=100"`
-	Offset int    `query:"offset" validate:"omitempty,min=0"`
+	Limit  int64  `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset int64  `query:"offset" validate:"omitempty,min=0"`
 	Sort   string `query:"sort"   validate:"omitempty,oneof=asc desc"`
 }
 

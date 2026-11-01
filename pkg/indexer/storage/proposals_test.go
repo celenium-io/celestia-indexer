@@ -90,7 +90,7 @@ func TestFillProposalVotingPower(t *testing.T) {
 
 		repos.Votes.
 			EXPECT().
-			ListByProposal(t.Context(), uint64(1), 1000, 0).
+			ListByProposal(t.Context(), uint64(1), int64(1000), int64(0)).
 			Return([]storage.Vote{{
 				VoterId: 1,
 				Option:  types.VoteOptionNo,

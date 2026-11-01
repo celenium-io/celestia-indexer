@@ -199,7 +199,7 @@ func (s *NamespaceTestSuite) TestList() {
 	c.SetPath("/namespace")
 
 	s.namespaces.EXPECT().
-		ListWithSort(gomock.Any(), "", sdk.SortOrderDesc, 10, 0).
+		ListWithSort(gomock.Any(), "", sdk.SortOrderDesc, int64(10), int64(0)).
 		Return([]storage.Namespace{
 			testNamespace,
 		}, nil)
@@ -251,7 +251,7 @@ func (s *NamespaceTestSuite) TestListWithSort() {
 		c.SetPath("/namespace")
 
 		s.namespaces.EXPECT().
-			ListWithSort(gomock.Any(), request.SortBy, pgSort(request.Sort), 10, 0).
+			ListWithSort(gomock.Any(), request.SortBy, pgSort(request.Sort), int64(10), int64(0)).
 			Return([]storage.Namespace{
 				testNamespace,
 			}, nil)
@@ -385,7 +385,7 @@ func (s *NamespaceTestSuite) TestGetMessages() {
 		Return(testNamespace, nil)
 
 	s.namespaces.EXPECT().
-		Messages(gomock.Any(), testNamespace.Id, 10, 0).
+		Messages(gomock.Any(), testNamespace.Id, int64(10), int64(0)).
 		Return([]storage.NamespaceMessage{
 			{
 				NamespaceId: testNamespace.Id,
@@ -712,7 +712,7 @@ func (s *NamespaceTestSuite) TestRollups() {
 		Return(testNamespace, nil)
 
 	s.rollups.EXPECT().
-		RollupsByNamespace(gomock.Any(), testNamespace.Id, 10, 0).
+		RollupsByNamespace(gomock.Any(), testNamespace.Id, int64(10), int64(0)).
 		Return([]storage.Rollup{testRollup}, nil)
 
 	s.Require().NoError(s.handler.Rollups(c))

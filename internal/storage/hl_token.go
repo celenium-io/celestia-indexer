@@ -15,8 +15,8 @@ import (
 )
 
 type ListHyperlaneTokens struct {
-	Limit     int
-	Offset    int
+	Limit     int64
+	Offset    int64
 	Sort      sdk.SortOrder
 	OwnerId   uint64
 	MailboxId uint64

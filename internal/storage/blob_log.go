@@ -16,8 +16,8 @@ import (
 )
 
 type BlobLogFilters struct {
-	Limit      int
-	Offset     int
+	Limit      int64
+	Offset     int64
 	Sort       sdk.SortOrder
 	SortBy     string
 	From       time.Time
@@ -31,8 +31,8 @@ type BlobLogFilters struct {
 }
 
 type ListBlobLogFilters struct {
-	Limit      int
-	Offset     int
+	Limit      int64
+	Offset     int64
 	Sort       sdk.SortOrder
 	SortBy     string
 	From       time.Time
@@ -54,7 +54,7 @@ type IBlobLog interface {
 	BySigner(ctx context.Context, signerId uint64, fltrs BlobLogFilters) ([]BlobLog, error)
 	ByTxId(ctx context.Context, txId uint64, fltrs BlobLogFilters) ([]BlobLog, error)
 	ByHeight(ctx context.Context, height pkgTypes.Level, fltrs BlobLogFilters) ([]BlobLog, error)
-	CountByTxId(ctx context.Context, txId uint64) (int, error)
+	CountByTxId(ctx context.Context, txId uint64) (int64, error)
 	ExportByProviders(ctx context.Context, providers []RollupProvider, from, to time.Time, stream io.Writer) (err error)
 	Blob(ctx context.Context, height pkgTypes.Level, nsId uint64, commitment string) (BlobLog, error)
 	ListBlobs(ctx context.Context, fltrs ListBlobLogFilters) ([]BlobLog, error)

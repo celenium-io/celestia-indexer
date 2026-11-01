@@ -128,7 +128,7 @@ func (r *Rollup) LeaderboardDay(ctx context.Context, fltrs storage.LeaderboardFi
 	return
 }
 
-func (r *Rollup) Namespaces(ctx context.Context, rollupId uint64, limit, offset int) (namespaceIds []uint64, err error) {
+func (r *Rollup) Namespaces(ctx context.Context, rollupId uint64, limit, offset int64) (namespaceIds []uint64, err error) {
 	query := r.DB().NewSelect().
 		TableExpr("rollup_stats_by_month as r").
 		ColumnExpr("distinct r.namespace_id").
@@ -149,7 +149,7 @@ func (r *Rollup) Providers(ctx context.Context, rollupId uint64) (providers []st
 	return
 }
 
-func (r *Rollup) RollupsByNamespace(ctx context.Context, namespaceId uint64, limit, offset int) (rollups []storage.Rollup, err error) {
+func (r *Rollup) RollupsByNamespace(ctx context.Context, namespaceId uint64, limit, offset int64) (rollups []storage.Rollup, err error) {
 	subQuery := r.DB().NewSelect().
 		Model((*storage.RollupProvider)(nil)).
 		Column("rollup_id").
@@ -234,7 +234,7 @@ func (r *Rollup) Series(ctx context.Context, rollupId uint64, timeframe storage.
 
 func (r *Rollup) Count(ctx context.Context) (int64, error) {
 	count, err := r.DB().NewSelect().Model((*storage.Rollup)(nil)).Where("verified = TRUE").Count(ctx)
-	return int64(count), err
+	return count, err
 }
 
 func (r *Rollup) Stats(ctx context.Context, rollupId uint64) (stats storage.RollupStats, err error) {

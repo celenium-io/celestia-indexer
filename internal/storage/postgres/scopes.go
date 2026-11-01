@@ -29,7 +29,7 @@ var (
 	excludedMsgTypesFilter = fmt.Sprintf("bit_count(message_types & ~(?::bit(%d))) > 0", types.MsgTypeBitsCount)
 )
 
-func limitScope(q *bun.SelectQuery, limit int) *bun.SelectQuery {
+func limitScope(q *bun.SelectQuery, limit int64) *bun.SelectQuery {
 	if limit < 1 || limit > 100 {
 		limit = 10
 	}

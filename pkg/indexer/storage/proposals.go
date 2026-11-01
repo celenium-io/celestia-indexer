@@ -477,7 +477,7 @@ func tallyProposal(
 	paginate := sdkSync.Paginate(
 		ctx, votesPageSize,
 		func(ctx context.Context, limit, offset int) ([]storage.Vote, error) {
-			return repos.Votes.ListByProposal(ctx, proposal.Id, limit, offset)
+			return repos.Votes.ListByProposal(ctx, proposal.Id, int64(limit), int64(offset))
 		},
 	)
 

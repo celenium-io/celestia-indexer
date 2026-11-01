@@ -253,7 +253,7 @@ func (bl *BlobLog) ByHeight(ctx context.Context, height types.Level, fltrs stora
 	return
 }
 
-func (bl *BlobLog) CountByTxId(ctx context.Context, txId uint64) (int, error) {
+func (bl *BlobLog) CountByTxId(ctx context.Context, txId uint64) (int64, error) {
 	return bl.DB().NewSelect().Model((*storage.BlobLog)(nil)).
 		Where("tx_id = ?", txId).
 		Count(ctx)

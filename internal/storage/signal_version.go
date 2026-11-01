@@ -14,8 +14,8 @@ import (
 )
 
 type ListSignalsFilter struct {
-	Limit       int
-	Offset      int
+	Limit       int64
+	Offset      int64
 	Sort        sdk.SortOrder
 	Version     uint64
 	ValidatorId uint64

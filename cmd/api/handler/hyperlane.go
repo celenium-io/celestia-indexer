@@ -84,8 +84,8 @@ func (handler *HyperlaneHandler) GetMailbox(c echo.Context) error {
 }
 
 type listHyperlaneMailboxRequest struct {
-	Limit  int `query:"limit"  validate:"omitempty,min=1,max=100"`
-	Offset int `query:"offset" validate:"omitempty,min=0"`
+	Limit  int64 `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset int64 `query:"offset" validate:"omitempty,min=0"`
 }
 
 func (req *listHyperlaneMailboxRequest) SetDefault() {
@@ -164,8 +164,8 @@ func (handler *HyperlaneHandler) GetToken(c echo.Context) error {
 }
 
 type listHyperlaneTokenRequest struct {
-	Limit   int         `query:"limit"   validate:"omitempty,min=1,max=100"`
-	Offset  int         `query:"offset"  validate:"omitempty,min=0"`
+	Limit   int64       `query:"limit"   validate:"omitempty,min=1,max=100"`
+	Offset  int64       `query:"offset"  validate:"omitempty,min=0"`
 	Sort    string      `query:"sort"    validate:"omitempty,oneof=asc desc"`
 	Owner   string      `query:"owner"   validate:"omitempty,address"`
 	Mailbox string      `query:"mailbox" validate:"omitempty,hexadecimal"`
@@ -258,8 +258,8 @@ func (handler *HyperlaneHandler) ListTokens(c echo.Context) error {
 }
 
 type listHyperlaneTransferRequest struct {
-	Limit   int         `query:"limit"   validate:"omitempty,min=1,max=100"`
-	Offset  int         `query:"offset"  validate:"omitempty,min=0"`
+	Limit   int64       `query:"limit"   validate:"omitempty,min=1,max=100"`
+	Offset  int64       `query:"offset"  validate:"omitempty,min=0"`
 	Sort    string      `query:"sort"    validate:"omitempty,oneof=asc desc"`
 	Address string      `query:"address" validate:"omitempty,address"`
 	Relayer string      `query:"relayer" validate:"omitempty,address"`

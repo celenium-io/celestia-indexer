@@ -51,7 +51,7 @@ type IValidator interface {
 	CountByStatus(ctx context.Context) (CountByStatus, error)
 	Messages(ctx context.Context, id uint64, fltrs ValidatorMessagesFilters) ([]MsgValidator, error)
 	Metrics(ctx context.Context, id uint64) (ValidatorMetrics, error)
-	TopNMetrics(ctx context.Context, n int) (ValidatorMetrics, error)
+	TopNMetrics(ctx context.Context, n int64) (ValidatorMetrics, error)
 	BondedValidators(ctx context.Context) ([]Validator, error)
 	FibreHosts(ctx context.Context) ([]string, error)
 }
@@ -117,16 +117,16 @@ func EmptyValidator() Validator {
 }
 
 type ValidatorFilters struct {
-	Limit   int
-	Offset  int
+	Limit   int64
+	Offset  int64
 	Jailed  *bool
 	Version *int
 	Status  types.ValidatorStatus
 }
 
 type ValidatorMessagesFilters struct {
-	Limit  int
-	Offset int
+	Limit  int64
+	Offset int64
 	Sort   storage.SortOrder
 	From   *time.Time
 	To     *time.Time

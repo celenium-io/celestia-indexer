@@ -45,7 +45,7 @@ func (m *MockIHLIGPConfig) EXPECT() *MockIHLIGPConfigMockRecorder {
 }
 
 // List mocks base method.
-func (m *MockIHLIGPConfig) List(ctx context.Context, limit, offset int) ([]storage.HLIGPConfig, error) {
+func (m *MockIHLIGPConfig) List(ctx context.Context, limit, offset int64) ([]storage.HLIGPConfig, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, limit, offset)
 	ret0, _ := ret[0].([]storage.HLIGPConfig)
@@ -72,13 +72,13 @@ func (c *MockIHLIGPConfigListCall) Return(arg0 []storage.HLIGPConfig, arg1 error
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIHLIGPConfigListCall) Do(f func(context.Context, int, int) ([]storage.HLIGPConfig, error)) *MockIHLIGPConfigListCall {
+func (c *MockIHLIGPConfigListCall) Do(f func(context.Context, int64, int64) ([]storage.HLIGPConfig, error)) *MockIHLIGPConfigListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIHLIGPConfigListCall) DoAndReturn(f func(context.Context, int, int) ([]storage.HLIGPConfig, error)) *MockIHLIGPConfigListCall {
+func (c *MockIHLIGPConfigListCall) DoAndReturn(f func(context.Context, int64, int64) ([]storage.HLIGPConfig, error)) *MockIHLIGPConfigListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

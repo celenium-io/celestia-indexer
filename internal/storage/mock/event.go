@@ -125,7 +125,7 @@ func (c *MockIEventByTxIdCall) DoAndReturn(f func(context.Context, uint64, stora
 }
 
 // CursorList mocks base method.
-func (m *MockIEvent) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Event, error) {
+func (m *MockIEvent) CursorList(ctx context.Context, id uint64, limit int64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Event, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CursorList", ctx, id, limit, order, cmp)
 	ret0, _ := ret[0].([]*storage.Event)
@@ -152,13 +152,13 @@ func (c *MockIEventCursorListCall) Return(arg0 []*storage.Event, arg1 error) *Mo
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIEventCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Event, error)) *MockIEventCursorListCall {
+func (c *MockIEventCursorListCall) Do(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.Event, error)) *MockIEventCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIEventCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Event, error)) *MockIEventCursorListCall {
+func (c *MockIEventCursorListCall) DoAndReturn(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.Event, error)) *MockIEventCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -280,7 +280,7 @@ func (c *MockIEventLastIDCall) DoAndReturn(f func(context.Context) (uint64, erro
 }
 
 // List mocks base method.
-func (m *MockIEvent) List(ctx context.Context, limit, offset uint64, order storage0.SortOrder) ([]*storage.Event, error) {
+func (m *MockIEvent) List(ctx context.Context, limit, offset int64, order storage0.SortOrder) ([]*storage.Event, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, limit, offset, order)
 	ret0, _ := ret[0].([]*storage.Event)
@@ -307,13 +307,13 @@ func (c *MockIEventListCall) Return(arg0 []*storage.Event, arg1 error) *MockIEve
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIEventListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Event, error)) *MockIEventListCall {
+func (c *MockIEventListCall) Do(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Event, error)) *MockIEventListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIEventListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Event, error)) *MockIEventListCall {
+func (c *MockIEventListCall) DoAndReturn(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Event, error)) *MockIEventListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

@@ -14,8 +14,8 @@ import (
 )
 
 type ListUpgradesFilter struct {
-	Limit    int
-	Offset   int
+	Limit    int64
+	Offset   int64
 	Sort     sdk.SortOrder
 	Height   uint64
 	Signer   string

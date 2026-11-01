@@ -202,7 +202,7 @@ func (c *MockIRollupCountCall) DoAndReturn(f func(context.Context) (int64, error
 }
 
 // CursorList mocks base method.
-func (m *MockIRollup) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Rollup, error) {
+func (m *MockIRollup) CursorList(ctx context.Context, id uint64, limit int64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Rollup, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CursorList", ctx, id, limit, order, cmp)
 	ret0, _ := ret[0].([]*storage.Rollup)
@@ -229,13 +229,13 @@ func (c *MockIRollupCursorListCall) Return(arg0 []*storage.Rollup, arg1 error) *
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIRollupCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Rollup, error)) *MockIRollupCursorListCall {
+func (c *MockIRollupCursorListCall) Do(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.Rollup, error)) *MockIRollupCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIRollupCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Rollup, error)) *MockIRollupCursorListCall {
+func (c *MockIRollupCursorListCall) DoAndReturn(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.Rollup, error)) *MockIRollupCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -474,7 +474,7 @@ func (c *MockIRollupLeaderboardDayCall) DoAndReturn(f func(context.Context, stor
 }
 
 // List mocks base method.
-func (m *MockIRollup) List(ctx context.Context, limit, offset uint64, order storage0.SortOrder) ([]*storage.Rollup, error) {
+func (m *MockIRollup) List(ctx context.Context, limit, offset int64, order storage0.SortOrder) ([]*storage.Rollup, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, limit, offset, order)
 	ret0, _ := ret[0].([]*storage.Rollup)
@@ -501,19 +501,19 @@ func (c *MockIRollupListCall) Return(arg0 []*storage.Rollup, arg1 error) *MockIR
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIRollupListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Rollup, error)) *MockIRollupListCall {
+func (c *MockIRollupListCall) Do(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Rollup, error)) *MockIRollupListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIRollupListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Rollup, error)) *MockIRollupListCall {
+func (c *MockIRollupListCall) DoAndReturn(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Rollup, error)) *MockIRollupListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // Namespaces mocks base method.
-func (m *MockIRollup) Namespaces(ctx context.Context, rollupId uint64, limit, offset int) ([]uint64, error) {
+func (m *MockIRollup) Namespaces(ctx context.Context, rollupId uint64, limit, offset int64) ([]uint64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Namespaces", ctx, rollupId, limit, offset)
 	ret0, _ := ret[0].([]uint64)
@@ -540,13 +540,13 @@ func (c *MockIRollupNamespacesCall) Return(namespaceIds []uint64, err error) *Mo
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIRollupNamespacesCall) Do(f func(context.Context, uint64, int, int) ([]uint64, error)) *MockIRollupNamespacesCall {
+func (c *MockIRollupNamespacesCall) Do(f func(context.Context, uint64, int64, int64) ([]uint64, error)) *MockIRollupNamespacesCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIRollupNamespacesCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]uint64, error)) *MockIRollupNamespacesCall {
+func (c *MockIRollupNamespacesCall) DoAndReturn(f func(context.Context, uint64, int64, int64) ([]uint64, error)) *MockIRollupNamespacesCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -630,7 +630,7 @@ func (c *MockIRollupRollupStatsGroupingCall) DoAndReturn(f func(context.Context,
 }
 
 // RollupsByNamespace mocks base method.
-func (m *MockIRollup) RollupsByNamespace(ctx context.Context, namespaceId uint64, limit, offset int) ([]storage.Rollup, error) {
+func (m *MockIRollup) RollupsByNamespace(ctx context.Context, namespaceId uint64, limit, offset int64) ([]storage.Rollup, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RollupsByNamespace", ctx, namespaceId, limit, offset)
 	ret0, _ := ret[0].([]storage.Rollup)
@@ -657,13 +657,13 @@ func (c *MockIRollupRollupsByNamespaceCall) Return(rollups []storage.Rollup, err
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIRollupRollupsByNamespaceCall) Do(f func(context.Context, uint64, int, int) ([]storage.Rollup, error)) *MockIRollupRollupsByNamespaceCall {
+func (c *MockIRollupRollupsByNamespaceCall) Do(f func(context.Context, uint64, int64, int64) ([]storage.Rollup, error)) *MockIRollupRollupsByNamespaceCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIRollupRollupsByNamespaceCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.Rollup, error)) *MockIRollupRollupsByNamespaceCall {
+func (c *MockIRollupRollupsByNamespaceCall) DoAndReturn(f func(context.Context, uint64, int64, int64) ([]storage.Rollup, error)) *MockIRollupRollupsByNamespaceCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

@@ -147,7 +147,7 @@ func TestFillProposalVotingPower_TotalVotingPower(t *testing.T) {
 	for _, name := range []string{"quorum", "threshold", "veto_threshold"} {
 		repos.Constants.EXPECT().Get(gomock.Any(), types.ModuleNameGov, name).Return(storage.Constant{Value: "0.5"}, nil)
 	}
-	repos.Votes.EXPECT().ListByProposal(gomock.Any(), uint64(1), votesPageSize, 0).Return(nil, nil)
+	repos.Votes.EXPECT().ListByProposal(gomock.Any(), uint64(1), int64(votesPageSize), int64(0)).Return(nil, nil)
 
 	module := NewModule(nil, nil, config.Indexer{})
 	filled, err := module.fillProposalsVotingPower(t.Context(), repos.Repos(), 601, proposalsMap(&storage.Proposal{
@@ -183,7 +183,7 @@ func TestFillProposalVotingPower_Cancelled(t *testing.T) {
 	for _, name := range []string{"quorum", "threshold", "veto_threshold"} {
 		repos.Constants.EXPECT().Get(gomock.Any(), types.ModuleNameGov, name).Return(storage.Constant{Value: "0.5"}, nil)
 	}
-	repos.Votes.EXPECT().ListByProposal(gomock.Any(), uint64(1), votesPageSize, 0).Return([]storage.Vote{
+	repos.Votes.EXPECT().ListByProposal(gomock.Any(), uint64(1), int64(votesPageSize), int64(0)).Return([]storage.Vote{
 		{VoterId: 10, ValidatorId: testsuite.Ptr(uint64(1)), Option: types.VoteOptionYes, Weight: types.NumericFromInt64(1)},
 	}, nil)
 	repos.Delegation.EXPECT().AddressDelegations(gomock.Any(), uint64(10)).Return(nil, nil)

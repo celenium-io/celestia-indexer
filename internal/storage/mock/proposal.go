@@ -124,7 +124,7 @@ func (c *MockIProposalByIdCall) DoAndReturn(f func(context.Context, uint64) (sto
 }
 
 // CursorList mocks base method.
-func (m *MockIProposal) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Proposal, error) {
+func (m *MockIProposal) CursorList(ctx context.Context, id uint64, limit int64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Proposal, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CursorList", ctx, id, limit, order, cmp)
 	ret0, _ := ret[0].([]*storage.Proposal)
@@ -151,13 +151,13 @@ func (c *MockIProposalCursorListCall) Return(arg0 []*storage.Proposal, arg1 erro
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIProposalCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Proposal, error)) *MockIProposalCursorListCall {
+func (c *MockIProposalCursorListCall) Do(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.Proposal, error)) *MockIProposalCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIProposalCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Proposal, error)) *MockIProposalCursorListCall {
+func (c *MockIProposalCursorListCall) DoAndReturn(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.Proposal, error)) *MockIProposalCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -279,7 +279,7 @@ func (c *MockIProposalLastIDCall) DoAndReturn(f func(context.Context) (uint64, e
 }
 
 // List mocks base method.
-func (m *MockIProposal) List(ctx context.Context, limit, offset uint64, order storage0.SortOrder) ([]*storage.Proposal, error) {
+func (m *MockIProposal) List(ctx context.Context, limit, offset int64, order storage0.SortOrder) ([]*storage.Proposal, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, limit, offset, order)
 	ret0, _ := ret[0].([]*storage.Proposal)
@@ -306,13 +306,13 @@ func (c *MockIProposalListCall) Return(arg0 []*storage.Proposal, arg1 error) *Mo
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIProposalListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Proposal, error)) *MockIProposalListCall {
+func (c *MockIProposalListCall) Do(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Proposal, error)) *MockIProposalListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIProposalListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Proposal, error)) *MockIProposalListCall {
+func (c *MockIProposalListCall) DoAndReturn(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Proposal, error)) *MockIProposalListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

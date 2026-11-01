@@ -106,7 +106,7 @@ func (v *Validator) Metrics(ctx context.Context, id uint64) (metrics storage.Val
 	return
 }
 
-func (v *Validator) TopNMetrics(ctx context.Context, n int) (metrics storage.ValidatorMetrics, err error) {
+func (v *Validator) TopNMetrics(ctx context.Context, n int64) (metrics storage.ValidatorMetrics, err error) {
 	subQuery := v.DB().NewSelect().
 		Table(storage.ViewValidatorMetrics).
 		Order("stake desc").

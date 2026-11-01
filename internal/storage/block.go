@@ -23,8 +23,8 @@ type IBlock interface {
 	ByHeight(ctx context.Context, height pkgTypes.Level) (Block, error)
 	ByHeightWithStats(ctx context.Context, height pkgTypes.Level) (Block, error)
 	ByHash(ctx context.Context, hash []byte) (Block, error)
-	ByProposer(ctx context.Context, proposerId uint64, limit, offset int) ([]Block, error)
-	ListWithStats(ctx context.Context, limit, offset uint64, order storage.SortOrder) ([]*Block, error)
+	ByProposer(ctx context.Context, proposerId uint64, limit, offset int64) ([]Block, error)
+	ListWithStats(ctx context.Context, limit, offset int64, order storage.SortOrder) ([]*Block, error)
 	Time(ctx context.Context, height pkgTypes.Level) (time.Time, error)
 }
 

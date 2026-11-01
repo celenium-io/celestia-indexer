@@ -175,8 +175,8 @@ func (handler *NamespaceHandler) GetWithVersion(c echo.Context) error {
 }
 
 type namespaceList struct {
-	Limit  int    `query:"limit"   validate:"omitempty,min=1,max=100"`
-	Offset int    `query:"offset"  validate:"omitempty,min=0"`
+	Limit  int64  `query:"limit"   validate:"omitempty,min=1,max=100"`
+	Offset int64  `query:"offset"  validate:"omitempty,min=0"`
 	Sort   string `query:"sort"    validate:"omitempty,oneof=asc desc"`
 	SortBy string `query:"sort_by" validate:"omitempty,oneof=time pfb_count pff_count size"`
 }
@@ -257,8 +257,8 @@ func (handler *NamespaceHandler) GetBlobs(c echo.Context) error {
 type listByNamespace struct {
 	Id      string `param:"id"      validate:"required,hexadecimal,len=56"`
 	Version byte   `param:"version"`
-	Limit   int    `query:"limit"   validate:"omitempty,min=1,max=100"`
-	Offset  int    `query:"offset"  validate:"omitempty,min=0"`
+	Limit   int64  `query:"limit"   validate:"omitempty,min=1,max=100"`
+	Offset  int64  `query:"offset"  validate:"omitempty,min=0"`
 }
 
 func (req *listByNamespace) SetDefault() {
@@ -318,8 +318,8 @@ func (handler *NamespaceHandler) GetMessages(c echo.Context) error {
 }
 
 type listBlobsRequest struct {
-	Limit      int         `query:"limit"      validate:"omitempty,min=1,max=100"`
-	Offset     int         `query:"offset"     validate:"omitempty,min=0"`
+	Limit      int64       `query:"limit"      validate:"omitempty,min=1,max=100"`
+	Offset     int64       `query:"offset"     validate:"omitempty,min=0"`
 	Sort       string      `query:"sort"       validate:"omitempty,oneof=asc desc"`
 	SortBy     string      `query:"sort_by"    validate:"omitempty,oneof=time size"`
 	Commitment string      `query:"commitment" validate:"omitempty,base64url"`
@@ -524,8 +524,8 @@ func (handler *NamespaceHandler) BlobMetadata(c echo.Context) error {
 type getBlobLogsForNamespace struct {
 	Id         string      `param:"id"         validate:"required,hexadecimal,len=56"`
 	Version    byte        `param:"version"`
-	Limit      int         `query:"limit"      validate:"omitempty,min=1,max=100"`
-	Offset     int         `query:"offset"     validate:"omitempty,min=0"`
+	Limit      int64       `query:"limit"      validate:"omitempty,min=1,max=100"`
+	Offset     int64       `query:"offset"     validate:"omitempty,min=0"`
 	Sort       string      `query:"sort"       validate:"omitempty,oneof=asc desc"`
 	SortBy     string      `query:"sort_by"    validate:"omitempty,oneof=time size"`
 	Commitment string      `query:"commitment" validate:"omitempty,base64url"`

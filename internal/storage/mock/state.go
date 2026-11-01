@@ -85,7 +85,7 @@ func (c *MockIStateByNameCall) DoAndReturn(f func(context.Context, string) (stor
 }
 
 // CursorList mocks base method.
-func (m *MockIState) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.State, error) {
+func (m *MockIState) CursorList(ctx context.Context, id uint64, limit int64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.State, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CursorList", ctx, id, limit, order, cmp)
 	ret0, _ := ret[0].([]*storage.State)
@@ -112,13 +112,13 @@ func (c *MockIStateCursorListCall) Return(arg0 []*storage.State, arg1 error) *Mo
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIStateCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.State, error)) *MockIStateCursorListCall {
+func (c *MockIStateCursorListCall) Do(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.State, error)) *MockIStateCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIStateCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.State, error)) *MockIStateCursorListCall {
+func (c *MockIStateCursorListCall) DoAndReturn(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.State, error)) *MockIStateCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -240,7 +240,7 @@ func (c *MockIStateLastIDCall) DoAndReturn(f func(context.Context) (uint64, erro
 }
 
 // List mocks base method.
-func (m *MockIState) List(ctx context.Context, limit, offset uint64, order storage0.SortOrder) ([]*storage.State, error) {
+func (m *MockIState) List(ctx context.Context, limit, offset int64, order storage0.SortOrder) ([]*storage.State, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, limit, offset, order)
 	ret0, _ := ret[0].([]*storage.State)
@@ -267,13 +267,13 @@ func (c *MockIStateListCall) Return(arg0 []*storage.State, arg1 error) *MockISta
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIStateListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.State, error)) *MockIStateListCall {
+func (c *MockIStateListCall) Do(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.State, error)) *MockIStateListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIStateListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.State, error)) *MockIStateListCall {
+func (c *MockIStateListCall) DoAndReturn(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.State, error)) *MockIStateListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

@@ -182,8 +182,8 @@ func (handler *TxHandler) List(c echo.Context) error {
 
 type getTxRequestWithPagination struct {
 	Hash   string `param:"hash"   validate:"required,hexadecimal,len=64"`
-	Limit  int    `query:"limit"  validate:"omitempty,min=1,max=100"`
-	Offset int    `query:"offset" validate:"omitempty,min=0"`
+	Limit  int64  `query:"limit"  validate:"omitempty,min=1,max=100"`
+	Offset int64  `query:"offset" validate:"omitempty,min=0"`
 }
 
 func (p *getTxRequestWithPagination) SetDefault() {
@@ -334,8 +334,8 @@ func (handler *TxHandler) Genesis(c echo.Context) error {
 
 type getBlobsForTx struct {
 	Hash   string `param:"hash"    validate:"required,hexadecimal,len=64"`
-	Limit  int    `query:"limit"   validate:"omitempty,min=1,max=100"`
-	Offset int    `query:"offset"  validate:"omitempty,min=0"`
+	Limit  int64  `query:"limit"   validate:"omitempty,min=1,max=100"`
+	Offset int64  `query:"offset"  validate:"omitempty,min=0"`
 	Sort   string `query:"sort"    validate:"omitempty,oneof=asc desc"`
 	SortBy string `query:"sort_by" validate:"omitempty,oneof=time size"`
 	Source string `query:"source"  validate:"omitempty,blob_source"`

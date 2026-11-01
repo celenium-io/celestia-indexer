@@ -14,8 +14,8 @@ import (
 )
 
 type ListHyperlaneTransferFilters struct {
-	Limit     int
-	Offset    int
+	Limit     int64
+	Offset    int64
 	Sort      sdk.SortOrder
 	MailboxId uint64
 	AddressId uint64
@@ -38,7 +38,7 @@ type IHLTransfer interface {
 	List(ctx context.Context, filters ListHyperlaneTransferFilters) ([]HLTransfer, error)
 	Series(ctx context.Context, domainId uint64, timeframe Timeframe, column string, req SeriesRequest) (items []HistogramItem, err error)
 	TotalSeries(ctx context.Context, timeframe Timeframe, column string, req SeriesRequest) (items []HistogramItem, err error)
-	StatsByDomain(ctx context.Context, limit, offset int) ([]DomainStats, error)
+	StatsByDomain(ctx context.Context, limit, offset int64) ([]DomainStats, error)
 }
 
 type HLTransfer struct {

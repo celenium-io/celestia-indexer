@@ -153,7 +153,7 @@ func (a *Address) AddressByString(ctx context.Context, readableHash string) (add
 }
 
 // Balances -
-func (a *Address) Balances(ctx context.Context, addressId uint64, limit, offset int) (balances []storage.Balance, err error) {
+func (a *Address) Balances(ctx context.Context, addressId uint64, limit, offset int64) (balances []storage.Balance, err error) {
 	query := a.DB().NewSelect().
 		Model((*storage.Balance)(nil)).
 		Where("id = ?", addressId).

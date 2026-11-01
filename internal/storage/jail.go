@@ -17,7 +17,7 @@ import (
 type IJail interface {
 	storage.Table[*Jail]
 
-	ByValidator(ctx context.Context, id uint64, limit, offset int) ([]Jail, error)
+	ByValidator(ctx context.Context, id uint64, limit, offset int64) ([]Jail, error)
 }
 
 // Jail -

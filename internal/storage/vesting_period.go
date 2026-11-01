@@ -17,7 +17,7 @@ import (
 type IVestingPeriod interface {
 	storage.Table[*VestingPeriod]
 
-	ByVesting(ctx context.Context, id uint64, limit, offset int) ([]VestingPeriod, error)
+	ByVesting(ctx context.Context, id uint64, limit, offset int64) ([]VestingPeriod, error)
 }
 
 type VestingPeriod struct {

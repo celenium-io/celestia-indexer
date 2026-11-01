@@ -43,7 +43,7 @@ func (n *Namespace) ByNamespaceIdAndVersion(ctx context.Context, namespaceId []b
 }
 
 // Messages -
-func (n *Namespace) Messages(ctx context.Context, id uint64, limit, offset int) (msgs []storage.NamespaceMessage, err error) {
+func (n *Namespace) Messages(ctx context.Context, id uint64, limit, offset int64) (msgs []storage.NamespaceMessage, err error) {
 	subQuery := n.DB().NewSelect().Model(&msgs).
 		Where("namespace_id = ?", id).
 		Order("time desc")
@@ -67,7 +67,7 @@ func (n *Namespace) Messages(ctx context.Context, id uint64, limit, offset int) 
 	return
 }
 
-func (n *Namespace) ListWithSort(ctx context.Context, sortField string, sort sdk.SortOrder, limit, offset int) (ns []storage.Namespace, err error) {
+func (n *Namespace) ListWithSort(ctx context.Context, sortField string, sort sdk.SortOrder, limit, offset int64) (ns []storage.Namespace, err error) {
 	var field string
 	switch sortField {
 	case timeColumn:

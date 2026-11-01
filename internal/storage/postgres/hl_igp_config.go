@@ -18,7 +18,7 @@ func NewHLIGPConfig(db bun.IDB) storage.IHLIGPConfig {
 	return &HLIGPConfig{db}
 }
 
-func (hl *HLIGPConfig) List(ctx context.Context, limit, offset int) (config []storage.HLIGPConfig, err error) {
+func (hl *HLIGPConfig) List(ctx context.Context, limit, offset int64) (config []storage.HLIGPConfig, err error) {
 	query := hl.db.NewSelect().
 		Model((*storage.HLIGPConfig)(nil))
 

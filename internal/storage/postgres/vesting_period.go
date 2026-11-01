@@ -23,7 +23,7 @@ func NewVestingPeriod(db bun.IDB) storage.IVestingPeriod {
 	}
 }
 
-func (v *VestingPeriod) ByVesting(ctx context.Context, id uint64, limit, offset int) (periods []storage.VestingPeriod, err error) {
+func (v *VestingPeriod) ByVesting(ctx context.Context, id uint64, limit, offset int64) (periods []storage.VestingPeriod, err error) {
 	query := v.DB().NewSelect().
 		Model(&periods).
 		Where("vesting_account_id = ?", id).

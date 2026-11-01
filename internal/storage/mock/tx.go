@@ -165,7 +165,7 @@ func (c *MockITxByIdWithRelationsCall) DoAndReturn(f func(context.Context, uint6
 }
 
 // CursorList mocks base method.
-func (m *MockITx) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Tx, error) {
+func (m *MockITx) CursorList(ctx context.Context, id uint64, limit int64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Tx, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CursorList", ctx, id, limit, order, cmp)
 	ret0, _ := ret[0].([]*storage.Tx)
@@ -192,13 +192,13 @@ func (c *MockITxCursorListCall) Return(arg0 []*storage.Tx, arg1 error) *MockITxC
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockITxCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Tx, error)) *MockITxCursorListCall {
+func (c *MockITxCursorListCall) Do(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.Tx, error)) *MockITxCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockITxCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Tx, error)) *MockITxCursorListCall {
+func (c *MockITxCursorListCall) DoAndReturn(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.Tx, error)) *MockITxCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -282,7 +282,7 @@ func (c *MockITxGasCall) DoAndReturn(f func(context.Context, types.Level, time.T
 }
 
 // Genesis mocks base method.
-func (m *MockITx) Genesis(ctx context.Context, limit, offset int, sortOrder storage0.SortOrder) ([]storage.Tx, error) {
+func (m *MockITx) Genesis(ctx context.Context, limit, offset int64, sortOrder storage0.SortOrder) ([]storage.Tx, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Genesis", ctx, limit, offset, sortOrder)
 	ret0, _ := ret[0].([]storage.Tx)
@@ -309,13 +309,13 @@ func (c *MockITxGenesisCall) Return(arg0 []storage.Tx, arg1 error) *MockITxGenes
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockITxGenesisCall) Do(f func(context.Context, int, int, storage0.SortOrder) ([]storage.Tx, error)) *MockITxGenesisCall {
+func (c *MockITxGenesisCall) Do(f func(context.Context, int64, int64, storage0.SortOrder) ([]storage.Tx, error)) *MockITxGenesisCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockITxGenesisCall) DoAndReturn(f func(context.Context, int, int, storage0.SortOrder) ([]storage.Tx, error)) *MockITxGenesisCall {
+func (c *MockITxGenesisCall) DoAndReturn(f func(context.Context, int64, int64, storage0.SortOrder) ([]storage.Tx, error)) *MockITxGenesisCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -477,7 +477,7 @@ func (c *MockITxLastIDCall) DoAndReturn(f func(context.Context) (uint64, error))
 }
 
 // List mocks base method.
-func (m *MockITx) List(ctx context.Context, limit, offset uint64, order storage0.SortOrder) ([]*storage.Tx, error) {
+func (m *MockITx) List(ctx context.Context, limit, offset int64, order storage0.SortOrder) ([]*storage.Tx, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, limit, offset, order)
 	ret0, _ := ret[0].([]*storage.Tx)
@@ -504,13 +504,13 @@ func (c *MockITxListCall) Return(arg0 []*storage.Tx, arg1 error) *MockITxListCal
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockITxListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Tx, error)) *MockITxListCall {
+func (c *MockITxListCall) Do(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Tx, error)) *MockITxListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockITxListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Tx, error)) *MockITxListCall {
+func (c *MockITxListCall) DoAndReturn(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Tx, error)) *MockITxListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

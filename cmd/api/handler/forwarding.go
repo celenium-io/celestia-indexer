@@ -37,8 +37,8 @@ func NewForwardingsHandler(
 }
 
 type listForwardingsRequest struct {
-	Limit   int    `query:"limit"   validate:"omitempty,min=1,max=100"`
-	Offset  int    `query:"offset"  validate:"omitempty,min=0"`
+	Limit   int64  `query:"limit"   validate:"omitempty,min=1,max=100"`
+	Offset  int64  `query:"offset"  validate:"omitempty,min=0"`
 	Sort    string `query:"sort"    validate:"omitempty,oneof=asc desc"`
 	TxHash  string `query:"tx_hash" validate:"omitempty,hexadecimal,len=64"`
 	Address string `query:"address" validate:"omitempty,address"`

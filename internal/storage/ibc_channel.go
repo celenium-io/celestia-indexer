@@ -14,8 +14,8 @@ import (
 )
 
 type ListChannelFilters struct {
-	Limit        int
-	Offset       int
+	Limit        int64
+	Offset       int64
 	Sort         sdk.SortOrder
 	ConnectionId string
 	ClientId     string
@@ -39,7 +39,7 @@ type BusiestChannel struct {
 type IIbcChannel interface {
 	ById(ctx context.Context, id string) (IbcChannel, error)
 	List(ctx context.Context, fltrs ListChannelFilters) ([]IbcChannel, error)
-	StatsByChain(ctx context.Context, limit, offset int) ([]ChainStats, error)
+	StatsByChain(ctx context.Context, limit, offset int64) ([]ChainStats, error)
 	BusiestChannel1m(ctx context.Context) (*BusiestChannel, error)
 }
 

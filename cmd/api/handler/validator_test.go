@@ -235,7 +235,7 @@ func (s *ValidatorTestSuite) TestByProposer() {
 	c.SetParamValues("1")
 
 	s.blocks.EXPECT().
-		ByProposer(gomock.Any(), uint64(1), 10, 0).
+		ByProposer(gomock.Any(), uint64(1), int64(10), int64(0)).
 		Return([]storage.Block{
 			testBlock,
 		}, nil)
@@ -342,7 +342,7 @@ func (s *ValidatorTestSuite) TestDelegators() {
 	c.SetParamValues("1")
 
 	s.delegations.EXPECT().
-		ByValidator(gomock.Any(), uint64(1), 10, 0, true).
+		ByValidator(gomock.Any(), uint64(1), int64(10), int64(0), true).
 		Return([]storage.Delegation{
 			{
 				AddressId:   1,
@@ -382,7 +382,7 @@ func (s *ValidatorTestSuite) TestJails() {
 	c.SetParamValues("1")
 
 	s.jails.EXPECT().
-		ByValidator(gomock.Any(), uint64(1), 10, 0).
+		ByValidator(gomock.Any(), uint64(1), int64(10), int64(0)).
 		Return([]storage.Jail{
 			{
 				Burned:      storageTypes.NumericFromInt64(100),
@@ -590,7 +590,7 @@ func (s *ValidatorTestSuite) TestTopNMetrics() {
 	c.SetPath("/validators/metrics")
 
 	s.validators.EXPECT().
-		TopNMetrics(gomock.Any(), 25).
+		TopNMetrics(gomock.Any(), int64(25)).
 		Return(storage.ValidatorMetrics{
 			VotesMetric:          storageTypes.MustNumericFromString("1.0"),
 			CommissionMetric:     storageTypes.MustNumericFromString("0.9"),

@@ -46,7 +46,7 @@ func (m *MockIStakingLog) EXPECT() *MockIStakingLogMockRecorder {
 }
 
 // CursorList mocks base method.
-func (m *MockIStakingLog) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.StakingLog, error) {
+func (m *MockIStakingLog) CursorList(ctx context.Context, id uint64, limit int64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.StakingLog, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CursorList", ctx, id, limit, order, cmp)
 	ret0, _ := ret[0].([]*storage.StakingLog)
@@ -73,13 +73,13 @@ func (c *MockIStakingLogCursorListCall) Return(arg0 []*storage.StakingLog, arg1 
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIStakingLogCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.StakingLog, error)) *MockIStakingLogCursorListCall {
+func (c *MockIStakingLogCursorListCall) Do(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.StakingLog, error)) *MockIStakingLogCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIStakingLogCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.StakingLog, error)) *MockIStakingLogCursorListCall {
+func (c *MockIStakingLogCursorListCall) DoAndReturn(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.StakingLog, error)) *MockIStakingLogCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -201,7 +201,7 @@ func (c *MockIStakingLogLastIDCall) DoAndReturn(f func(context.Context) (uint64,
 }
 
 // List mocks base method.
-func (m *MockIStakingLog) List(ctx context.Context, limit, offset uint64, order storage0.SortOrder) ([]*storage.StakingLog, error) {
+func (m *MockIStakingLog) List(ctx context.Context, limit, offset int64, order storage0.SortOrder) ([]*storage.StakingLog, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, limit, offset, order)
 	ret0, _ := ret[0].([]*storage.StakingLog)
@@ -228,13 +228,13 @@ func (c *MockIStakingLogListCall) Return(arg0 []*storage.StakingLog, arg1 error)
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIStakingLogListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.StakingLog, error)) *MockIStakingLogListCall {
+func (c *MockIStakingLogListCall) Do(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.StakingLog, error)) *MockIStakingLogListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIStakingLogListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.StakingLog, error)) *MockIStakingLogListCall {
+func (c *MockIStakingLogListCall) DoAndReturn(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.StakingLog, error)) *MockIStakingLogListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }

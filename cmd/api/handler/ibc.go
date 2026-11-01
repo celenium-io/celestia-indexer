@@ -77,8 +77,8 @@ func (handler *IbcHandler) Get(c echo.Context) error {
 }
 
 type getIbcClientsRequest struct {
-	Limit   int    `query:"limit"    validate:"omitempty,min=1,max=100"`
-	Offset  int    `query:"offset"   validate:"omitempty,min=0"`
+	Limit   int64  `query:"limit"    validate:"omitempty,min=1,max=100"`
+	Offset  int64  `query:"offset"   validate:"omitempty,min=0"`
 	Sort    string `query:"sort"     validate:"omitempty,oneof=asc desc"`
 	ChainId string `query:"chain_id" validate:"omitempty"`
 	Creator string `query:"creator"  validate:"omitempty,address"`
@@ -180,8 +180,8 @@ func (handler *IbcHandler) GetConnection(c echo.Context) error {
 }
 
 type getIbcConnsRequest struct {
-	Limit    int    `query:"limit"     validate:"omitempty,min=1,max=100"`
-	Offset   int    `query:"offset"    validate:"omitempty,min=0"`
+	Limit    int64  `query:"limit"     validate:"omitempty,min=1,max=100"`
+	Offset   int64  `query:"offset"    validate:"omitempty,min=0"`
 	Sort     string `query:"sort"      validate:"omitempty,oneof=asc desc"`
 	ClientId string `query:"client_id" validate:"omitempty"`
 }
@@ -267,8 +267,8 @@ func (handler *IbcHandler) GetChannel(c echo.Context) error {
 }
 
 type getIbcChannelsRequest struct {
-	Limit        int                    `query:"limit"         validate:"omitempty,min=1,max=100"`
-	Offset       int                    `query:"offset"        validate:"omitempty,min=0"`
+	Limit        int64                  `query:"limit"         validate:"omitempty,min=1,max=100"`
+	Offset       int64                  `query:"offset"        validate:"omitempty,min=0"`
 	Sort         string                 `query:"sort"          validate:"omitempty,oneof=asc desc"`
 	ClientId     string                 `query:"client_id"     validate:"omitempty"`
 	ConnectionId string                 `query:"connection_id" validate:"omitempty"`
@@ -329,8 +329,8 @@ func (handler *IbcHandler) ListChannels(c echo.Context) error {
 }
 
 type getIbcTransfersRequest struct {
-	Limit     int    `query:"limit"      validate:"omitempty,min=1,max=100"`
-	Offset    int    `query:"offset"     validate:"omitempty,min=0"`
+	Limit     int64  `query:"limit"      validate:"omitempty,min=1,max=100"`
+	Offset    int64  `query:"offset"     validate:"omitempty,min=0"`
 	Sort      string `query:"sort"       validate:"omitempty,oneof=asc desc"`
 	ChannelId string `query:"channel_id" validate:"omitempty"`
 	ChainId   string `query:"chain_id"   validate:"omitempty"`

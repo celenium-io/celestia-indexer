@@ -46,7 +46,7 @@ func (m *MockIJail) EXPECT() *MockIJailMockRecorder {
 }
 
 // ByValidator mocks base method.
-func (m *MockIJail) ByValidator(ctx context.Context, id uint64, limit, offset int) ([]storage.Jail, error) {
+func (m *MockIJail) ByValidator(ctx context.Context, id uint64, limit, offset int64) ([]storage.Jail, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ByValidator", ctx, id, limit, offset)
 	ret0, _ := ret[0].([]storage.Jail)
@@ -73,19 +73,19 @@ func (c *MockIJailByValidatorCall) Return(arg0 []storage.Jail, arg1 error) *Mock
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIJailByValidatorCall) Do(f func(context.Context, uint64, int, int) ([]storage.Jail, error)) *MockIJailByValidatorCall {
+func (c *MockIJailByValidatorCall) Do(f func(context.Context, uint64, int64, int64) ([]storage.Jail, error)) *MockIJailByValidatorCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIJailByValidatorCall) DoAndReturn(f func(context.Context, uint64, int, int) ([]storage.Jail, error)) *MockIJailByValidatorCall {
+func (c *MockIJailByValidatorCall) DoAndReturn(f func(context.Context, uint64, int64, int64) ([]storage.Jail, error)) *MockIJailByValidatorCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
 
 // CursorList mocks base method.
-func (m *MockIJail) CursorList(ctx context.Context, id, limit uint64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Jail, error) {
+func (m *MockIJail) CursorList(ctx context.Context, id uint64, limit int64, order storage0.SortOrder, cmp storage0.Comparator) ([]*storage.Jail, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CursorList", ctx, id, limit, order, cmp)
 	ret0, _ := ret[0].([]*storage.Jail)
@@ -112,13 +112,13 @@ func (c *MockIJailCursorListCall) Return(arg0 []*storage.Jail, arg1 error) *Mock
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIJailCursorListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Jail, error)) *MockIJailCursorListCall {
+func (c *MockIJailCursorListCall) Do(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.Jail, error)) *MockIJailCursorListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIJailCursorListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder, storage0.Comparator) ([]*storage.Jail, error)) *MockIJailCursorListCall {
+func (c *MockIJailCursorListCall) DoAndReturn(f func(context.Context, uint64, int64, storage0.SortOrder, storage0.Comparator) ([]*storage.Jail, error)) *MockIJailCursorListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -240,7 +240,7 @@ func (c *MockIJailLastIDCall) DoAndReturn(f func(context.Context) (uint64, error
 }
 
 // List mocks base method.
-func (m *MockIJail) List(ctx context.Context, limit, offset uint64, order storage0.SortOrder) ([]*storage.Jail, error) {
+func (m *MockIJail) List(ctx context.Context, limit, offset int64, order storage0.SortOrder) ([]*storage.Jail, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, limit, offset, order)
 	ret0, _ := ret[0].([]*storage.Jail)
@@ -267,13 +267,13 @@ func (c *MockIJailListCall) Return(arg0 []*storage.Jail, arg1 error) *MockIJailL
 }
 
 // Do rewrite *gomock.Call.Do
-func (c *MockIJailListCall) Do(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Jail, error)) *MockIJailListCall {
+func (c *MockIJailListCall) Do(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Jail, error)) *MockIJailListCall {
 	c.Call = c.Call.Do(f)
 	return c
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockIJailListCall) DoAndReturn(f func(context.Context, uint64, uint64, storage0.SortOrder) ([]*storage.Jail, error)) *MockIJailListCall {
+func (c *MockIJailListCall) DoAndReturn(f func(context.Context, int64, int64, storage0.SortOrder) ([]*storage.Jail, error)) *MockIJailListCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
