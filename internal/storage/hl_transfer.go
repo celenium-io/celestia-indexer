@@ -55,7 +55,7 @@ type HLTransfer struct {
 	AddressId           uint64               `bun:"address_id"                     comment:"Internal celestia address identity"`
 	CounterpartyAddress string               `bun:"counterparty_address"           comment:"Counterparty address"`
 	Version             byte                 `bun:"version"                        comment:"Version"`
-	Nonce               uint32               `bun:"nonce"                          comment:"Nonce"`
+	Nonce               uint32               `bun:"nonce,type:bigint"              comment:"Nonce"`
 	MessageId           []byte               `bun:"message_id,type:bytea,nullzero" comment:"Hyperlane message id (keccak256 of the message)"`
 	Body                []byte               `bun:"body,type:bytea,nullzero"       comment:"Body"`
 	Metadata            []byte               `bun:"metadata,type:bytea,nullzero"   comment:"Metadata"`
