@@ -39,7 +39,9 @@ var (
 	testAddress = "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
 	// listed in celestia-app app/frozen/addresses/mocha-5.txt
 	testFrozenAddress = "celestia1kuzawt83w7uxtf5uthv9lssrt8fk7y09sqfucf"
-	testHashAddress   = []byte{0x96, 0xa, 0xa0, 0x36, 0x6b, 0x25, 0x4e, 0x1e, 0xa7, 0x9b, 0xda, 0x46, 0x7e, 0xb3, 0xaa, 0x5c, 0x97, 0xcb, 0xa5, 0xae}
+	// frozen.MochaWhitehat
+	testWhitehatAddress = "celestia1xk4tasrhcr3w6jyq4xzd8x6aapv9hmfuh8mcxn"
+	testHashAddress     = []byte{0x96, 0xa, 0xa0, 0x36, 0x6b, 0x25, 0x4e, 0x1e, 0xa7, 0x9b, 0xda, 0x46, 0x7e, 0xb3, 0xaa, 0x5c, 0x97, 0xcb, 0xa5, 0xae}
 )
 
 // AddressTestSuite -
@@ -141,20 +143,25 @@ func (s *AddressTestSuite) TestGet() {
 	s.Require().EqualValues("name", address.Celestials.Name)
 	s.Require().EqualValues("image", address.Celestials.ImageUrl)
 	s.Require().False(address.IsFrozen)
+	s.Require().False(address.IsWhitehat)
 }
 
 func (s *AddressTestSuite) TestGetFrozen() {
 	for _, tt := range []struct {
-		name    string
-		address string
-		chainId string
-		version uint64
-		want    bool
+		name     string
+		address  string
+		chainId  string
+		version  uint64
+		frozen   bool
+		whitehat bool
 	}{
-		{name: "listed, v11", address: testFrozenAddress, chainId: "mocha-5", version: 11, want: true},
-		{name: "listed, before v11", address: testFrozenAddress, chainId: "mocha-5", version: 10, want: false},
-		{name: "listed on another chain", address: testFrozenAddress, chainId: "celestia", version: 11, want: false},
-		{name: "not listed", address: testAddress, chainId: "mocha-5", version: 11, want: false},
+		{name: "listed, v11", address: testFrozenAddress, chainId: "mocha-5", version: 11, frozen: true},
+		{name: "listed, before v11", address: testFrozenAddress, chainId: "mocha-5", version: 10},
+		{name: "listed on another chain", address: testFrozenAddress, chainId: "celestia", version: 11},
+		{name: "not listed", address: testAddress, chainId: "mocha-5", version: 11},
+		{name: "whitehat, v11", address: testWhitehatAddress, chainId: "mocha-5", version: 11, whitehat: true},
+		{name: "whitehat, before v11", address: testWhitehatAddress, chainId: "mocha-5", version: 10},
+		{name: "whitehat of another chain", address: testWhitehatAddress, chainId: "celestia", version: 11},
 	} {
 		s.Run(tt.name, func() {
 			s.handler.frozen = newFrozenState(s.state, testIndexerName)
@@ -187,7 +194,8 @@ func (s *AddressTestSuite) TestGetFrozen() {
 
 			var address responses.Address
 			s.Require().NoError(json.NewDecoder(rec.Body).Decode(&address))
-			s.Require().Equal(tt.want, address.IsFrozen)
+			s.Require().Equal(tt.frozen, address.IsFrozen)
+			s.Require().Equal(tt.whitehat, address.IsWhitehat)
 		})
 	}
 }
