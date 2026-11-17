@@ -36,6 +36,7 @@ type SearchTestSuite struct {
 	validator *mock.MockIValidator
 	search    *mock.MockISearch
 	rollup    *mock.MockIRollup
+	state     *mock.MockIState
 	celestial *celestialMock.MockICelestial
 
 	echo    *echo.Echo
@@ -56,7 +57,13 @@ func (s *SearchTestSuite) SetupSuite() {
 	s.validator = mock.NewMockIValidator(s.ctrl)
 	s.rollup = mock.NewMockIRollup(s.ctrl)
 	s.celestial = celestialMock.NewMockICelestial(s.ctrl)
-	s.handler = NewSearchHandler(s.search, s.address, s.block, s.tx, s.namespace, s.validator, s.rollup, s.celestial, geo.Noop{})
+	s.state = mock.NewMockIState(s.ctrl)
+	s.handler = NewSearchHandler(s.search, s.address, s.block, s.tx, s.namespace, s.validator, s.rollup, s.state, s.celestial, geo.Noop{}, testIndexerName)
+}
+
+// SetupTest drops the frozen-state cache so every test sets its own state.
+func (s *SearchTestSuite) SetupTest() {
+	s.handler.frozen = newFrozenState(s.state, testIndexerName)
 }
 
 // TearDownSuite -
@@ -86,6 +93,11 @@ func (s *SearchTestSuite) TestSearchAddress() {
 			Height:     100,
 			LastHeight: 100,
 		}, nil)
+
+	s.state.EXPECT().
+		ByName(gomock.Any(), testIndexerName).
+		Return(testState, nil).
+		Times(1)
 
 	s.Require().NoError(s.handler.Search(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
@@ -556,6 +568,11 @@ func (s *SearchTestSuite) TestSearchCelestial() {
 			Id:       "name 3",
 			ImageUrl: "test",
 		}, nil).
+		Times(1)
+
+	s.state.EXPECT().
+		ByName(gomock.Any(), testIndexerName).
+		Return(testState, nil).
 		Times(1)
 
 	s.Require().NoError(s.handler.Search(c))

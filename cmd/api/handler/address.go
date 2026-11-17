@@ -33,6 +33,7 @@ type AddressHandler struct {
 	votes         storage.IVote
 	state         storage.IState
 	indexerName   string
+	frozen        *frozenState
 }
 
 func NewAddressHandler(
@@ -66,6 +67,7 @@ func NewAddressHandler(
 		votes:         votes,
 		state:         state,
 		indexerName:   indexerName,
+		frozen:        newFrozenState(state, indexerName),
 	}
 }
 
@@ -102,7 +104,12 @@ func (handler *AddressHandler) Get(c echo.Context) error {
 		return handleError(c, err, handler.address)
 	}
 
-	return c.JSON(http.StatusOK, responses.NewAddress(address))
+	chainId, err := handler.frozen.activeChainId(c.Request().Context())
+	if err != nil {
+		return handleError(c, err, handler.state)
+	}
+
+	return c.JSON(http.StatusOK, responses.NewAddress(address, chainId))
 }
 
 type addressListRequest struct {
@@ -155,9 +162,14 @@ func (handler *AddressHandler) List(c echo.Context) error {
 		return handleError(c, err, handler.address)
 	}
 
+	chainId, err := handler.frozen.activeChainId(c.Request().Context())
+	if err != nil {
+		return handleError(c, err, handler.state)
+	}
+
 	response := make([]responses.Address, len(address))
 	for i := range address {
-		response[i] = responses.NewAddress(address[i])
+		response[i] = responses.NewAddress(address[i], chainId)
 	}
 
 	return returnArray(c, response)
