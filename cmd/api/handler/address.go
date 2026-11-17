@@ -33,7 +33,7 @@ type AddressHandler struct {
 	votes         storage.IVote
 	state         storage.IState
 	indexerName   string
-	frozen        *frozenState
+	frozen        *FrozenState
 }
 
 func NewAddressHandler(
@@ -51,6 +51,7 @@ func NewAddressHandler(
 	votes storage.IVote,
 	state storage.IState,
 	indexerName string,
+	frozen *FrozenState,
 ) *AddressHandler {
 	return &AddressHandler{
 		address:       address,
@@ -67,7 +68,7 @@ func NewAddressHandler(
 		votes:         votes,
 		state:         state,
 		indexerName:   indexerName,
-		frozen:        newFrozenState(state, indexerName),
+		frozen:        frozen,
 	}
 }
 

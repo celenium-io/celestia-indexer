@@ -16,7 +16,7 @@ import (
 func TestFrozenState_CachesOnceActive(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	state := mock.NewMockIState(ctrl)
-	f := newFrozenState(state, testIndexerName)
+	f := NewFrozenState(state, testIndexerName)
 
 	// before v11 the state is read on every call
 	state.EXPECT().
@@ -44,7 +44,7 @@ func TestFrozenState_CachesOnceActive(t *testing.T) {
 func TestFrozenState_Error(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	state := mock.NewMockIState(ctrl)
-	f := newFrozenState(state, testIndexerName)
+	f := NewFrozenState(state, testIndexerName)
 
 	state.EXPECT().
 		ByName(gomock.Any(), testIndexerName).

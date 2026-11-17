@@ -84,12 +84,12 @@ func (s *AddressTestSuite) SetupSuite() {
 	s.votes = mock.NewMockIVote(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
 	s.blocks = mock.NewMockIBlock(s.ctrl)
-	s.handler = NewAddressHandler(s.address, s.blocks, s.txs, s.blobLogs, s.messages, s.delegations, s.undelegations, s.redelegations, s.vestings, s.grants, s.celestials, s.votes, s.state, testIndexerName)
+	s.handler = NewAddressHandler(s.address, s.blocks, s.txs, s.blobLogs, s.messages, s.delegations, s.undelegations, s.redelegations, s.vestings, s.grants, s.celestials, s.votes, s.state, testIndexerName, NewFrozenState(s.state, testIndexerName))
 }
 
 // SetupTest drops the frozen-state cache so every test sets its own state.
 func (s *AddressTestSuite) SetupTest() {
-	s.handler.frozen = newFrozenState(s.state, testIndexerName)
+	s.handler.frozen = NewFrozenState(s.state, testIndexerName)
 }
 
 // TearDownSuite -
@@ -164,7 +164,7 @@ func (s *AddressTestSuite) TestGetFrozen() {
 		{name: "whitehat of another chain", address: testWhitehatAddress, chainId: "celestia", version: 11},
 	} {
 		s.Run(tt.name, func() {
-			s.handler.frozen = newFrozenState(s.state, testIndexerName)
+			s.handler.frozen = NewFrozenState(s.state, testIndexerName)
 
 			_, hash, err := pkgTypes.Address(tt.address).Decode()
 			s.Require().NoError(err)

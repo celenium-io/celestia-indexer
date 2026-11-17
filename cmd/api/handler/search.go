@@ -36,7 +36,7 @@ type SearchHandler struct {
 	rollup     storage.IRollup
 	celestials celestials.ICelestial
 	locator    geo.ILocator
-	frozen     *frozenState
+	frozen     *FrozenState
 }
 
 func NewSearchHandler(
@@ -47,10 +47,9 @@ func NewSearchHandler(
 	namespace storage.INamespace,
 	validator storage.IValidator,
 	rollup storage.IRollup,
-	state storage.IState,
 	celestials celestials.ICelestial,
 	locator geo.ILocator,
-	indexerName string,
+	frozen *FrozenState,
 ) SearchHandler {
 	return SearchHandler{
 		search:     search,
@@ -62,7 +61,7 @@ func NewSearchHandler(
 		rollup:     rollup,
 		celestials: celestials,
 		locator:    locator,
-		frozen:     newFrozenState(state, indexerName),
+		frozen:     frozen,
 	}
 }
 
@@ -264,7 +263,11 @@ func (handler SearchHandler) searchText(ctx context.Context, text string) ([]res
 		return nil, err
 	}
 
-	response := make([]responses.SearchItem, len(result))
+	var (
+		response        = make([]responses.SearchItem, len(result))
+		chainId         string
+		chainIdResolved bool
+	)
 	for i := range result {
 		response[i].Type = result[i].Type
 		switch response[i].Type {
@@ -291,9 +294,12 @@ func (handler SearchHandler) searchText(ctx context.Context, text string) ([]res
 			if err != nil {
 				return nil, err
 			}
-			chainId, err := handler.frozen.activeChainId(ctx)
-			if err != nil {
-				return nil, err
+			if !chainIdResolved {
+				chainId, err = handler.frozen.activeChainId(ctx)
+				if err != nil {
+					return nil, err
+				}
+				chainIdResolved = true
 			}
 			addr := responses.NewAddress(*address, chainId)
 

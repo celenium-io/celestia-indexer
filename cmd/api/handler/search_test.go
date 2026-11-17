@@ -58,12 +58,12 @@ func (s *SearchTestSuite) SetupSuite() {
 	s.rollup = mock.NewMockIRollup(s.ctrl)
 	s.celestial = celestialMock.NewMockICelestial(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
-	s.handler = NewSearchHandler(s.search, s.address, s.block, s.tx, s.namespace, s.validator, s.rollup, s.state, s.celestial, geo.Noop{}, testIndexerName)
+	s.handler = NewSearchHandler(s.search, s.address, s.block, s.tx, s.namespace, s.validator, s.rollup, s.celestial, geo.Noop{}, NewFrozenState(s.state, testIndexerName))
 }
 
 // SetupTest drops the frozen-state cache so every test sets its own state.
 func (s *SearchTestSuite) SetupTest() {
-	s.handler.frozen = newFrozenState(s.state, testIndexerName)
+	s.handler.frozen = NewFrozenState(s.state, testIndexerName)
 }
 
 // TearDownSuite -
