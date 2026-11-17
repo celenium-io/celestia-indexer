@@ -12,7 +12,7 @@ import (
 	decodeContext "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/node/types"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
-	fibreTypes "github.com/celestiaorg/celestia-app/v10/x/fibre/types"
+	fibreTypes "github.com/celestiaorg/celestia-app/v11/x/fibre/types"
 	"github.com/pkg/errors"
 )
 

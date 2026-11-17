@@ -6,11 +6,13 @@ package storage
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	decodeContext "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	fibreTypes "github.com/celestiaorg/celestia-app/v10/x/fibre/types"
+	"github.com/celestiaorg/celestia-app/v11/pkg/appconsts"
+	fibreTypes "github.com/celestiaorg/celestia-app/v11/x/fibre/types"
 	sdkStorage "github.com/dipdup-net/indexer-sdk/pkg/storage"
 	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/pkg/errors"
@@ -54,6 +56,8 @@ func upgrade(
 			if err := seedFibreParams(ctx, repos, decodeContext); err != nil {
 				return errors.Wrap(err, "failed to seed fibre params")
 			}
+		case 11:
+			upgradeV11(decodeContext)
 		case 4:
 			if err := upgradeV4(ctx, decodeContext, repos.Constants); err != nil {
 				return err
@@ -81,8 +85,26 @@ func seedFibreParams(
 		return nil
 	}
 
-	decodeContext.AddFibreParams(fibreTypes.DefaultParams())
+	// v10 app defaults, pinned: fibreTypes.DefaultParams follows the latest app version.
+	decodeContext.AddFibreParams(fibreTypes.Params{
+		WithdrawalDelay:            24 * time.Hour,
+		PaymentPromiseTimeout:      time.Hour,
+		PaymentPromiseHeightWindow: 1000,
+		ShardRetention:             4 * time.Hour,
+		FullStakeStorageBudget:     2 << 40, // 2 TiB
+	})
 	return nil
+}
+
+// upgradeV11: the upgrade handler sets corto's unbonding time without an event;
+// the frozen-account rules of v11 change no state.
+func upgradeV11(decodeContext *decodeContext.Context) {
+	if decodeContext.Block == nil || decodeContext.Block.ChainId != appconsts.CortoChainID {
+		return
+	}
+	// 10 minutes in ns, pinned: appconsts.CortoUnbondingTime follows the latest app version.
+	const unbondingTime = "600000000000"
+	decodeContext.AddConstant(types.ModuleNameStaking, "unbonding_time", unbondingTime)
 }
 
 func upgradeV7(

@@ -7,7 +7,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
-	valaddrTypes "github.com/celestiaorg/celestia-app/v10/x/valaddr/types"
+	valaddrTypes "github.com/celestiaorg/celestia-app/v11/x/valaddr/types"
 )
 
 // MsgSetFibreProviderInfo advertises the host a validator serves fibre shards

@@ -340,3 +340,32 @@ func TestUpgrade_V10ChainsThroughEarlierVersions(t *testing.T) {
 	require.Equal(t, "0.600000000000000000", got["max_commission_rate"])
 	require.Contains(t, got, "withdrawal_delay")
 }
+
+// TestUpgrade_V11 checks that v11 halts nothing and only sets corto's unbonding time.
+func TestUpgrade_V11(t *testing.T) {
+	tests := []struct {
+		chainId string
+		want    map[string]string
+	}{
+		{chainId: "corto-1", want: map[string]string{"unbonding_time": "600000000000"}},
+		{chainId: "mocha-5", want: map[string]string{}},
+		{chainId: "celestia", want: map[string]string{}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.chainId, func(t *testing.T) {
+
+			dCtx := decodeContext.NewContext()
+			dCtx.Block = &storage.Block{ChainId: tt.chainId}
+
+			err := upgrade(t.Context(), storage.TxRepos{}, dCtx, 10, 11)
+			require.NoError(t, err)
+
+			got := make(map[string]string)
+			for c := range dCtx.Constants.AllValues() {
+				require.Equal(t, storageTypes.ModuleNameStaking, c.Module)
+				got[c.Name] = c.Value
+			}
+			require.Equal(t, tt.want, got)
+		})
+	}
+}

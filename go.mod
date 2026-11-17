@@ -14,7 +14,7 @@ require (
 	github.com/bcp-innovations/hyperlane-cosmos v1.2.0
 	github.com/bytedance/sonic v1.15.5
 	github.com/celenium-io/celestial-module v0.0.12
-	github.com/celestiaorg/celestia-app/v10 v10.5.0
+	github.com/celestiaorg/celestia-app/v11 v11.0.0-mocha
 	github.com/celestiaorg/go-square/v4 v4.3.0
 	github.com/celestiaorg/rsmt2d v0.15.3
 	github.com/cometbft/cometbft v1.0.1
@@ -368,9 +368,10 @@ replace (
 	cosmossdk.io/x/evidence => github.com/celestiaorg/cosmos-sdk/x/evidence v0.1.2-celestia
 	cosmossdk.io/x/tx => github.com/celestiaorg/cosmos-sdk/x/tx v0.13.9
 	cosmossdk.io/x/upgrade => github.com/celestiaorg/cosmos-sdk/x/upgrade v0.2.0
-	github.com/bcp-innovations/hyperlane-cosmos => github.com/celestiaorg/hyperlane-cosmos v1.3.1
-	github.com/cometbft/cometbft => github.com/celestiaorg/celestia-core v0.42.7
+	github.com/bcp-innovations/hyperlane-cosmos => github.com/celestiaorg/hyperlane-cosmos v1.3.3
+	github.com/cometbft/cometbft => github.com/celestiaorg/celestia-core v0.42.8
 	github.com/cosmos/cosmos-sdk => github.com/celestiaorg/cosmos-sdk v0.52.12
+	github.com/cosmos/ibc-go/modules/capability => github.com/celestiaorg/ibc-go/modules/capability v1.0.2
 	github.com/cosmos/ibc-go/v8 => github.com/celestiaorg/ibc-go/v8 v8.7.2
 	github.com/cosmos/ledger-cosmos-go => github.com/cosmos/ledger-cosmos-go v0.16.0
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
