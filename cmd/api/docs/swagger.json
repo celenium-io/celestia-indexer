@@ -9358,6 +9358,14 @@
                     "type": "boolean",
                     "example": true
                 },
+                "is_frozen": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "is_whitehat": {
+                    "type": "boolean",
+                    "example": false
+                },
                 "last_height": {
                     "type": "integer",
                     "format": "int64",

@@ -10,7 +10,7 @@ import (
 	"cosmossdk.io/math"
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode"
-	blobTypes "github.com/celestiaorg/celestia-app/v10/x/blob/types"
+	blobTypes "github.com/celestiaorg/celestia-app/v11/x/blob/types"
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	codecTypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/types"

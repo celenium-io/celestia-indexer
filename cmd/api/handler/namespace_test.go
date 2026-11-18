@@ -14,7 +14,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/celestiaorg/celestia-app/v10/pkg/proof"
+	"github.com/celestiaorg/celestia-app/v11/pkg/proof"
 
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	sdk "github.com/dipdup-net/indexer-sdk/pkg/storage"

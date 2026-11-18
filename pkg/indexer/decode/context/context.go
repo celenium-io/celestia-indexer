@@ -15,7 +15,7 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
-	fibreTypes "github.com/celestiaorg/celestia-app/v10/x/fibre/types"
+	fibreTypes "github.com/celestiaorg/celestia-app/v11/x/fibre/types"
 	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/pkg/errors"
 )

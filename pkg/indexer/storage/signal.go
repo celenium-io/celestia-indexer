@@ -11,8 +11,8 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage/types"
 	decodeContext "github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
-	"github.com/celestiaorg/celestia-app/v10/pkg/appconsts"
-	"github.com/celestiaorg/celestia-app/v10/x/signal"
+	"github.com/celestiaorg/celestia-app/v11/pkg/appconsts"
+	"github.com/celestiaorg/celestia-app/v11/x/signal"
 	sdkSync "github.com/dipdup-net/indexer-sdk/pkg/sync"
 	"github.com/pkg/errors"
 )

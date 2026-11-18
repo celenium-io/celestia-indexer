@@ -36,8 +36,12 @@ var (
 		TotalNamespaces: 123,
 		TotalBlobsSize:  1000,
 	}
-	testAddress     = "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
-	testHashAddress = []byte{0x96, 0xa, 0xa0, 0x36, 0x6b, 0x25, 0x4e, 0x1e, 0xa7, 0x9b, 0xda, 0x46, 0x7e, 0xb3, 0xaa, 0x5c, 0x97, 0xcb, 0xa5, 0xae}
+	testAddress = "celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60"
+	// listed in celestia-app app/frozen/addresses/mocha-5.txt
+	testFrozenAddress = "celestia1kuzawt83w7uxtf5uthv9lssrt8fk7y09sqfucf"
+	// frozen.MochaWhitehat
+	testWhitehatAddress = "celestia1xk4tasrhcr3w6jyq4xzd8x6aapv9hmfuh8mcxn"
+	testHashAddress     = []byte{0x96, 0xa, 0xa0, 0x36, 0x6b, 0x25, 0x4e, 0x1e, 0xa7, 0x9b, 0xda, 0x46, 0x7e, 0xb3, 0xaa, 0x5c, 0x97, 0xcb, 0xa5, 0xae}
 )
 
 // AddressTestSuite -
@@ -80,7 +84,12 @@ func (s *AddressTestSuite) SetupSuite() {
 	s.votes = mock.NewMockIVote(s.ctrl)
 	s.state = mock.NewMockIState(s.ctrl)
 	s.blocks = mock.NewMockIBlock(s.ctrl)
-	s.handler = NewAddressHandler(s.address, s.blocks, s.txs, s.blobLogs, s.messages, s.delegations, s.undelegations, s.redelegations, s.vestings, s.grants, s.celestials, s.votes, s.state, testIndexerName)
+	s.handler = NewAddressHandler(s.address, s.blocks, s.txs, s.blobLogs, s.messages, s.delegations, s.undelegations, s.redelegations, s.vestings, s.grants, s.celestials, s.votes, s.state, testIndexerName, NewFrozenState(s.state, testIndexerName))
+}
+
+// SetupTest drops the frozen-state cache so every test sets its own state.
+func (s *AddressTestSuite) SetupTest() {
+	s.handler.frozen = NewFrozenState(s.state, testIndexerName)
 }
 
 // TearDownSuite -
@@ -115,6 +124,11 @@ func (s *AddressTestSuite) TestGet() {
 		}, nil).
 		Times(1)
 
+	s.state.EXPECT().
+		ByName(gomock.Any(), testIndexerName).
+		Return(testState, nil).
+		Times(1)
+
 	s.Require().NoError(s.handler.Get(c))
 	s.Require().Equal(http.StatusOK, rec.Code)
 
@@ -128,6 +142,62 @@ func (s *AddressTestSuite) TestGet() {
 	s.Require().NotNil(address.Celestials)
 	s.Require().EqualValues("name", address.Celestials.Name)
 	s.Require().EqualValues("image", address.Celestials.ImageUrl)
+	s.Require().False(address.IsFrozen)
+	s.Require().False(address.IsWhitehat)
+}
+
+func (s *AddressTestSuite) TestGetFrozen() {
+	for _, tt := range []struct {
+		name     string
+		address  string
+		chainId  string
+		version  uint64
+		frozen   bool
+		whitehat bool
+	}{
+		{name: "listed, v11", address: testFrozenAddress, chainId: "mocha-5", version: 11, frozen: true},
+		{name: "listed, before v11", address: testFrozenAddress, chainId: "mocha-5", version: 10},
+		{name: "listed on another chain", address: testFrozenAddress, chainId: "celestia", version: 11},
+		{name: "not listed", address: testAddress, chainId: "mocha-5", version: 11},
+		{name: "whitehat, v11", address: testWhitehatAddress, chainId: "mocha-5", version: 11, whitehat: true},
+		{name: "whitehat, before v11", address: testWhitehatAddress, chainId: "mocha-5", version: 10},
+		{name: "whitehat of another chain", address: testWhitehatAddress, chainId: "celestia", version: 11},
+	} {
+		s.Run(tt.name, func() {
+			s.handler.frozen = NewFrozenState(s.state, testIndexerName)
+
+			_, hash, err := pkgTypes.Address(tt.address).Decode()
+			s.Require().NoError(err)
+
+			req := httptest.NewRequestWithContext(s.T().Context(), http.MethodGet, "/", nil)
+			rec := httptest.NewRecorder()
+			c := s.echo.NewContext(req, rec)
+			c.SetPath("/address/:hash")
+			c.SetParamNames("hash")
+			c.SetParamValues(tt.address)
+
+			s.address.EXPECT().
+				ByHash(gomock.Any(), hash).
+				Return(storage.Address{Id: 1, Hash: hash, Address: tt.address}, nil).
+				Times(1)
+
+			state := testState
+			state.ChainId = tt.chainId
+			state.Version = tt.version
+			s.state.EXPECT().
+				ByName(gomock.Any(), testIndexerName).
+				Return(state, nil).
+				Times(1)
+
+			s.Require().NoError(s.handler.Get(c))
+			s.Require().Equal(http.StatusOK, rec.Code)
+
+			var address responses.Address
+			s.Require().NoError(json.NewDecoder(rec.Body).Decode(&address))
+			s.Require().Equal(tt.frozen, address.IsFrozen)
+			s.Require().Equal(tt.whitehat, address.IsWhitehat)
+		})
+	}
 }
 
 func (s *AddressTestSuite) TestGetInvalidAddress() {
@@ -195,6 +265,11 @@ func (s *AddressTestSuite) TestList() {
 				},
 			},
 		}, nil)
+
+	s.state.EXPECT().
+		ByName(gomock.Any(), testIndexerName).
+		Return(testState, nil).
+		Times(1)
 
 	s.Require().NoError(s.handler.List(c))
 	s.Require().Equal(http.StatusOK, rec.Code)

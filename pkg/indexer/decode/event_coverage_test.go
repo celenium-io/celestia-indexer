@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
-	_ "github.com/celestiaorg/celestia-app/v10/app"
+	_ "github.com/celestiaorg/celestia-app/v11/app"
 	"github.com/cosmos/gogoproto/proto"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/reflect/protoreflect"

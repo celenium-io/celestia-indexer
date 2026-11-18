@@ -19,7 +19,7 @@ import (
 	storageTypes "github.com/celenium-io/celestia-indexer/internal/storage/types"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/context"
 	"github.com/celenium-io/celestia-indexer/pkg/indexer/decode/decoder"
-	blobTypes "github.com/celestiaorg/celestia-app/v10/x/blob/types"
+	blobTypes "github.com/celestiaorg/celestia-app/v11/x/blob/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	distributionTypes "github.com/cosmos/cosmos-sdk/x/distribution/types"

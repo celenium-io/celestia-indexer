@@ -36,6 +36,7 @@ type SearchHandler struct {
 	rollup     storage.IRollup
 	celestials celestials.ICelestial
 	locator    geo.ILocator
+	frozen     *FrozenState
 }
 
 func NewSearchHandler(
@@ -48,6 +49,7 @@ func NewSearchHandler(
 	rollup storage.IRollup,
 	celestials celestials.ICelestial,
 	locator geo.ILocator,
+	frozen *FrozenState,
 ) SearchHandler {
 	return SearchHandler{
 		search:     search,
@@ -59,6 +61,7 @@ func NewSearchHandler(
 		rollup:     rollup,
 		celestials: celestials,
 		locator:    locator,
+		frozen:     frozen,
 	}
 }
 
@@ -141,10 +144,14 @@ func (handler SearchHandler) searchAddress(ctx context.Context, search string) (
 	if err != nil {
 		return nil, err
 	}
+	chainId, err := handler.frozen.activeChainId(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	result := responses.SearchItem{
 		Type:   searchTypeAddress,
-		Result: responses.NewAddress(address),
+		Result: responses.NewAddress(address, chainId),
 	}
 	return []responses.SearchItem{result}, nil
 }
@@ -159,6 +166,10 @@ func (handler SearchHandler) searchValoperAddress(ctx context.Context, search st
 	if err != nil {
 		return nil, err
 	}
+	chainId, err := handler.frozen.activeChainId(ctx)
+	if err != nil {
+		return nil, err
+	}
 	validator, err := handler.validator.ByAddress(ctx, search)
 	if err != nil {
 		return nil, err
@@ -170,7 +181,7 @@ func (handler SearchHandler) searchValoperAddress(ctx context.Context, search st
 			Result: newValidatorResponse(validator, handler.locator),
 		}, {
 			Type:   searchTypeAddress,
-			Result: responses.NewAddress(address),
+			Result: responses.NewAddress(address, chainId),
 		},
 	}, nil
 }
@@ -252,7 +263,11 @@ func (handler SearchHandler) searchText(ctx context.Context, text string) ([]res
 		return nil, err
 	}
 
-	response := make([]responses.SearchItem, len(result))
+	var (
+		response        = make([]responses.SearchItem, len(result))
+		chainId         string
+		chainIdResolved bool
+	)
 	for i := range result {
 		response[i].Type = result[i].Type
 		switch response[i].Type {
@@ -279,7 +294,14 @@ func (handler SearchHandler) searchText(ctx context.Context, text string) ([]res
 			if err != nil {
 				return nil, err
 			}
-			addr := responses.NewAddress(*address)
+			if !chainIdResolved {
+				chainId, err = handler.frozen.activeChainId(ctx)
+				if err != nil {
+					return nil, err
+				}
+				chainIdResolved = true
+			}
+			addr := responses.NewAddress(*address, chainId)
 
 			celestial, err := handler.celestials.ById(ctx, result[i].Value)
 			if err != nil {

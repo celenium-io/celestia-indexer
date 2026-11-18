@@ -7,7 +7,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/celestiaorg/celestia-app/v10/pkg/appconsts"
+	"github.com/celestiaorg/celestia-app/v11/pkg/appconsts"
 	"github.com/pkg/errors"
 	"github.com/uptrace/bun"
 )

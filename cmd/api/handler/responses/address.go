@@ -7,6 +7,8 @@ import (
 	"github.com/celenium-io/celestia-indexer/internal/storage"
 	pkgTypes "github.com/celenium-io/celestia-indexer/pkg/types"
 	celestials "github.com/celenium-io/celestial-module/pkg/storage"
+	"github.com/celestiaorg/celestia-app/v11/app/frozen"
+	"github.com/celestiaorg/celestia-app/v11/pkg/appconsts"
 )
 
 // Address model info
@@ -19,12 +21,24 @@ type Address struct {
 	Hash         string         `example:"celestia1jc92qdnty48pafummfr8ava2tjtuhfdw774w60" json:"hash"           swaggertype:"string"`
 	Name         string         `example:"bonded_tokens_pool"                              json:"name,omitempty" swaggertype:"string"`
 	IsForwarding bool           `example:"true"                                            json:"is_forwarding"  swaggertype:"boolean"`
+	IsFrozen     bool           `example:"true"                                            json:"is_frozen"      swaggertype:"boolean"`
+	IsWhitehat   bool           `example:"false"                                           json:"is_whitehat"    swaggertype:"boolean"`
 	Balance      Balance        `json:"balance"`
 
 	Celestials *Celestial `json:"celestials,omitempty"`
 }
 
-func NewAddress(addr storage.Address) Address {
+var frozenRules = frozen.NewRules(nil, nil)
+
+// whitehats mirrors the unexported per-chain map in app/frozen.
+var whitehats = map[string]string{
+	appconsts.MainnetChainID: frozen.MainnetWhitehat,
+	appconsts.MochaChainID:   frozen.MochaWhitehat,
+	appconsts.CortoChainID:   frozen.CortoWhitehat,
+}
+
+// NewAddress marks frozen and whitehat accounts of chainId; an empty chainId means the rules are not active yet.
+func NewAddress(addr storage.Address, chainId string) Address {
 	address := Address{
 		Id:           addr.Id,
 		Height:       addr.Height,
@@ -32,6 +46,8 @@ func NewAddress(addr storage.Address) Address {
 		Hash:         addr.Address,
 		Name:         addr.Name,
 		IsForwarding: addr.IsForwarding,
+		IsFrozen:     frozenRules.Has(chainId, addr.Hash),
+		IsWhitehat:   chainId != "" && whitehats[chainId] == addr.Address,
 	}
 	if addr.DefaultBalance != nil {
 		address.Balance = NewBalance(*addr.DefaultBalance)

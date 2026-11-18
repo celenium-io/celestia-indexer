@@ -8,9 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/celestiaorg/celestia-app/v10/app"
-	"github.com/celestiaorg/celestia-app/v10/app/encoding"
-	fibreTypes "github.com/celestiaorg/celestia-app/v10/x/fibre/types"
+	"github.com/celestiaorg/celestia-app/v11/app"
+	"github.com/celestiaorg/celestia-app/v11/app/encoding"
+	fibreTypes "github.com/celestiaorg/celestia-app/v11/x/fibre/types"
 	"github.com/stretchr/testify/require"
 )
 
